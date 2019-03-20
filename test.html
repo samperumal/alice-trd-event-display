@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css"> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.js"></script>
+    <script src="data.js"></script>
+</head>
+
+<body>
+    <script>
+        function DetectorToStack(detector) { return Math.floor((detector % 30) / 6); } // convert detector (=chamber) number 0-539 to local stack index 0-4
+        function DetectorToLayer(detector) { return detector % 6; } // convert detector (=chamber) number 0-539 to local layer 0-5
+        function DetectorToLinearStackIndex(detector) { return Math.floor(detector / 6); } // convert TRD detector/chamber 0-539 index to linear stack index 0-89
+        function DetectorToSector(detector) { return Math.floor(DetectorToLinearStackIndex(detector) / 5); } // convert linear stack index 0-89 to TRD sector 0-17
+
+        function getTrdTracks(data) {
+            return data.map(d => d.TRDTracks)
+                .reduce((a, b) => a.concat(b), [])
+                .map(d => ({
+                    Stack: d.Stack,
+                    Sector: d.Sector,
+                    Tracklets: d.TrdTracklets.map(t => ({
+                        Stack: DetectorToStack(t.Detector),
+                        Sector: DetectorToSector(t.Detector),
+                        Layer: DetectorToLayer(t.Detector),
+                        Chamber: t.HCId % 2,
+                        Detector: t.Detector,
+                        HCId: t.HCId,
+                    }))
+                }));
+        }
+    </script>
+    <script>
+        const data = getData();
+        const allTracklets = data.map(d => d.TRDTracklets).reduce((a, b) => a.concat(b), []);
+        const pids = Array.from(new Set(allTracklets.map(d => d.PID))).sort();
+        const detectors = Array.from(new Set(allTracklets.map(d => d.Detector))).sort();
+        const hcid = [...new Set(allTracklets.map(d => d.HCId))].sort();
+
+        const trdTracks = getTrdTracks(data);
+        console.log(trdTracks[0]);
+
+    </script>
+</body>
+
+</html>
