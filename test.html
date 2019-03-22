@@ -15,7 +15,17 @@
             stroke: none;
         }
 
-        .SSC-LinearStack.hit {
+        .SSC-LinearStack.SSC-hit {
+            fill: red;
+            stroke: black;
+        }
+
+        .SLC-Supermodule {
+            fill: lightslategray;
+            stroke: none;
+        }
+
+        .SLC-Supermodule.SLC-hit {
             fill: red;
             stroke: black;
         }
@@ -27,7 +37,7 @@
         <svg id="stackSector" width="200px">
 
         </svg>
-        <svg id="sectorLayer">
+        <svg id="sectorLayer" width="400px">
 
         </svg>
     </div>
@@ -51,30 +61,41 @@
     </script>
     <script>
         // Data conversions
+        function parseTrdTracklet(t) {
+            return {
+                Stack: DetectorToStack(t.Detector),
+                Sector: DetectorToSector(t.Detector),
+                Layer: DetectorToLayer(t.Detector),
+                LinearStackIndex: DetectorToLinearStackIndex(t.Detector),
+                Chamber: t.HCId % 2,
+                Detector: t.Detector,
+                HCId: t.HCId,
+            };
+        }
+        function parseTrdTrack(d) {
+            return {
+                Stack: d.Stack,
+                Sector: d.Sector,
+                LinearStackIndex: StackSectorToLinearStackIndex(d.Sector, d.Stack),
+                Tracklets: d.TrdTracklets.map(parseTrdTracklet)
+            };
+        }
         function getTrdTracks(event) {
-            return event.TRDTracks
-                .map(d => ({
-                    Stack: d.Stack,
-                    Sector: d.Sector,
-                    LinearStackIndex: StackSectorToLinearStackIndex(d.Sector, d.Stack),
-                    Tracklets: d.TrdTracklets.map(t => ({
-                        Stack: DetectorToStack(t.Detector),
-                        Sector: DetectorToSector(t.Detector),
-                        Layer: DetectorToLayer(t.Detector),
-                        LinearStackIndex: DetectorToLinearStackIndex(t.Detector),
-                        Chamber: t.HCId % 2,
-                        Detector: t.Detector,
-                        HCId: t.HCId,
-                    }))
-                }));
+            return event.TRDTracks.map(parseTrdTrack);
         }
     </script>
     <script>
         // D3 components
-        class StackSectorComponent {
-            constructor(width, height, parent) {
+        class BaseComponent {
+            constructor(width, height) {
                 this.height = height;
                 this.width = width;
+            }
+        }
+
+        class StackSectorComponent extends BaseComponent {
+            constructor(width, height, parent) {
+                super(width, height);
 
                 const componentWidth = this.componentWidth = this.width / nSTACKS;
                 const componentHeight = this.componentHeight = this.height / nSECTORS;
@@ -108,19 +129,63 @@
                 }
 
                 this.g.selectAll("g.SSC-LinearStack")
-                    .classed("hit", d => d.tracks.length > 0);
+                    .classed("SSC-hit", d => d.tracks.length > 0);
+            }
+        }
+
+        class SectorLayerComponent extends BaseComponent {
+            constructor(width, height, parent) {
+                super(width, height);
+
+                const componentWidth = this.componentWidth = this.width / nSTACKS;
+                const componentHeight = this.componentHeight = this.height / nSECTORS;
+
+                this.g = parent.append("g").attr("class", "stackSector");
+
+                this.sectorLayerData = d3.range(nSECTORS * nLAYERS)
+                    .map(d => ({
+                        index: d,
+                        sector: Math.floor(d / nLAYERS),
+                        layer: d % nLAYERS,
+                        tracks: []
+                    }));
+
+                this.sectorLayers = this.g.selectAll("g.SLC-Supermodule")
+                    .data(this.sectorLayerData)
+                    .enter()
+                    .append("g")
+                    .attr("class", "SLC-Supermodule")
+                    .attr("transform", d => "translate(" + (this.width / 2) + "," + (this.height / 2) + ")rotate(" + (-d.sector / nSECTORS * 360) + ")");
+
+                this.sectorLayers.append("circle")
+                    .attr("cx", d => (height / 10) * (3 * d.layer / nLAYERS + 2))
+                    .attr("cy", 0)
+                    .attr("r", 5);
+            }
+
+            draw(event) {
+                const trdTracklets = event.TRDTracklets.map(parseTrdTracklet);
+
+                for (const sld of this.sectorLayerData)
+                    sld.tracks = [];
+
+                for (const trdTracklet of trdTracklets) {
+                    this.sectorLayerData[trdTracklet.Sector * nLAYERS + trdTracklet.Layer].tracks.push(trdTracklet);
+                }
+
+                this.g.selectAll("g.SLC-Supermodule")
+                    .classed("SLC-hit", d => d.tracks.length > 0);
             }
         }
     </script>
     <script>
         // Event Display
-        const stackSector = new StackSectorComponent(200, 200, d3.select("#stackSector").attr("viewBox", "0 0 200 200"));
-        //const sectorLayer = new SectorLayer(200, 200, d3.select("#stackSector").attr("viewBox", "0 0 200 200"));
+        const stackSector = new StackSectorComponent(100, 200, d3.select("#stackSector").attr("viewBox", "0 0 100 200"));
+        const sectorLayer = new SectorLayerComponent(200, 200, d3.select("#sectorLayer").attr("viewBox", "0 0 200 200"));
         const data = getData();
-        const trdTracks = getTrdTracks(data[0]);
 
-        stackSector.draw(data[0]);        
-        //sectorLayer.draw(data[0]);
+        stackSector.draw(data[0]);
+        sectorLayer.draw(data[0]);
     </script>
 </body>
 
