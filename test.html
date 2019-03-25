@@ -93,7 +93,7 @@
             };
         }
         function getTrdTracks(event) {
-            return event.TRDTracks.map(parseTrdTrack);
+            return event.TrdTracks.map(parseTrdTrack);
         }
     </script>
     <script>
@@ -181,11 +181,6 @@
                     .attr("class", "SLC-Supermodule ")
                     .attr("transform", d => "translate(" + (this.width / 2) + "," + (this.height / 2) + ")rotate(" + (-10 - d.sector / nSECTORS * 360) + ")");
 
-                // this.sectorLayers.append("circle")
-                //     .attr("cx", d => (height / 10) * (3 * d.layer / nLAYERS + 2))  
-                //     .attr("cy", 0)
-                //     .attr("r", 5);
-
                 this.sectorLayers.append("rect")
                     .attr("x", d => d.x)
                     .attr("y", d => d.y)
@@ -210,29 +205,40 @@
     </script>
     <script>
         // JSTree conversion functions
-        function trdTrackletToJseTreeNode(t) {
+        function trdTrackletToJseTreeNode(parentId, t) {
             return {
-                id: t.Ref,
-                text: "Tracklet " + t.Id
+                id: parentId + "_L" + t.Ref,
+                text: "Tracklet " + t.Id,
+                data: t,
+                type: "TrdTracklet"
             };
         }
 
-        function trdTrackToJSTreeNode(t) {
+        function trdTrackToJSTreeNode(parentId, t) {
             return {
-                id: t.Ref,
+                id: parentId + "_T" + t.Ref,
                 text: "TrdTrack " + t.Id,
-                children: t.TrdTracklets.map(trdTrackletToJseTreeNode)
+                data: t,
+                type: "TrdTrack",
+                children: t.TrdTracklets.map(tlt => trdTrackletToJseTreeNode(parentId + "_T" + t.Ref, tlt))
             };
         }
+
         function eventToJSTreeNode(e) {
             return {
-                id: e.Event,
+                id: "E" + e.Ref,
                 text: "Event " + e.Event,
+                type: "Event",
+                data: e,
+                state: {
+                    opened: true,
+                },
                 children:
-                    e.TRDTracks.map(trdTrackToJSTreeNode)
+                    e.TrdTracks.map(tr => trdTrackToJSTreeNode("E" + e.Event, tr))
                         .concat([{
+                            id: "E" + e.Ref + "_CTracklets",
                             text: "Tracklets",
-                            children: e.TRDTracklets.map(trdTrackletToJseTreeNode)
+                            children: e.TrdTracklets.map(tlt => trdTrackletToJseTreeNode("E" + e.Event, tlt))
                         }])
             };
         }
@@ -243,18 +249,29 @@
         const sectorLayer = new SectorLayerComponent(200, 200, d3.select("#sectorLayer").attr("viewBox", "0 0 200 200"));
         const data = getData();
 
-        stackSector.draw(data[0]);
-        sectorLayer.draw(data[0]);
+        // stackSector.draw(data[0]);
+        // sectorLayer.draw(data[0]);
 
-        $("#dataTree").jstree({
-            'core': {
-                'themes': {
-                    'name': 'proton',
-                    'responsive': true
-                },
-                'data': data.map(eventToJSTreeNode)
-            }
-        })
+        const treeData = data.map(eventToJSTreeNode);
+
+        $("#dataTree")
+            .on("hover_node.jstree", function (event, eventData) {
+                const ids = eventData.node.id.split("_").map(d => [d[0], d.slice(1)]);
+                if (ids.length == 1) {
+                    stackSector.draw(eventData.node.data);
+                }
+
+                console.log(ids);
+            })
+            .jstree({
+                'core': {
+                    'themes': {
+                        'name': 'proton',
+                        'responsive': true
+                    },
+                    'data': treeData
+                }
+            })
     </script>
 </body>
 
