@@ -15,13 +15,16 @@
     <script src="data.js"></script>
     <style>
         .SSC-LinearStack {
-            fill: lightslategray;
-            stroke: none;
+            fill: none;
+            stroke: black;
         }
 
         .SSC-LinearStack.SSC-hit {
+            fill: lightslategray;
+        }
+
+        .SSC-LinearStack.SSC-hit.SSC-selected {
             fill: red;
-            stroke: black;
         }
 
         .SLC-Supermodule {
@@ -89,6 +92,7 @@
                 Stack: d.Stack,
                 Sector: d.Sector,
                 LinearStackIndex: StackSectorToLinearStackIndex(d.Sector, d.Stack),
+                Index: d.index,
                 Tracklets: d.TrdTracklets.map(parseTrdTracklet)
             };
         }
@@ -115,7 +119,7 @@
                 this.g = parent.append("g").attr("class", "stackSector");
 
                 this.linearStackData = d3.range(nLINEARSTACKS)
-                    .map(d => ({ index: d, tracks: [] }));
+                    .map(d => ({ index: d, selected: false, tracks: [] }));
 
                 this.linearStacks = this.g.selectAll("g.SSC-LinearStack")
                     .data(this.linearStackData)
@@ -130,18 +134,23 @@
                     .attr("r", Math.min(componentWidth, componentHeight) * 1 / 3);
             }
 
-            draw(event) {
+            draw(event, selectedTrdTrack) {
                 const trdTracks = getTrdTracks(event);
 
-                for (const lsd of this.linearStackData)
+                for (const lsd of this.linearStackData) {
                     lsd.tracks = [];
+                    lsd.selected = false;
+                }
 
                 for (const trdTrack of trdTracks) {
                     this.linearStackData[trdTrack.LinearStackIndex].tracks.push(trdTrack);
+                    if (selectedTrdTrack != null && trdTrack.Index == selectedTrdTrack.index)
+                        this.linearStackData[trdTrack.LinearStackIndex].selected = true;
                 }
 
                 this.g.selectAll("g.SSC-LinearStack")
-                    .classed("SSC-hit", d => d.tracks.length > 0);
+                    .classed("SSC-hit", d => d.tracks.length > 0)
+                    .classed("SSC-selected", d => d.selected);
             }
         }
 
@@ -207,7 +216,7 @@
         // JSTree conversion functions
         function trdTrackletToJseTreeNode(parentId, t) {
             return {
-                id: parentId + "_L" + t.Ref,
+                id: parentId + "_L" + t.index,
                 text: "Tracklet " + t.Id,
                 data: t,
                 type: "TrdTracklet"
@@ -216,29 +225,30 @@
 
         function trdTrackToJSTreeNode(parentId, t) {
             return {
-                id: parentId + "_T" + t.Ref,
+                id: parentId + "_T" + t.index,
                 text: "TrdTrack " + t.Id,
                 data: t,
                 type: "TrdTrack",
-                children: t.TrdTracklets.map(tlt => trdTrackletToJseTreeNode(parentId + "_T" + t.Ref, tlt))
+                children: t.TrdTracklets.map(tlt => trdTrackletToJseTreeNode(parentId + "_T" + t.index, tlt))
             };
         }
 
-        function eventToJSTreeNode(e) {
+        function eventToJSTreeNode(e, index) {
+            const id = "E" + index;
             return {
-                id: "E" + e.Ref,
+                id: id,
                 text: "Event " + e.Event,
                 type: "Event",
                 data: e,
                 state: {
-                    opened: true,
+                    opened: false,
                 },
                 children:
-                    e.TrdTracks.map(tr => trdTrackToJSTreeNode("E" + e.Event, tr))
+                    e.TrdTracks.map(tr => trdTrackToJSTreeNode(id, tr))
                         .concat([{
-                            id: "E" + e.Ref + "_CTracklets",
+                            id: id + "_CTracklets",
                             text: "Tracklets",
-                            children: e.TrdTracklets.map(tlt => trdTrackletToJseTreeNode("E" + e.Event, tlt))
+                            children: e.TrdTracklets.map(tlt => trdTrackletToJseTreeNode(id, tlt))
                         }])
             };
         }
@@ -248,6 +258,22 @@
         const stackSector = new StackSectorComponent(100, 200, d3.select("#stackSector").attr("viewBox", "0 0 100 200"));
         const sectorLayer = new SectorLayerComponent(200, 200, d3.select("#sectorLayer").attr("viewBox", "0 0 200 200"));
         const data = getData();
+        //const trdTracks = data.map(e => e.TrdTracks).concat((a,b) => a.concat(b));
+        for (const event of data) {
+            for (let index = 0; index < event.TrdTracklets.length; index++) {
+                event.TrdTracklets[index].index = index;
+            }
+
+            for (let trdTrackIndex = 0; trdTrackIndex < event.TrdTracks.length; trdTrackIndex++) {
+                event.TrdTracks[trdTrackIndex].index = trdTrackIndex;
+
+                for (const trackTracklet of event.TrdTracks[trdTrackIndex].TrdTracklets) {
+                    for (const trdTracklet of event.TrdTracklets)
+                        if (trdTracklet.Ref === trackTracklet.Ref)
+                            trackTracklet.index = trdTracklet.index;
+                }
+            }
+        }
 
         // stackSector.draw(data[0]);
         // sectorLayer.draw(data[0]);
@@ -257,11 +283,22 @@
         $("#dataTree")
             .on("hover_node.jstree", function (event, eventData) {
                 const ids = eventData.node.id.split("_").map(d => [d[0], d.slice(1)]);
-                if (ids.length == 1) {
-                    stackSector.draw(eventData.node.data);
+                var event = null, trdTrack = null;
+                for (const id of ids) {
+                    const prefix = id[0];
+                    const index = id[1];
+                    console.log(prefix, index);
+                    if (prefix == "E")
+                        event = data[+index];
+
+                    if (prefix == "T" && event != null)
+                        trdTrack = event.TrdTracks[+index];
                 }
 
-                console.log(ids);
+                if (event != null)
+                    stackSector.draw(event, trdTrack);
+
+                //console.log(ids);
             })
             .jstree({
                 'core': {
