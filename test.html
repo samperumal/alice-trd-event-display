@@ -39,6 +39,19 @@
         .SLC-Supermodule.SLC-hit.SLC-selected {
             fill: red;
         }
+
+        .STLC-roc {
+            stroke: black;
+            fill: none;
+        }
+
+        .STLC-roc.STLC-hit {
+            fill: lightslategray;
+        }
+
+        .STLC-roc.STLC-hit.STLC-selected {
+            fill: red;
+        }
     </style>
 </head>
 
@@ -56,6 +69,11 @@
     </div>
     <div style="display: inline-block;">
         <svg id="sectorLayer" width="400px">
+
+        </svg>
+    </div>
+    <div style="display: inline-block;">
+        <svg id="stackLayer" width="400px">
 
         </svg>
     </div>
@@ -221,6 +239,87 @@
                     .classed("SLC-selected", d => d.selected);
             }
         }
+
+        const STACK_LAYER_WIDTHS = [
+            [110, 85, 60, 85, 110],
+            [100, 80, 60, 80, 100],
+            [90, 75, 60, 75, 90],
+            [80, 70, 60, 70, 80],
+            [70, 65, 60, 65, 70],
+            [70, 65, 60, 65, 70],
+        ];
+
+        class StackLayerComponent extends BaseComponent {
+            constructor(width, height, parent) {
+                super(width, height);
+
+                const componentWidth = this.componentWidth = this.width / nSTACKS;
+                const componentHeight = this.componentHeight = this.height / nLAYERS;
+
+                const layerHeight = 30;
+
+                this.g = parent.append("g").attr("class", "stackLayer");
+
+                this.stackLayerData = d3.range(nSTACKS * nLAYERS)
+                    .map(d => {
+                        const layer = d % nLAYERS;
+                        const stack = Math.floor(d / nLAYERS);
+                        let x = -STACK_LAYER_WIDTHS[layer].reduce((a, b) => a + b) / 2;
+
+                        let stackIndex = 0, width = 0;
+                        while (stackIndex < stack)
+                            x += STACK_LAYER_WIDTHS[layer][stackIndex++];
+                        width = STACK_LAYER_WIDTHS[layer][stackIndex];
+
+                        return {
+                            index: d,
+                            stack: stack,
+                            layer: layer,
+                            x: x,
+                            y: (layer - 3) * layerHeight,
+                            width: width,
+                            height: layerHeight,
+                            tracks: [],
+                            selected: false
+                        };
+                    });
+
+                this.stackLayers = this.g.selectAll("g.STLC-roc")
+                    .data(this.stackLayerData)
+                    .enter()
+                    .append("g")
+                    .attr("class", "STLC-roc")
+                    .attr("transform", d => "translate(" + (this.width / 2) + "," + (this.height / 2) + ")");
+
+                this.stackLayers.append("rect")
+                    .attr("x", d => d.x)
+                    .attr("y", d => d.y)
+                    .attr("width", d => d.width)
+                    .attr("height", d => d.height);
+            }
+
+            draw(event, selectedTracklets) {
+                const trdTracklets = event.TrdTracklets.map(parseTrdTracklet);
+
+                for (const sld of this.stackLayerData) {
+                    sld.tracks = [];
+                    sld.selected = false;
+                }
+
+                for (const trdTracklet of trdTracklets) {
+                    const sld = this.stackLayerData[trdTracklet.Stack * nSTACKS + trdTracklet.Layer];
+                    sld.tracks.push(trdTracklet);
+                    for (const selTracklet of selectedTracklets)
+                        if (trdTracklet.Index == selTracklet.index)
+                            sld.selected = true;
+                }
+
+                this.g.selectAll("g.STLC-roc")
+                    .classed("STLC-hit", d => d.tracks.length > 0)
+                    .classed("STLC-selected", d => d.selected);
+            }
+        }
+
     </script>
     <script>
         // JSTree conversion functions
@@ -265,10 +364,14 @@
     </script>
     <script>
         // Event Display
-        const stackSector = new StackSectorComponent(100, 200, d3.select("#stackSector").attr("viewBox", "0 0 100 200"));
-        const sectorLayer = new SectorLayerComponent(200, 200, d3.select("#sectorLayer").attr("viewBox", "0 0 200 200"));
+        const stackSector = new StackSectorComponent(100, 200, d3.select("#stackSector")
+            .attr("viewBox", "0 0 100 200"));
+        const sectorLayer = new SectorLayerComponent(200, 200, d3.select("#sectorLayer")
+            .attr("viewBox", "0 0 200 200"));
+        const stackLayer = new StackLayerComponent(600, 300, d3.select("#stackLayer")
+            .attr("viewBox", "0 0 600 300").attr("style", "border: 1px solid black"));
         const data = getData();
-        
+
         for (const event of data) {
             for (let index = 0; index < event.TrdTracklets.length; index++) {
                 event.TrdTracklets[index].index = index;
@@ -285,39 +388,37 @@
             }
         }
 
-        // stackSector.draw(data[0]);
-        // sectorLayer.draw(data[0]);
-
         const treeData = data.map(eventToJSTreeNode);
 
+        function treeSelect(event, eventData) {
+            const ids = eventData.node.id.split("_").map(d => [d[0], d.slice(1)]);
+            var event = null, trdTrack = null, trdTracklets = [];
+            for (const id of ids) {
+                const prefix = id[0];
+                const index = id[1];
+                //console.log(prefix, index);
+                if (prefix == "E")
+                    event = data[+index];
+
+                if (prefix == "T" && event != null) {
+                    trdTrack = event.TrdTracks[+index];
+                    trdTracklets = trdTrack.TrdTracklets;
+                }
+
+                if (prefix == "L" && event != null) {
+                    trdTracklets = [event.TrdTracklets[+index]];
+                }
+            }
+
+            if (event != null) {
+                stackSector.draw(event, trdTrack);
+                sectorLayer.draw(event, trdTracklets);
+                stackLayer.draw(event, trdTracklets);
+            }
+        }
+
         $("#dataTree")
-            .on("hover_node.jstree", function (event, eventData) {
-                const ids = eventData.node.id.split("_").map(d => [d[0], d.slice(1)]);
-                var event = null, trdTrack = null, trdTracklets = [];
-                for (const id of ids) {
-                    const prefix = id[0];
-                    const index = id[1];
-                    //console.log(prefix, index);
-                    if (prefix == "E")
-                        event = data[+index];
-
-                    if (prefix == "T" && event != null) {
-                        trdTrack = event.TrdTracks[+index];
-                        trdTracklets = trdTrack.TrdTracklets;
-                    }
-
-                    if (prefix == "L" && event != null) {
-                        trdTracklets = [event.TrdTracklets[+index]];
-                    }
-                }
-
-                if (event != null) {
-                    stackSector.draw(event, trdTrack);
-                    sectorLayer.draw(event, trdTracklets);
-                }
-
-                //console.log(ids);
-            })
+            .on("hover_node.jstree", treeSelect)
             .jstree({
                 'core': {
                     'themes': {
