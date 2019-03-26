@@ -113,7 +113,7 @@
             return {
                 Stack: d.Stack,
                 Sector: d.Sector,
-                LinearStackIndex: StackSectorToLinearStackIndex(d.Sector, d.Stack),
+                LinearStackIndex: StackSectorToLinearStackIndex(d.Stack, d.Sector),
                 Index: d.index,
                 Tracklets: d.TrdTracklets.map(parseTrdTracklet)
             };
