@@ -56,7 +56,7 @@
             fill: red;
         }
 
-        .SLC-sector-index {            
+        .SLC-sector-index {
             text-anchor: start;
             dominant-baseline: central;
             font-size: xx-small;
@@ -68,7 +68,7 @@
             stroke: black;
         }
 
-        .SLC-supermodule-header {            
+        .SLC-supermodule-header {
             text-anchor: middle;
             dominant-baseline: central;
         }
@@ -93,6 +93,11 @@
         .STLC-roc.STLC-hit.STLC-selected {
             fill: red;
         }
+
+        path.TP {
+            stroke: black;
+            fill: none;
+        }
     </style>
 </head>
 
@@ -103,20 +108,32 @@
         </div>
 
     </div>
-    <div style="display: inline-block;">
-        <svg id="stackSector" width="200px">
 
-        </svg>
-    </div>
-    <div style="display: inline-block;">
-        <svg id="sectorLayer" width="400px">
+    <div style="display:inline-block;">
+        <div>
+            <div style="display: inline-block;">
+                <svg id="stackSector" height="200px">
 
-        </svg>
-    </div>
-    <div style="display: inline-block;">
-        <svg id="stackLayer" width="400px">
+                </svg>
+            </div>
+            <div style="display: inline-block;">
+                <svg id="sectorLayer" width="200px">
 
-        </svg>
+                </svg>
+            </div>
+            <div style="display: inline-block;">
+                <svg id="stackLayer" width="200px" height="200px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+            </div>
+        </div>
+        <div>
+            <div style="display: inline-block;">
+                <svg id="trackPath" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+            </div>
+        </div>
     </div>
     <script>
         // Constants
@@ -417,6 +434,54 @@
             }
         }
 
+        class TrackPathComponent extends BaseComponent {
+            constructor(width, height, parent) {
+                super(width, height);
+
+                this.g = parent.append("g").attr("class", "trackPath")
+                    .attr("transform", "translate(" + this.width / 2 + "," + this.height / 2 + ")");
+
+                const minDim = 0.9 * Math.min(this.width, this.height) / 2;
+
+                this.xscale = d3.scaleLinear()
+                    .range([-minDim, minDim])
+                    .domain([-370, 370]);
+
+                this.yscale = d3.scaleLinear()
+                    .range([minDim, -minDim])
+                    .domain([-370, 370]);
+
+                this.xaxis = d3.axisBottom(this.xscale);
+                this.yaxis = d3.axisLeft(this.yscale);
+
+                this.g.append("g")
+                    .attr("class", "x-axis")
+                    .call(this.xaxis);
+
+                this.g.append("g")
+                    .attr("class", "y-axis")
+                    .call(this.yaxis);
+
+                this.paths = this.g.append("g")
+                    .attr("class", "paths");
+            }
+            
+            draw(event, selectedTracklets) {
+                const trackPaths = event.TrdTracks.filter(d => d.TrackMatch != null).map(d => d.TrackMatch);
+                const line = d3.line().x(d => d[0]).y(d => d[1]);
+                
+                const selection = this.paths.selectAll("path.TP")
+                    .data(trackPaths)
+                    .join(
+                        enter => enter.append("path").attr("class", "TP"),
+                        null,
+                        exit => exit.remove()
+                    )
+                    .attr("data-track-ref", d => d.Ref)
+                    .attr("d", d => line(d.Path))
+                    ;
+            }
+        }
     </script>
     <script>
         // JSTree conversion functions
@@ -467,6 +532,8 @@
             .attr("viewBox", "0 0 250 250"));
         const stackLayer = new StackLayerComponent(600, 300, d3.select("#stackLayer")
             .attr("viewBox", "0 0 600 300"));
+        const trackPath = new TrackPathComponent(300, 300, d3.select("#trackPath")
+            .attr("viewBox", "0 0 300 300"));
         const data = getData();
 
         for (const event of data) {
@@ -511,6 +578,7 @@
                 stackSector.draw(event, trdTrack);
                 sectorLayer.draw(event, trdTracklets);
                 stackLayer.draw(event, trdTracklets);
+                trackPath.draw(event);
             }
         }
 
