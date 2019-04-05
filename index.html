@@ -106,6 +106,11 @@
             fill: none;
             stroke-dasharray: none;
         }
+
+        path.TPR-detector {
+            stroke: none;
+            fill: lightblue;
+        }
     </style>
 </head>
 
@@ -138,6 +143,11 @@
         <div>
             <div style="display: inline-block;">
                 <svg id="trackPathXY" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+            </div>
+            <div style="display: inline-block;">
+                <svg id="trackPathZR" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
 
                 </svg>
             </div>
@@ -453,14 +463,14 @@
         }
 
         class TrackPathComponent extends BaseComponent {
-            constructor(width, height, parent, xlab, ylab, horixIndex, vertIndex, xsign = 1, ysign = 1) {
+            constructor(width, height, parent, xlab, ylab, xSel, ySel, xsign = 1, ysign = 1) {
                 super(width, height);
 
-                this.horixIndex = horixIndex;
-                this.vertIndex = vertIndex;
-
-                this.g = parent.append("g").attr("class", "trackPath")
+                this.container = parent.append("g").attr("class", "trackPath")
                     .attr("transform", "translate(" + this.width / 2 + "," + this.height / 2 + ")");
+
+                this.background = this.container.append("g");
+                this.g = this.container.append("g");
 
                 const minDim = 0.9 * Math.min(this.width, this.height) / 2;
 
@@ -472,7 +482,7 @@
                     .range([minDim * ysign, -minDim * ysign])
                     .domain([-370, 370]);
 
-                this.line = d3.line().x(d => xscale(d[horixIndex])).y(d => yscale(d[vertIndex]));
+                this.line = d3.line().x(d => xscale(xSel(d))).y(d => yscale(ySel(d)));
 
                 this.xaxis = d3.axisBottom(this.xscale);
                 this.yaxis = d3.axisLeft(this.yscale);
@@ -516,6 +526,25 @@
                     .attr("d", d => line(d.TrackMatch.Path))
                     .classed("TP-selected", d => selectedTrack != null && d.index == selectedTrack.index)
                     ;
+            }
+        }
+
+        class TrackPathRadialComponent extends TrackPathComponent {
+            constructor(width, height, parent, xlab, ylab, xSel, ySel, xsign = 1, ysign = 1) {
+                super(width, height, parent, xlab, ylab, xSel, ySel, xsign, ysign);
+
+                const xscale = this.xscale, yscale = this.yscale;
+                const detectorPoints = [
+                    [-301, 368],
+                    [301, 368],
+                    [301, 290],
+                    [-301, 290],
+                    [-301, 368]
+                ].map(d => [xscale(d[0]), yscale(d[1])]);
+
+                this.background.append("path")
+                    .attr("class", "TPR-detector")
+                    .attr("d", d3.line()(detectorPoints));
             }
         }
     </script>
@@ -569,11 +598,13 @@
         const stackLayer = new StackLayerComponent(600, 300, d3.select("#stackLayer")
             .attr("viewBox", "0 0 600 300"));
         const trackPathXY = new TrackPathComponent(300, 300, d3.select("#trackPathXY")
-            .attr("viewBox", "0 0 300 300"), "X", "Y", 0, 1);
+            .attr("viewBox", "0 0 300 300"), "X", "Y", d => d[0], d => d[1]);
+        const trackPathZR = new TrackPathRadialComponent(300, 300, d3.select("#trackPathZR")
+            .attr("viewBox", "0 0 300 300"), "Z", "R", d => d[2], d => Math.sqrt(Math.pow(d[1], 2) + Math.pow(d[0], 2)), -1, 1);
         const trackPathZY = new TrackPathComponent(300, 300, d3.select("#trackPathZY")
-            .attr("viewBox", "0 0 300 300"), "Z", "Y", 2, 1, -1, 1);
+            .attr("viewBox", "0 0 300 300"), "Z", "Y", d => d[2], d => d[1], -1, 1);
         const trackPathZX = new TrackPathComponent(300, 300, d3.select("#trackPathZX")
-            .attr("viewBox", "0 0 300 300"), "Z", "X", 2, 0, -1, 1);
+            .attr("viewBox", "0 0 300 300"), "Z", "X", d => d[2], d => d[0], -1, 1);
         const data = getData();
 
         for (const event of data) {
@@ -619,6 +650,7 @@
                 sectorLayer.draw(event, trdTracklets);
                 stackLayer.draw(event, trdTracklets);
                 trackPathXY.draw(event, trdTrack);
+                trackPathZR.draw(event, trdTrack);
                 trackPathZY.draw(event, trdTrack);
                 trackPathZX.draw(event, trdTrack);
             }
