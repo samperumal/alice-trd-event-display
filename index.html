@@ -101,7 +101,7 @@
 
         path.TP.TP-selected {
             stroke: red;
-            stroke-width: 2px;
+            stroke-width: 4px;
             fill: none;
         }
     </style>
@@ -135,7 +135,17 @@
         </div>
         <div>
             <div style="display: inline-block;">
-                <svg id="trackPath" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+                <svg id="trackPathXY" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+            </div>
+            <div style="display: inline-block;">
+                <svg id="trackPathZY" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+            </div>
+            <div style="display: inline-block;">
+                <svg id="trackPathXZ" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
 
                 </svg>
             </div>
@@ -441,21 +451,26 @@
         }
 
         class TrackPathComponent extends BaseComponent {
-            constructor(width, height, parent) {
+            constructor(width, height, parent, xlab, ylab, horixIndex, vertIndex, xsign = 1, ysign = 1) {
                 super(width, height);
+
+                this.horixIndex = horixIndex;
+                this.vertIndex = vertIndex;
 
                 this.g = parent.append("g").attr("class", "trackPath")
                     .attr("transform", "translate(" + this.width / 2 + "," + this.height / 2 + ")");
 
                 const minDim = 0.9 * Math.min(this.width, this.height) / 2;
 
-                this.xscale = d3.scaleLinear()
+                const xscale = this.xscale = d3.scaleLinear()
+                    .range([-minDim, minDim])
+                    .domain([-370, 370]);
+
+                const yscale = this.yscale = d3.scaleLinear()
                     .range([minDim, -minDim])
                     .domain([-370, 370]);
 
-                this.yscale = d3.scaleLinear()
-                    .range([-minDim, minDim])
-                    .domain([-370, 370]);
+                this.line = d3.line().x(d => xscale(d[horixIndex]) * xsign).y(d => yscale(d[vertIndex]) * ysign);
 
                 this.xaxis = d3.axisBottom(this.xscale);
                 this.yaxis = d3.axisLeft(this.yscale);
@@ -471,12 +486,11 @@
                 this.paths = this.g.append("g")
                     .attr("class", "paths");
             }
-            
+
             draw(event, selectedTrack) {
                 const trackPaths = event.TrdTracks.filter(d => d.TrackMatch != null && d.TrackMatch.Path != null);
-                const line = d3.line().x(d => d[0]).y(d => d[1]);
-                console.log(trackPaths);
-                
+                const line = this.line;
+
                 const selection = this.paths.selectAll("path.TP")
                     .data(trackPaths)
                     .join(
@@ -540,8 +554,12 @@
             .attr("viewBox", "0 0 250 250"));
         const stackLayer = new StackLayerComponent(600, 300, d3.select("#stackLayer")
             .attr("viewBox", "0 0 600 300"));
-        const trackPath = new TrackPathComponent(300, 300, d3.select("#trackPath")
-            .attr("viewBox", "0 0 300 300"));
+        const trackPathXY = new TrackPathComponent(300, 300, d3.select("#trackPathXY")
+            .attr("viewBox", "0 0 300 300"), "X", "Y", 0, 1);
+        const trackPathZY = new TrackPathComponent(300, 300, d3.select("#trackPathZY")
+            .attr("viewBox", "0 0 300 300"), "Z", "Y", 2, 1, -1, 1);
+        const trackPathXZ = new TrackPathComponent(300, 300, d3.select("#trackPathXZ")
+            .attr("viewBox", "0 0 300 300"), "X", "Z", 0, 2, 1, 1);
         const data = getData();
 
         for (const event of data) {
@@ -586,7 +604,9 @@
                 stackSector.draw(event, trdTrack);
                 sectorLayer.draw(event, trdTracklets);
                 stackLayer.draw(event, trdTracklets);
-                trackPath.draw(event, trdTrack);
+                trackPathXY.draw(event, trdTrack);
+                trackPathZY.draw(event, trdTrack);
+                trackPathXZ.draw(event, trdTrack);
             }
         }
 
