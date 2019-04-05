@@ -488,11 +488,11 @@
 
                 const xscale = this.xscale = d3.scaleLinear()
                     .range([-minDim * xsign, minDim * xsign])
-                    .domain([-370, 370]);
+                    .domain([-400, 400]);
 
                 const yscale = this.yscale = d3.scaleLinear()
                     .range([minDim * ysign, -minDim * ysign])
-                    .domain([-370, 370]);
+                    .domain([-400, 400]);
 
                 this.line = d3.line().x(d => xscale(xSel(d))).y(d => yscale(ySel(d)));
 
