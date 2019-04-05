@@ -487,16 +487,16 @@
                     .attr("class", "paths");
 
                 this.g.append("text")
-                    .attr("class", "x-label")
+                    .attr("class", "y-label")
                     .attr("y", this.yscale.range()[1])
                     .attr("x", 10)
-                    .text(xlab);
+                    .text(ylab);
 
                 this.g.append("text")
-                    .attr("class", "y-label")
+                    .attr("class", "x-label")
                     .attr("x", this.xscale.range()[1])
                     .attr("y", -10)
-                    .text(ylab);
+                    .text(xlab);
             }
 
             draw(event, selectedTrack) {
