@@ -95,7 +95,13 @@
         }
 
         path.TP {
-            stroke: black;
+            stroke: darkgray;
+            fill: none;
+        }
+
+        path.TP.TP-selected {
+            stroke: red;
+            stroke-width: 2px;
             fill: none;
         }
     </style>
@@ -444,11 +450,11 @@
                 const minDim = 0.9 * Math.min(this.width, this.height) / 2;
 
                 this.xscale = d3.scaleLinear()
-                    .range([-minDim, minDim])
+                    .range([minDim, -minDim])
                     .domain([-370, 370]);
 
                 this.yscale = d3.scaleLinear()
-                    .range([minDim, -minDim])
+                    .range([-minDim, minDim])
                     .domain([-370, 370]);
 
                 this.xaxis = d3.axisBottom(this.xscale);
@@ -466,9 +472,10 @@
                     .attr("class", "paths");
             }
             
-            draw(event, selectedTracklets) {
-                const trackPaths = event.TrdTracks.filter(d => d.TrackMatch != null).map(d => d.TrackMatch);
+            draw(event, selectedTrack) {
+                const trackPaths = event.TrdTracks.filter(d => d.TrackMatch != null && d.TrackMatch.Path != null);
                 const line = d3.line().x(d => d[0]).y(d => d[1]);
+                console.log(trackPaths);
                 
                 const selection = this.paths.selectAll("path.TP")
                     .data(trackPaths)
@@ -478,7 +485,8 @@
                         exit => exit.remove()
                     )
                     .attr("data-track-ref", d => d.Ref)
-                    .attr("d", d => line(d.Path))
+                    .attr("d", d => line(d.TrackMatch.Path))
+                    .classed("TP-selected", d => selectedTrack != null && d.index == selectedTrack.index)
                     ;
             }
         }
@@ -578,7 +586,7 @@
                 stackSector.draw(event, trdTrack);
                 sectorLayer.draw(event, trdTracklets);
                 stackLayer.draw(event, trdTracklets);
-                trackPath.draw(event);
+                trackPath.draw(event, trdTrack);
             }
         }
 
