@@ -108,8 +108,18 @@
         }
 
         path.TPR-detector {
-            stroke: none;
+            stroke: black;
             fill: lightblue;
+        }
+
+        circle.TPA-detector-outer {
+            stroke: black;
+            fill: lightblue;
+        }
+
+        circle.TPA-detector-inner {
+            stroke: black;
+            fill: white;
         }
     </style>
 </head>
@@ -151,6 +161,8 @@
 
                 </svg>
             </div>
+        </div>
+        <div>
             <div style="display: inline-block;">
                 <svg id="trackPathZY" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
 
@@ -529,6 +541,22 @@
             }
         }
 
+        class TrackPathXYComponent extends TrackPathComponent {
+            constructor(width, height, parent, xlab, ylab, xSel, ySel, xsign = 1, ysign = 1) {
+                super(width, height, parent, xlab, ylab, xSel, ySel, xsign, ysign);
+
+                const xscale = this.xscale, yscale = this.yscale;
+
+                this.background.append("circle")
+                    .attr("class", "TPA-detector-outer")
+                    .attr("r", xscale(368));
+
+                this.background.append("circle")
+                    .attr("class", "TPA-detector-inner")
+                    .attr("r", xscale(290));
+            }
+        }
+
         class TrackPathRadialComponent extends TrackPathComponent {
             constructor(width, height, parent, xlab, ylab, xSel, ySel, xsign = 1, ysign = 1) {
                 super(width, height, parent, xlab, ylab, xSel, ySel, xsign, ysign);
@@ -597,7 +625,7 @@
             .attr("viewBox", "0 0 250 250"));
         const stackLayer = new StackLayerComponent(600, 300, d3.select("#stackLayer")
             .attr("viewBox", "0 0 600 300"));
-        const trackPathXY = new TrackPathComponent(300, 300, d3.select("#trackPathXY")
+        const trackPathXY = new TrackPathXYComponent(300, 300, d3.select("#trackPathXY")
             .attr("viewBox", "0 0 300 300"), "X", "Y", d => d[0], d => d[1]);
         const trackPathZR = new TrackPathRadialComponent(300, 300, d3.select("#trackPathZR")
             .attr("viewBox", "0 0 300 300"), "Z", "R", d => d[2], d => Math.sqrt(Math.pow(d[1], 2) + Math.pow(d[0], 2)), -1, 1);
