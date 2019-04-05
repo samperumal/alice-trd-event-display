@@ -27,6 +27,7 @@
             text-anchor: middle;
             dominant-baseline: central;
             font-size: xx-small;
+            fill: #555;
         }
 
         .SSC-sector-text {
@@ -39,6 +40,7 @@
             text-anchor: middle;
             dominant-baseline: central;
             font-size: xx-small;
+            fill: #555;
         }
 
         .SSC-LinearStack {
@@ -54,9 +56,21 @@
             fill: red;
         }
 
+        .SLC-sector-index {            
+            text-anchor: start;
+            dominant-baseline: central;
+            font-size: xx-small;
+            fill: #555;
+        }
+
         .SLC-Supermodule {
             fill: none;
             stroke: black;
+        }
+
+        .SLC-supermodule-header {            
+            text-anchor: middle;
+            dominant-baseline: central;
         }
 
         .SLC-Supermodule.SLC-hit {
@@ -253,7 +267,14 @@
                 const minRadius = 30;
                 const layerHeight = 10;
 
-                this.g = parent.append("g").attr("class", "stackSector");
+                parent.append("text")
+                    .text("Supermodules")
+                    .attr("class", "SLC-supermodule-header")
+                    .attr("x", this.width / 2)
+                    .attr("y", 15);
+
+                this.g = parent.append("g").attr("class", "stackSector")
+                    .attr("transform", "translate(15,30)");
 
                 this.sectorLayerData = d3.range(nSECTORS * nLAYERS)
                     .map(d => {
@@ -277,6 +298,15 @@
                     .append("g")
                     .attr("class", "SLC-Supermodule ")
                     .attr("transform", d => "translate(" + (this.width / 2) + "," + (this.height / 2) + ")rotate(" + (-10 - d.sector / nSECTORS * 360) + ")");
+
+                this.g.selectAll("text.SLC-sector-index")
+                    .data(d3.range(nSECTORS))
+                    .enter()
+                    .append("text")
+                    .attr("class", "SLC-sector-index")
+                    .text(d => d)
+                    .attr("x", minRadius + (layerHeight + 0.5) * nLAYERS)
+                    .attr("transform", d => "translate(" + (this.width / 2) + "," + (this.height / 2) + ")rotate(" + (-10 - d / nSECTORS * 360) + ")");
 
                 this.sectorLayers.append("rect")
                     .attr("x", d => d.x)
@@ -434,7 +464,7 @@
         const stackSector = new StackSectorComponent(100, 200, d3.select("#stackSector")
             .attr("viewBox", "0 0 100 200"));
         const sectorLayer = new SectorLayerComponent(200, 200, d3.select("#sectorLayer")
-            .attr("viewBox", "0 0 200 200"));
+            .attr("viewBox", "0 0 250 250"));
         const stackLayer = new StackLayerComponent(600, 300, d3.select("#stackLayer")
             .attr("viewBox", "0 0 600 300"));
         const data = getData();
