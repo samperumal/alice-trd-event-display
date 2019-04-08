@@ -183,7 +183,7 @@
                 <svg id="trackPathZAzi" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
 
                 </svg>
-        </div>
+            </div>
             <div class="component">
                 <p>Z-Polar projection</p>
                 <svg id="trackPathZPolar" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
@@ -506,7 +506,7 @@
         }
 
         class TrackPathComponent extends BaseComponent {
-            constructor(width, height, parent, xlab, ylab, xSel, ySel, xsign = 1, ysign = 1) {
+            constructor(width, height, parent, xlab, ylab, xSel, ySel, xsign = 1, ysign = 1, xmax = 400, ymax = 400) {
                 super(width, height);
 
                 this.container = parent.append("g").attr("class", "trackPath")
@@ -519,11 +519,11 @@
 
                 const xscale = this.xscale = d3.scaleLinear()
                     .range([-minDim * xsign, minDim * xsign])
-                    .domain([-400, 400]);
+                    .domain([-xmax, xmax]);
 
                 const yscale = this.yscale = d3.scaleLinear()
                     .range([minDim * ysign, -minDim * ysign])
-                    .domain([-400, 400]);
+                    .domain([-ymax, ymax]);
 
                 this.line = d3.line().x(d => xscale(xSel(d))).y(d => yscale(ySel(d)));
 
@@ -589,8 +589,8 @@
         }
 
         class TrackPathRadialComponent extends TrackPathComponent {
-            constructor(width, height, parent, xlab, ylab, xSel, ySel, xsign = 1, ysign = 1) {
-                super(width, height, parent, xlab, ylab, xSel, ySel, xsign, ysign);
+            constructor(width, height, parent, xlab, ylab, xSel, ySel, xsign = 1, ysign = 1, xmax, ymax) {
+                super(width, height, parent, xlab, ylab, xSel, ySel, xsign, ysign, xmax, ymax);
 
                 const xscale = this.xscale, yscale = this.yscale;
                 const detectorPoints = [
@@ -649,6 +649,18 @@
         }
     </script>
     <script>
+        function r(xyz) {
+            return Math.sqrt(Math.pow(xyz[0], 2) + Math.pow(xyz[1], 2) + Math.pow(xyz[2], 2));
+        }
+
+        function polar(xyz) {
+            return Math.acos(xyz[2] / r(xyz));
+        }
+
+        function azimuth(xyz) {
+            return Math.atan2(xyz[1], xyz[0]);
+        }
+
         // Event Display
         const stackSector = new StackSectorComponent(100, 200, d3.select("#stackSector")
             .attr("viewBox", "0 0 100 200"));
@@ -660,6 +672,10 @@
             .attr("viewBox", "0 0 300 300"), "X", "Y", d => d[0], d => d[1]);
         const trackPathZR = new TrackPathRadialComponent(300, 300, d3.select("#trackPathZR")
             .attr("viewBox", "0 0 300 300"), "Z", "R", d => d[2], d => Math.sqrt(Math.pow(d[1], 2) + Math.pow(d[0], 2)), -1, 1);
+        const trackPathZAzi = new TrackPathRadialComponent(300, 300, d3.select("#trackPathZAzi")
+            .attr("viewBox", "0 0 300 300"), "Z", "Azimuth", d => d[2], azimuth, -1, 1, 400, Math.PI);
+        const trackPathZPolar = new TrackPathRadialComponent(300, 300, d3.select("#trackPathZPolar")
+            .attr("viewBox", "0 0 300 300"), "Z", "Polar", d => d[2], polar, -1, 1, 400, Math.PI);
         const trackPathZY = new TrackPathComponent(300, 300, d3.select("#trackPathZY")
             .attr("viewBox", "0 0 300 300"), "Z", "Y", d => d[2], d => d[1], -1, 1);
         const trackPathZX = new TrackPathComponent(300, 300, d3.select("#trackPathZX")
@@ -710,6 +726,8 @@
                 stackLayer.draw(event, trdTracklets);
                 trackPathXY.draw(event, trdTrack);
                 trackPathZR.draw(event, trdTrack);
+                trackPathZAzi.draw(event, trdTrack);
+                trackPathZPolar.draw(event, trdTrack);
                 trackPathZY.draw(event, trdTrack);
                 trackPathZX.draw(event, trdTrack);
             }
