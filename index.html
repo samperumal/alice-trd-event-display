@@ -93,6 +93,12 @@
             fill: red;
         }
 
+        .supermodule-xy-layer rect {
+            fill: none;
+            stroke: black;
+            shape-rendering: crispEdges;
+        }
+
         .STLC-roc {
             stroke: black;
             fill: none;
@@ -273,86 +279,6 @@
             }
         }
 
-        class CylinderComponent extends BaseComponent {
-            constructor(width, height, parent) {
-                const margin = { n: 30, s: 10, e: 30, w: 5 };
-                margin.vert = margin.n + margin.s;
-                margin.horiz = margin.e + margin.w;
-
-                super(width, height, margin);
-
-                const componentWidth = this.componentWidth = this.width / nSTACKS;
-                const componentHeight = this.componentHeight = this.height / nSECTORS;
-
-                this.componentg = parent.append("g").attr("class", "stackSector");
-
-                this.headerg = this.componentg.append("g");
-
-                this.headerg.append("text")
-                    .text("Stack")
-                    .attr("class", "SSC-stack-text")
-                    .attr("transform", "translate(" + (margin.e + this.width / 2) + "," + (margin.n / 3) + ")");
-
-                this.headerg.append("text")
-                    .text("Sector")
-                    .attr("class", "SSC-sector-text")
-                    .attr("transform", "translate(" + (margin.e / 3) + "," + (margin.n + this.height / 2) + ")rotate(-90)");
-
-                this.headerg.selectAll("text.SSC-stack-index")
-                    .data(d3.range(nSTACKS))
-                    .enter()
-                    .append("text")
-                    .attr("class", "SSC-stack-index")
-                    .text(d => d)
-                    .attr("transform", d => "translate(" + (margin.e + (d + 0.5) * componentWidth) + "," + (margin.n * 4 / 5) + ")");
-
-                this.headerg.selectAll("text.SSC-sector-index")
-                    .data(d3.range(nSECTORS))
-                    .enter()
-                    .append("text")
-                    .attr("class", "SSC-sector-index")
-                    .text(d => d)
-                    .attr("transform", d => "translate(" + (margin.e * 4 / 5) + "," + (margin.n + (d + 0.5) * componentHeight) + ")");
-
-                this.g = this.componentg.append("g")
-                    .attr("transform", "translate(" + margin.e + "," + margin.n + ")");
-
-                this.linearStackData = d3.range(nLINEARSTACKS)
-                    .map(d => ({ index: d, selected: false, tracks: [] }));
-
-                this.linearStacks = this.g.selectAll("g.SSC-LinearStack")
-                    .data(this.linearStackData)
-                    .enter()
-                    .append("g")
-                    .attr("class", "SSC-LinearStack")
-                    .attr("transform", d => "translate(" + ((d.index % nSTACKS) * componentWidth) + "," + (Math.floor(d.index / nSTACKS) * componentHeight) + ")");
-
-                this.linearStacks.append("circle")
-                    .attr("cx", componentWidth / 2)
-                    .attr("cy", componentHeight / 2)
-                    .attr("r", Math.min(componentWidth, componentHeight) * 1 / 3);
-            }
-
-            draw(event, selectedTrdTrack) {
-                const trdTracks = getTrdTracks(event);
-
-                for (const lsd of this.linearStackData) {
-                    lsd.tracks = [];
-                    lsd.selected = false;
-                }
-
-                for (const trdTrack of trdTracks) {
-                    this.linearStackData[trdTrack.LinearStackIndex].tracks.push(trdTrack);
-                    if (selectedTrdTrack != null && trdTrack.Index == selectedTrdTrack.index)
-                        this.linearStackData[trdTrack.LinearStackIndex].selected = true;
-                }
-
-                this.g.selectAll("g.SSC-LinearStack")
-                    .classed("SSC-hit", d => d.tracks.length > 0)
-                    .classed("SSC-selected", d => d.selected);
-            }
-        }
-
         class SectorXYComponent extends BaseComponent {
             constructor(width, height, parent) {
                 super(width, height);
@@ -510,6 +436,163 @@
                 this.g.selectAll("g.STLC-roc")
                     .classed("STLC-hit", d => d.tracks.length > 0)
                     .classed("STLC-selected", d => d.selected);
+            }
+        }
+
+        class SupermoduleXYPlaneComponent extends BaseComponent {
+            constructor(width, height, parent) {
+                const margin = {};
+                margin.vert = 2 * height / 10;
+                margin.horiz = 2 * width / 10;
+                margin.n = margin.s = margin.vert / 2;
+                margin.e = margin.w = margin.horiz / 2;
+
+                super(width, height, margin);
+
+                const MAX_RADIUS = 370; // cm
+                const MIN_RADIUS = 290; // cm
+                const MODULE_HEIGHT = MAX_RADIUS - MIN_RADIUS;
+                const LAYER_HEIGHT = MODULE_HEIGHT / nLAYERS;
+
+                this.layerData = d3.range(nLAYERS)
+                    .map(d => {
+                        const r = MIN_RADIUS + d * LAYER_HEIGHT;
+                        const chord = 2 * r * Math.sin((Math.PI * 20 / 180) / 2);
+                        return {
+                            index: d,
+                            x: -chord / 2,
+                            width: chord,
+                            y: r + LAYER_HEIGHT,
+                            height: LAYER_HEIGHT
+                        };
+                    }); console.log(this.layerData);
+
+                const yscale = this.yscale = d3.scaleLinear()
+                    .domain([MIN_RADIUS, MAX_RADIUS])
+                    .range([this.height, 0]);
+
+                const xscale = this.xscale = d3.scaleLinear()
+                    .domain([d3.min(this.layerData, d => d.x), 0])
+                    .range([0, this.width / 2]);
+
+                this.g = parent
+                    .attr("viewBox", "0 0 " + width + " " + height)
+                    .append("g")
+                    .attr("class", "supermodule-xy")                    
+                    .attr("transform", d => "translate(" + (margin.w) + "," + (margin.n) + ")");
+
+                this.layers = this.g.selectAll("g.supermodule-xy-layer")
+                    .data(this.layerData)
+                    .enter()
+                    .append("g")
+                    .attr("class", "supermodule-xy-layer");
+
+                this.layers.append("rect")
+                    .attr("x", d => xscale(d.x))
+                    .attr("y", d => yscale(d.y))
+                    .attr("width", d => (xscale(0) - xscale(d.x)) * 2)
+                    .attr("height", d => yscale(d.y) - yscale(d.y + LAYER_HEIGHT));
+            }
+
+            draw(event, selectedTracklets) {
+                // const trdTracklets = event.TrdTracklets.map(parseTrdTracklet);
+
+                // for (const sld of this.stackLayerData) {
+                //     sld.tracks = [];
+                //     sld.selected = false;
+                // }
+
+                // for (const trdTracklet of trdTracklets) {
+                //     const sld = this.stackLayerData[trdTracklet.Stack * nLAYERS + trdTracklet.Layer];
+                //     sld.tracks.push(trdTracklet);
+                //     for (const selTracklet of selectedTracklets)
+                //         if (trdTracklet.Index == selTracklet.index)
+                //             sld.selected = true;
+                // }
+
+                // this.g.selectAll("g.STLC-roc")
+                //     .classed("STLC-hit", d => d.tracks.length > 0)
+                //     .classed("STLC-selected", d => d.selected);
+            }
+        }
+
+        class CylinderComponent extends BaseComponent {
+            constructor(width, height, parent) {
+                const margin = { n: 30, s: 10, e: 30, w: 5 };
+                margin.vert = margin.n + margin.s;
+                margin.horiz = margin.e + margin.w;
+
+                super(width, height, margin);
+
+                const componentWidth = this.componentWidth = this.width / nSTACKS;
+                const componentHeight = this.componentHeight = this.height / nSECTORS;
+
+                this.componentg = parent.append("g").attr("class", "stackSector");
+
+                this.headerg = this.componentg.append("g");
+
+                this.headerg.append("text")
+                    .text("Stack")
+                    .attr("class", "SSC-stack-text")
+                    .attr("transform", "translate(" + (margin.e + this.width / 2) + "," + (margin.n / 3) + ")");
+
+                this.headerg.append("text")
+                    .text("Sector")
+                    .attr("class", "SSC-sector-text")
+                    .attr("transform", "translate(" + (margin.e / 3) + "," + (margin.n + this.height / 2) + ")rotate(-90)");
+
+                this.headerg.selectAll("text.SSC-stack-index")
+                    .data(d3.range(nSTACKS))
+                    .enter()
+                    .append("text")
+                    .attr("class", "SSC-stack-index")
+                    .text(d => d)
+                    .attr("transform", d => "translate(" + (margin.e + (d + 0.5) * componentWidth) + "," + (margin.n * 4 / 5) + ")");
+
+                this.headerg.selectAll("text.SSC-sector-index")
+                    .data(d3.range(nSECTORS))
+                    .enter()
+                    .append("text")
+                    .attr("class", "SSC-sector-index")
+                    .text(d => d)
+                    .attr("transform", d => "translate(" + (margin.e * 4 / 5) + "," + (margin.n + (d + 0.5) * componentHeight) + ")");
+
+                this.g = this.componentg.append("g")
+                    .attr("transform", "translate(" + margin.e + "," + margin.n + ")");
+
+                this.linearStackData = d3.range(nLINEARSTACKS)
+                    .map(d => ({ index: d, selected: false, tracks: [] }));
+
+                this.linearStacks = this.g.selectAll("g.SSC-LinearStack")
+                    .data(this.linearStackData)
+                    .enter()
+                    .append("g")
+                    .attr("class", "SSC-LinearStack")
+                    .attr("transform", d => "translate(" + ((d.index % nSTACKS) * componentWidth) + "," + (Math.floor(d.index / nSTACKS) * componentHeight) + ")");
+
+                this.linearStacks.append("circle")
+                    .attr("cx", componentWidth / 2)
+                    .attr("cy", componentHeight / 2)
+                    .attr("r", Math.min(componentWidth, componentHeight) * 1 / 3);
+            }
+
+            draw(event, selectedTrdTrack) {
+                const trdTracks = getTrdTracks(event);
+
+                for (const lsd of this.linearStackData) {
+                    lsd.tracks = [];
+                    lsd.selected = false;
+                }
+
+                for (const trdTrack of trdTracks) {
+                    this.linearStackData[trdTrack.LinearStackIndex].tracks.push(trdTrack);
+                    if (selectedTrdTrack != null && trdTrack.Index == selectedTrdTrack.index)
+                        this.linearStackData[trdTrack.LinearStackIndex].selected = true;
+                }
+
+                this.g.selectAll("g.SSC-LinearStack")
+                    .classed("SSC-hit", d => d.tracks.length > 0)
+                    .classed("SSC-selected", d => d.selected);
             }
         }
 
@@ -674,6 +757,8 @@
             .attr("viewBox", "0 0 250 250"));
         const stackLayer = new SupermoduleZAxisComponent(600, 300, d3.select("#supermoduleZ")
             .attr("viewBox", "0 0 600 300"));
+        const supermoduleXYPlane = new SupermoduleXYPlaneComponent(300, 300, d3.select("#supermoduleXY"));
+
         const stackSector = new CylinderComponent(100, 200, d3.select("#stackSector")
             .attr("viewBox", "0 0 100 200"));
         const trackPathXY = new TrackPathXYComponent(300, 300, d3.select("#trackPathXY")
