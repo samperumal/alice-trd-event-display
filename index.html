@@ -14,6 +14,18 @@
     <script src="jstree.min.js"></script>
     <script src="data.js"></script>
     <style>
+        div.component {
+            display: inline-block;
+            margin-right: 0.5em;
+            margin-bottom: 1.5em;
+        }
+
+        div.component p {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 0.25em;
+        }
+
         svg {
             border: 1px solid black;
         }
@@ -134,41 +146,60 @@
 
     <div style="display:inline-block;">
         <div>
-            <div style="display: inline-block;">
+            <div class="component">
+                <p>Sector view</p>
                 <svg id="sectorLayer" width="300px">
 
                 </svg>
             </div>
-            <div style="display: inline-block;">
+            <div class="component">
+                <p>Supermodule view</p>
                 <svg id="stackLayer" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
 
                 </svg>
             </div>
-            <div style="display: inline-block;">
+            <div class="component">
+                <p>Unrolled cylinder surface view</p>
                 <svg id="stackSector" height="300px" width="300px">
 
                 </svg>
             </div>
         </div>
         <div>
-            <div style="display: inline-block;">
+            <div class="component">
+                <p>XY projection</p>
                 <svg id="trackPathXY" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
 
                 </svg>
             </div>
-            <div style="display: inline-block;">
+            <div class="component">
+                <p>ZR projection (R^2 = X^2 + Y^2)</p>
                 <svg id="trackPathZR" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+            </div>
+            <div class="component">
+                <p>Z-Azimuth projection</p>
+                <svg id="trackPathZAzi" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+        </div>
+            <div class="component">
+                <p>Z-Polar projection</p>
+                <svg id="trackPathZPolar" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
 
                 </svg>
             </div>
         </div>
         <div>
-            <div style="display: inline-block;">
+            <div class="component">
+                <p>ZY projection</p>
                 <svg id="trackPathZY" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
 
                 </svg>
             </div>
-            <div style="display: inline-block;">
+            <div class="component">
+                <p>ZX projection</p>
                 <svg id="trackPathZX" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
 
                 </svg>
