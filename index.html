@@ -14,6 +14,14 @@
     <script src="jstree.min.js"></script>
     <script src="data.js"></script>
     <style>
+        div.navigation {
+            width: 400px; 
+            max-height: 800px; 
+            overflow: auto; 
+            display: inline-block; 
+            vertical-align: top;
+        }
+
         div.component {
             display: inline-block;
             margin-right: 0.5em;
@@ -143,7 +151,7 @@
 </head>
 
 <body>
-    <div style="width: 400px; max-height: 800px; overflow: auto; display: inline-block; vertical-align: top;">
+    <div class="navigation">
         <div>
             <img src="alice-coord.png" style="width: 400px;" />
         </div>
@@ -449,8 +457,8 @@
 
                 super(width, height, margin);
 
-                const MAX_RADIUS = 370; // cm
-                const MIN_RADIUS = 290; // cm
+                const MIN_RADIUS = 294.5; // cm
+                const MAX_RADIUS = MIN_RADIUS + 74.5; // cm
                 const MODULE_HEIGHT = MAX_RADIUS - MIN_RADIUS;
                 const LAYER_HEIGHT = MODULE_HEIGHT / nLAYERS;
 
