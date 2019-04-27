@@ -13,12 +13,13 @@
     <script src="jquery.min.js"></script>
     <script src="jstree.min.js"></script>
     <script src="data.js"></script>
+    <script src="TrdDimensions.js"></script>
     <style>
         div.navigation {
             width: 400px; 
             max-height: 800px; 
+            display: none;
             overflow: auto; 
-            display: inline-block; 
             vertical-align: top;
         }
 
@@ -104,7 +105,7 @@
         .supermodule-xy-layer rect {
             fill: none;
             stroke: black;
-            shape-rendering: crispEdges;
+            shape-rendering: auto;
         }
 
         .STLC-roc {
@@ -448,7 +449,7 @@
         }
 
         class SupermoduleXYPlaneComponent extends BaseComponent {
-            constructor(width, height, parent) {
+            constructor(width, height, parent, trdDimensions) {
                 const margin = {};
                 margin.vert = 2 * height / 10;
                 margin.horiz = 2 * width / 10;
@@ -457,36 +458,41 @@
 
                 super(width, height, margin);
 
+                this.trdDimensions = trdDimensions;
+                
                 const MIN_RADIUS = 294.5; // cm
                 const MAX_RADIUS = MIN_RADIUS + 74.5; // cm
                 const MODULE_HEIGHT = MAX_RADIUS - MIN_RADIUS;
                 const LAYER_HEIGHT = MODULE_HEIGHT / nLAYERS;
 
-                this.layerData = d3.range(nLAYERS)
-                    .map(d => {
-                        const r = MIN_RADIUS + d * LAYER_HEIGHT;
-                        const chord = 2 * r * Math.sin((Math.PI * 20 / 180) / 2);
-                        return {
-                            index: d,
-                            x: -chord / 2,
-                            width: chord,
-                            y: r + LAYER_HEIGHT,
-                            height: LAYER_HEIGHT
-                        };
-                    }); console.log(this.layerData);
-
-                const yscale = this.yscale = d3.scaleLinear()
-                    .domain([MIN_RADIUS, MAX_RADIUS])
-                    .range([this.height, 0]);
+                this.layerData = this.trdDimensions
+                    .filter(d => d.module == 2);
 
                 const xscale = this.xscale = d3.scaleLinear()
-                    .domain([d3.min(this.layerData, d => d.x), 0])
-                    .range([0, this.width / 2]);
+                    .domain([d3.min(this.layerData, d => d.minLocalY), d3.max(this.layerData, d => d.maxLocalY)])
+                    .range([0, this.width]);
+
+                const yscale = this.yscale = d3.scaleLinear()
+                    .domain([d3.min(this.layerData, d => d.minR), d3.max(this.layerData, d => d.maxR)])
+                    .range([this.height, 0]);
+
+                this.layerData
+                    .forEach(d => {
+                        const r = MIN_RADIUS + d.layer * LAYER_HEIGHT;
+                        
+                        d.index = d.layer;
+                        d.x = Math.floor(xscale(d.minLocalY));
+                        d.width = Math.ceil(xscale(d.maxLocalY) - d.x);
+                        d.y = Math.ceil(yscale(d.maxR));
+                        d.height = Math.floor(yscale(d.minR)) - Math.ceil(yscale(d.maxR));
+                    }); 
+                    
+                console.log(this.layerData);
 
                 this.g = parent
                     .attr("viewBox", "0 0 " + width + " " + height)
                     .append("g")
-                    .attr("class", "supermodule-xy")                    
+                    .attr("class", "supermodule-xy")
                     .attr("transform", d => "translate(" + (margin.w) + "," + (margin.n) + ")");
 
                 this.layers = this.g.selectAll("g.supermodule-xy-layer")
@@ -496,13 +502,28 @@
                     .attr("class", "supermodule-xy-layer");
 
                 this.layers.append("rect")
-                    .attr("x", d => xscale(d.x))
-                    .attr("y", d => yscale(d.y))
-                    .attr("width", d => (xscale(0) - xscale(d.x)) * 2)
-                    .attr("height", d => yscale(d.y) - yscale(d.y + LAYER_HEIGHT));
+                    .attr("x", d => d.x)
+                    .attr("width", d => d.width)
+                    .attr("y", d => d.y)
+                    .attr("height", d => d.height);
+
+                // LocalY Range: -65.536 61.472
             }
 
-            draw(event, selectedTracklets) {
+            draw(event, selectedTrdTrack) {
+                console.log(selectedTrdTrack);
+                // const layers = this.g.selectAll("g.supermodule-xy-layer")
+                //     .data(this.layerData)
+                //     .enter()
+                //     .append("g")
+                //     .attr("class", "supermodule-xy-layer");
+
+                // this.layers.append("rect")
+                //     .attr("x", d => xscale(d.x))
+                //     .attr("y", d => yscale(d.y))
+                //     .attr("width", d => (xscale(0) - xscale(d.x)) * 2)
+                //     .attr("height", d => yscale(d.y) - yscale(d.y + LAYER_HEIGHT));
+
                 // const trdTracklets = event.TrdTracklets.map(parseTrdTracklet);
 
                 // for (const sld of this.stackLayerData) {
@@ -765,7 +786,9 @@
             .attr("viewBox", "0 0 250 250"));
         const stackLayer = new SupermoduleZAxisComponent(600, 300, d3.select("#supermoduleZ")
             .attr("viewBox", "0 0 600 300"));
-        const supermoduleXYPlane = new SupermoduleXYPlaneComponent(300, 300, d3.select("#supermoduleXY"));
+        
+        const trdDimensions = getDimensions();
+        const supermoduleXYPlane = new SupermoduleXYPlaneComponent(300, 300, d3.select("#supermoduleXY"), trdDimensions);
 
         const stackSector = new CylinderComponent(100, 200, d3.select("#stackSector")
             .attr("viewBox", "0 0 100 200"));
@@ -825,6 +848,7 @@
                 stackSector.draw(event, trdTrack);
                 sectorLayer.draw(event, trdTracklets);
                 stackLayer.draw(event, trdTracklets);
+                supermoduleXYPlane.draw(event, trdTrack);
                 trackPathXY.draw(event, trdTrack);
                 trackPathZR.draw(event, trdTrack);
                 trackPathZAzi.draw(event, trdTrack);
@@ -836,6 +860,7 @@
 
         $("#dataTree")
             .on("hover_node.jstree", treeSelect)
+            .on("select_node.jstree", treeSelect)
             .jstree({
                 'core': {
                     'themes': {
@@ -844,7 +869,9 @@
                     },
                     'data': treeData
                 }
-            })
+            });
+
+        setTimeout(() => $("#dataTree").jstree("select_node", treeData[1].children[1]), 500);
     </script>
 </body>
 
