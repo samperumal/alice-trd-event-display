@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="d3.min.js"></script>
+    <script src="data.js"></script>
+    <script src="TrdDimensions.js"></script>
+    <script src="common-functions.js"></script>
+    <style>
+        svg {
+            border: 1px solid black;
+        }
+
+        .detector rect {
+            fill: none;
+            stroke: black;
+        }
+    </style>
+</head>
+
+<body>
+    <svg id="supermodule" style="width:400px;" viewBox="0 0 400 400">
+
+    </svg>
+    <div id="test">
+
+    </div>
+    <script>
+        const width = 400;
+        const height = 400;
+        const margin = 20;
+
+        const displayWidth = width - margin * 2;
+        const displayHeight = height - margin * 2;
+
+        const xscale = d3.scaleLinear()
+            .domain([-400, 400])
+            .range([-displayWidth / 2, displayHeight / 2]);
+
+        const yscale = d3.scaleLinear()
+            .domain([-400, 400])
+            .range([-displayHeight / 2, displayHeight / 2]);
+
+        function dist(a, b, scale) {
+            return Math.abs(scale(a) - scale(b));
+        }
+
+        const data = getData();
+        const layerData = getDimensions().filter(d => d.module == 2);
+        const detectorData = d3.range(18)
+            .map(s => layerData.map(l => Object.assign({ sector: s, rot: -10 - 20 * s }, l)))
+            .reduce((a, b) => a.concat(b));
+            //.filter(d => d.sector == 0 || d.layer == 5);
+
+        const detectors = d3.select("#supermodule")
+            .append("g")
+            .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+            .selectAll("g.detector")
+            .data(detectorData)
+            .enter()
+            .append("g")
+            .attr("class", "detector")
+            .attr("transform", d => "rotate(" + d.rot + ")translate(" + xscale(d.minR / 10) + ",0)");
+
+        detectors
+            .append("rect")
+            .attr("y", d => yscale(d.minLocalY))
+            .attr("height", d => dist(d.minLocalY, d.maxLocalY, yscale))
+            .attr("width", d => dist(d.minR / 10, d.maxR / 10, xscale));
+
+        d3.select("#test").selectAll("p")
+            .data(detectorData)
+            .enter()
+            .append("p")
+            .text(d => JSON.stringify(d));
+
+    </script>
+</body>
+
+</html>
