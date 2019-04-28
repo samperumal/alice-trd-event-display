@@ -18,7 +18,7 @@
         div.navigation {
             width: 400px; 
             max-height: 800px; 
-            display: none;
+            display: inline-block;
             overflow: auto; 
             vertical-align: top;
         }
@@ -181,12 +181,6 @@
 
                 </svg>
             </div>
-            <div class="component">
-                <p>Cylinder circumference view</p>
-                <svg id="stackSector" height="300px" width="300px">
-
-                </svg>
-            </div>
         </div>
         <div>
             <div class="component">
@@ -202,14 +196,8 @@
                 </svg>
             </div>
             <div class="component">
-                <p>Z-Azimuth projection</p>
-                <svg id="trackPathZAzi" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
-
-                </svg>
-            </div>
-            <div class="component">
-                <p>Z-Polar projection</p>
-                <svg id="trackPathZPolar" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+                <p>Cylinder circumference view</p>
+                <svg id="stackSector" height="300px" width="300px">
 
                 </svg>
             </div>
@@ -224,6 +212,20 @@
             <div class="component">
                 <p>ZX projection</p>
                 <svg id="trackPathZX" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+            </div>
+        </div>
+        <div>            
+            <div class="component">
+                <p>Z-Azimuth projection</p>
+                <svg id="trackPathZAzi" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+            </div>
+            <div class="component">
+                <p>Z-Polar projection</p>
+                <svg id="trackPathZPolar" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
 
                 </svg>
             </div>
@@ -460,13 +462,14 @@
 
                 this.trdDimensions = trdDimensions;
                 
-                const MIN_RADIUS = 294.5; // cm
+                const MIN_RADIUS = this.MIN_RADIUS = 294.5; // cm
                 const MAX_RADIUS = MIN_RADIUS + 74.5; // cm
                 const MODULE_HEIGHT = MAX_RADIUS - MIN_RADIUS;
-                const LAYER_HEIGHT = MODULE_HEIGHT / nLAYERS;
+                const LAYER_HEIGHT = this.LAYER_HEIGHT = MODULE_HEIGHT / nLAYERS;
 
                 this.layerData = this.trdDimensions
-                    .filter(d => d.module == 2);
+                    .filter(d => d.module == 2)
+                    .sort((x,y) => x.layer - y.layer);
 
                 const xscale = this.xscale = d3.scaleLinear()
                     .domain([d3.min(this.layerData, d => d.minLocalY), d3.max(this.layerData, d => d.maxLocalY)])
@@ -511,16 +514,23 @@
             }
 
             draw(event, selectedTrdTrack) {
-                console.log(selectedTrdTrack);
-                // const layers = this.g.selectAll("g.supermodule-xy-layer")
-                //     .data(this.layerData)
-                //     .enter()
-                //     .append("g")
-                //     .attr("class", "supermodule-xy-layer");
+                if (selectedTrdTrack.TrdTracklets == null) return;
+                console.log(selectedTrdTrack.TrdTracklets);
+                const xscale = this.xscale, yscale = this.yscale;
+                const LAYER_HEIGHT = this.LAYER_HEIGHT;
+                const MIN_RADIUS = this.MIN_RADIUS;
 
-                // this.layers.append("rect")
-                //     .attr("x", d => xscale(d.x))
-                //     .attr("y", d => yscale(d.y))
+                this.g.selectAll("g.supermodule-xy-tracklets").remove();
+
+                const trackletSelection= this.g.selectAll("g.supermodule-xy-tracklets")
+                    .data(selectedTrdTrack.TrdTracklets)
+                    .enter()
+                    .append("g")
+                    .attr("class", "supermodule-xy-tracklets")
+                    .append("circle")
+                    .attr("cx", d => xscale(-d.LocalY))
+                    .attr("cy", d => { return yscale(((DetectorToLayer(d.Detector) + 1) * LAYER_HEIGHT + MIN_RADIUS) * 10); })
+                    .attr("r", 5);
                 //     .attr("width", d => (xscale(0) - xscale(d.x)) * 2)
                 //     .attr("height", d => yscale(d.y) - yscale(d.y + LAYER_HEIGHT));
 
