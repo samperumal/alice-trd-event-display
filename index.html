@@ -487,54 +487,50 @@
                     .append("g")
                     .attr("class", "supermodule-xy-layer");
 
+                this.tracklets = this.g.selectAll("g.supermodule-xy-tracklets")
+                    .data(this.layerData)
+                    .enter()
+                    .append("g")
+                    .attr("class", "supermodule-xy-tracklets");
+
                 this.layers.append("rect")
                     .attr("x", d => d.x)
                     .attr("width", d => d.width)
                     .attr("y", d => d.y)
                     .attr("height", d => d.height);
 
-                // LocalY Range: -65.536 61.472
+                    this.track = this.g.append("path")
+                    .attr("class", "supermodule-xy-path");
+
+                this.line = d3.line().x(d => xscale(d[0])).y(d => yscale(d[1]));
             }
 
             draw(event, selectedTrdTrack) {
-                if (selectedTrdTrack.TrdTracklets == null) return;
-                console.log(selectedTrdTrack.TrdTracklets);
+                this.tracklets.selectAll("g.supermodule-xy-tracklet").remove();
+                this.track.attr("d", "");
+
+                if (selectedTrdTrack == null || selectedTrdTrack.TrdTracklets == null) return;
+                
+                //console.log(selectedTrdTrack.TrdTracklets);
                 const xscale = this.xscale, yscale = this.yscale;
                 const LAYER_HEIGHT = this.LAYER_HEIGHT;
                 const MIN_RADIUS = this.MIN_RADIUS;
 
-                this.g.selectAll("g.supermodule-xy-tracklets").remove();
-
-                const trackletSelection= this.g.selectAll("g.supermodule-xy-tracklets")
+                const trackletSelection= this.tracklets.selectAll("g.supermodule-xy-tracklet")
                     .data(selectedTrdTrack.TrdTracklets)
                     .enter()
                     .append("g")
-                    .attr("class", "supermodule-xy-tracklets")
+                    .attr("class", "supermodule-xy-tracklet")
                     .append("circle")
                     .attr("cx", d => xscale(-d.LocalY))
                     .attr("cy", d => { return yscale(((DetectorToLayer(d.Detector) + 1) * LAYER_HEIGHT + MIN_RADIUS) * 10); })
                     .attr("r", 5);
-                //     .attr("width", d => (xscale(0) - xscale(d.x)) * 2)
-                //     .attr("height", d => yscale(d.y) - yscale(d.y + LAYER_HEIGHT));
 
-                // const trdTracklets = event.TrdTracklets.map(parseTrdTracklet);
-
-                // for (const sld of this.stackLayerData) {
-                //     sld.tracks = [];
-                //     sld.selected = false;
-                // }
-
-                // for (const trdTracklet of trdTracklets) {
-                //     const sld = this.stackLayerData[trdTracklet.Stack * nLAYERS + trdTracklet.Layer];
-                //     sld.tracks.push(trdTracklet);
-                //     for (const selTracklet of selectedTracklets)
-                //         if (trdTracklet.Index == selTracklet.index)
-                //             sld.selected = true;
-                // }
-
-                // this.g.selectAll("g.STLC-roc")
-                //     .classed("STLC-hit", d => d.tracks.length > 0)
-                //     .classed("STLC-selected", d => d.selected);
+                if (selectedTrdTrack.TrackMatch != null && selectedTrdTrack.TrackMatch.Path != null) {
+                    const path = selectedTrdTrack.TrackMatch.Path.map(d => ({x: xscale(d[0]), x0: d[0], y0: d[1]}));
+                    console.log(path);
+                    this.track.attr("d", this.line(selectedTrdTrack.TrackMatch.Path));                    
+                }
             }
         }
 
