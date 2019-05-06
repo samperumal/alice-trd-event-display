@@ -23,7 +23,7 @@
 </head>
 
 <body>
-    <svg id="supermodule" style="width:400px;" viewBox="0 0 400 400">
+    <svg id="supermodule" style="width: 400px;" viewBox="0 0 400 400">
 
     </svg>
     <div id="test">
@@ -53,12 +53,13 @@
         const layerData = getDimensions().filter(d => d.module == 2);
         const detectorData = d3.range(18)
             .map(s => layerData.map(l => Object.assign({ sector: s, rot: -10 - 20 * s }, l)))
-            .reduce((a, b) => a.concat(b));
-            //.filter(d => d.sector == 0 || d.layer == 5);
+            .reduce((a, b) => a.concat(b))
+            .filter(d => d.sector == 0 || d.layer == d.sector);
 
         const detectors = d3.select("#supermodule")
             .append("g")
             .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+            .attr("viewBox", "0 0 400 400")
             .selectAll("g.detector")
             .data(detectorData)
             .enter()
