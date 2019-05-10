@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="d3.min.js"></script>
+    <script src="components/trd-dimensions.js"></script>
+    <script src="components/component-base.js"></script>
+    <script src="components/supermodule.js"></script>
+
+    <script src="data.min.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <svg id="testComponent" style="width:400px;">
+
+    </svg>
+    <script>
+        const data = getData();
+        const test = new SuperModuleComponent("#testComponent", 400, 400, marginDef(20, 20, 20, 20));
+        test.draw();
+    </script>
+</body>
+</html>
