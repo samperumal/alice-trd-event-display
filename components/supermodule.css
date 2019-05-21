@@ -2,3 +2,14 @@
     fill: none;
     stroke: darkgray;
 }
+
+.supermodule-component path.track {
+    fill: none;
+    stroke: lightskyblue;
+}
+
+
+.supermodule-component path.track.selected {
+    fill: none;
+    stroke: red;
+}
