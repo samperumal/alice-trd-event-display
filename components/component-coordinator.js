@@ -25,31 +25,25 @@ class ComponentCoordinator {
         this.components.push(component);
     }
 
-    treeSelect() {
-        const fn = function treeMap(ev, eventData) {
-            const obj = ev.handleObj.handler.obj;
-            const ids = eventData.node.id.split("_");
-            let event = null;
-            if (ids[0] !== null)
-                event = obj.dataMap[ids[0]];
+    treeSelect(ev, eventData) {
+        const ids = eventData.node.id.split("_");
+        
+        let event = null;
+        if (ids[0] !== null)
+            event = this.dataMap[ids[0]];
 
-            let trdTrack = null;
-            if (ids[1] !== null)
-                trdTrack = obj.dataMap[ids[0] + "_" + ids[1]];
+        let trdTrack = null;
+        if (ids[1] !== null)
+            trdTrack = this.dataMap[ids[0] + "_" + ids[1]];
 
-            const drawData = {
-                event: event,
-                trdTrack: trdTrack
-            };
-
-            for (const component of obj.components) {
-                component.draw(drawData);
-            }
+        const drawData = {
+            event: event,
+            trdTrack: trdTrack
         };
 
-        fn.obj = this;
-        
-        return fn;
+        for (const component of this.components) {
+            component.draw(drawData);
+        }
     }
 }
 

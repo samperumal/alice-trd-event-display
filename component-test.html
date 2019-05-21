@@ -62,7 +62,7 @@
         
         const coordinator = new ComponentCoordinator(data);
         
-        const tree = new EventTree("#dataTree", data, coordinator.treeSelect());
+        const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
         
         const test = new SuperModuleComponent("#testComponent", 400, 400);
         coordinator.addComponent(test);
