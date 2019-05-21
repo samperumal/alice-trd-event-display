@@ -1,6 +1,6 @@
 class SuperModuleComponent extends ComponentBase {
-    constructor (id, width, height, margin) {
-        super(id, width, height, margin);
+    constructor (id, width, height) {
+        super(id, width, height, marginDef(20, 20, 20, 20));
 
         const layerData = this.layerData = getDimensions().filter(d => d.module == 2);
         this.detectorData = d3.range(18)
@@ -8,6 +8,10 @@ class SuperModuleComponent extends ComponentBase {
             .reduce((a, b) => a.concat(b));
 
         const xscale = this.xscale, yscale = this.yscale;
+        xscale.domain([-450, 450]);
+        yscale.domain([-450, 450]);
+
+        this.container.classed("supermodule-component", true);
 
         this.detectors = this.container
             .selectAll("g.detector")
@@ -19,6 +23,7 @@ class SuperModuleComponent extends ComponentBase {
 
         this.detectors
             .append("rect")
+            .attr("class", "detector")
             .attr("y", d => yscale(d.minLocalY))
             .attr("height", d => dist(d.minLocalY, d.maxLocalY, yscale))
             .attr("width", d => dist(d.minR / 10, d.maxR / 10, xscale));
