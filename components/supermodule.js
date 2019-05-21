@@ -27,9 +27,11 @@ class SuperModuleComponent extends ComponentBase {
             .attr("y", d => yscale(d.minLocalY))
             .attr("height", d => dist(d.minLocalY, d.maxLocalY, yscale))
             .attr("width", d => dist(d.minR / 10, d.maxR / 10, xscale));
+
+        super.draw();
     }
 
-    draw(event, selectedTrack, selectedTracklet) {
-        super.draw();
+    draw(eventData) {
+
     }
 }

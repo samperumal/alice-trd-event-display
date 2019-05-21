@@ -8,19 +8,20 @@
     <script src="d3.min.js"></script>
     <script src="jquery.min.js"></script>
     <script src="jstree.min.js"></script>
-    
+
     <script src="components/trd-dimensions.js"></script>
     <script src="components/component-base.js"></script>
     <script src="components/supermodule.js"></script>
     <script src="components/event-tree.js"></script>
+    <script src="components/component-coordinator.js"></script>
 
     <script src="data.min.js"></script>
-    <title>Document</title>
-    
+    <title>ALICE TRD Event Display - Alpha</title>
+
     <link href='./bootstrap/css/bootstrap.min.css' rel='stylesheet' />
     <link href='./proton/style.min.css' rel='stylesheet' />
     <link href='./components/supermodule.css' rel='stylesheet' />
-    
+
     <style>
         div.navigation {
             width: 400px;
@@ -57,32 +58,15 @@
         </div>
     </div>
     <script>
-        function treeSelect(event, eventData) {
-            // const ids = eventData.node.id.split("_").map(d => [d[0], d.slice(1)]);
-            // var event = null, trdTrack = null, trdTracklets = [];
-            // for (const id of ids) {
-            //     const prefix = id[0];
-            //     const index = id[1];
-            //     //console.log(prefix, index);
-            //     if (prefix == "E")
-            //         event = data[+index];
-
-            //     if (prefix == "T" && event != null) {
-            //         trdTrack = event.TrdTracks[+index];
-            //         trdTracklets = trdTrack.TrdTracklets;
-            //     }
-
-            //     if (prefix == "L" && event != null) {
-            //         trdTracklets = [event.TrdTracklets[+index]];
-            //     }
-            // }
-            console.log(eventData.node.data);
-        }
-        
         const data = getData();
-        const tree = new EventTree("#dataTree", data, treeSelect);
+        
+        const coordinator = new ComponentCoordinator(data);
+        
+        const tree = new EventTree("#dataTree", data, coordinator.treeSelect());
+        
         const test = new SuperModuleComponent("#testComponent", 400, 400);
-        test.draw();
+        coordinator.addComponent(test);
+        
     </script>
 </body>
 
