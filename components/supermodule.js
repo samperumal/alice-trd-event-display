@@ -1,5 +1,5 @@
 class SuperModuleComponent extends ComponentBase {
-    constructor (id, width, height) {
+    constructor(id, width, height) {
         super(id, width, height, marginDef(20, 20, 20, 20));
 
         const layerData = this.layerData = getDimensions().filter(d => d.module == 2);
@@ -11,7 +11,7 @@ class SuperModuleComponent extends ComponentBase {
         xscale.domain([-450, 450]);
         yscale.domain([-450, 450]);
 
-        this.line = d3.line().x(d => xscale(d.x)).y(d => yscale(d.y));
+        this.line = d3.line().x(d => xscale(d.x)).y(d => yscale(-d.y));
 
         this.container.classed("supermodule-component", true);
 
@@ -21,6 +21,7 @@ class SuperModuleComponent extends ComponentBase {
             .selectAll("g.detector")
             .data(this.detectorData)
             .enter()
+
             .append("g")
             .attr("class", "detector")
             .attr("transform", d => "rotate(" + d.rot + ")translate(" + xscale(d.minR / 10) + ",0)");
@@ -35,12 +36,16 @@ class SuperModuleComponent extends ComponentBase {
         this.tracks = this.container.append("g")
             .attr("class", "tracks");
 
+        this.tracklets = this.container.append("g")
+            .attr("class", "tracklets");
+
         super.draw();
     }
 
     draw(eventData) {
         const xscale = this.xscale, yscale = this.yscale;
         const line = this.line;
+        const layerData = this.layerData;
 
         const selectedTrack = eventData.trdTrack != null ? eventData.trdTrack.id : null;
 
@@ -57,9 +62,25 @@ class SuperModuleComponent extends ComponentBase {
             .attr("class", "track")
             .attr("d", d => line(d.track.path));
 
-        tracks = tracks.merge(tracks.enter());
+        this.tracks.selectAll("path.track")
+            .classed("selected", d => d.id == selectedTrack);
 
-        tracks.selectAll("path.track")
-            .classed("selected", d => d.id == selectedTrack);            
+        if (eventData.trdTrack != null && eventData.trdTrack.trdTracklets != null) {
+            let tracklets = this.tracklets
+                .selectAll(".tracklet")
+                .data(eventData.trdTrack.trdTracklets, d => d.id);
+
+            tracklets.exit().remove();
+
+            tracklets.enter()
+                .append("g")
+                .attr("transform", d => "rotate(" + (-10 - 20 * d.sector) + ")")
+                .append("circle")
+                .attr("class", "tracklet")
+                .attr("cy", d => yscale(-d.localY))
+                .attr("cx", d => xscale((layerData[d.layer].minR + layerData[d.layer].maxR) / 2 / 10))
+                .attr("r", 2);
+
+        }
     }
 }
