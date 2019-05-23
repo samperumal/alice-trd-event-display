@@ -23,6 +23,9 @@
     <link href='./components/supermodule.css' rel='stylesheet' />
 
     <style>
+        svg {
+            border: 1px solid black;
+        }
         div.navigation {
             width: 400px;
             max-height: 800px;
@@ -35,6 +38,15 @@
             display: inline-block;
             margin-right: 0.5em;
             margin-bottom: 1.5em;
+        }
+
+        #supermodule-zoom {
+            stroke-width: 0.5;
+            font-size: x-small;
+        }
+
+        .not-selected {
+            opacity: 0.3;
         }
     </style>
 </head>
@@ -49,24 +61,23 @@
         </div>
     </div>
     <div style="display:inline-block;">
-        <div>
-            <div class="component">
-                <svg id="testComponent" style="width: 400px; height: 400px;" preserveAspectRatio="none">
-
-                </svg>
-            </div>
+        <div class="component">
+            <svg id="supermodule" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
+        </div>
+        <div class="component">
+            <svg id="supermodule-zoom" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
         </div>
     </div>
     <script>
         const data = getData();
-        
+
         const coordinator = new ComponentCoordinator(data);
-        
+
         const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
-        
-        const test = new SuperModuleComponent("#testComponent", 400, 400);
-        coordinator.addComponent(test);
-        
+
+        coordinator.addComponent(new SuperModuleComponent("#supermodule", 300, 300));
+        coordinator.addComponent(new SuperModuleComponent("#supermodule-zoom", 300, 300, "-25 -137 50 50", { r: 1, rotate: true }));
+
     </script>
 </body>
 

@@ -1,6 +1,6 @@
 class SuperModuleComponent extends ComponentBase {
-    constructor(id, width, height) {
-        super(id, width, height, marginDef(20, 20, 20, 20));
+    constructor(id, width, height, viewBox, config) {
+        super(id, width, height, marginDef(5, 5, 5, 5), viewBox);
 
         const sectorToRotationAngle = this.sectorToRotationAngle;
 
@@ -9,19 +9,19 @@ class SuperModuleComponent extends ComponentBase {
             .map(s => layerData.map(l => Object.assign({ sector: s, rot: sectorToRotationAngle(s) }, l)))
             .reduce((a, b) => a.concat(b));
 
+        this.config = config != null ? config : {};
+        this.r = (this.config.r != null) ? this.config.r : 2;
+
         const xscale = this.xscale, yscale = this.yscale;
         xscale.domain([-450, 450]);
         yscale.domain([-450, 450]);
 
         this.line = d3.line().x(d => xscale(d.x)).y(d => yscale(-d.y));
 
-        this.container
-            .classed("supermodule-component", true);
-
         const zoom = d3.zoom()
             .scaleExtent([1, 40])
-            .translateExtent([[-this.displayWidth / 2, -this.displayHeight / 2],[this.displayWidth / 2, this.displayHeight / 2]])
-            .extent([[-this.displayWidth / 2, -this.displayHeight / 2],[this.displayWidth / 2, this.displayHeight / 2]])
+            .translateExtent([[-this.displayWidth / 2, -this.displayHeight / 2], [this.displayWidth / 2, this.displayHeight / 2]])
+            .extent([[-this.displayWidth / 2, -this.displayHeight / 2], [this.displayWidth / 2, this.displayHeight / 2]])
             .on("zoom", this.zoomed.bind(this));
 
         this.container.append("rect")
@@ -31,7 +31,13 @@ class SuperModuleComponent extends ComponentBase {
             .attr("transform", "translate(" + (-this.displayWidth / 2) + "," + (-this.displayHeight / 2) + ")")
             .call(zoom);
 
-        this.detectors = this.container
+        this.rotatingContainer = this.container
+            .classed("supermodule-component", true)
+            .append("g")
+            .attr("class", "rotating")
+            ;
+
+        this.detectors = this.rotatingContainer
             .append("g")
             .attr("class", "detectors")
             .selectAll("g.detector")
@@ -48,27 +54,27 @@ class SuperModuleComponent extends ComponentBase {
             .attr("height", d => dist(d.minLocalY, d.maxLocalY, yscale))
             .attr("width", d => dist(d.minR, d.maxR, xscale));
 
-        this.container
+        this.sectorNumbers = this.rotatingContainer
             .append("g")
             .attr("class", "sector-number")
             .selectAll("g")
             .data(d3.range(18))
             .enter()
             .append("g")
-            .attr("transform", d => "rotate(" + sectorToRotationAngle(d) + ")")
+            .attr("transform", d => "rotate(" + sectorToRotationAngle(d) + ")translate(" + (xscale(d3.max(layerData, d2 => d2.maxR) * 1.1)) + ", 0)")
             .append("text")
             .attr("class", "sector-number")
             .text(d => d)
-            .attr("transform", d => "translate(" + (xscale(d3.max(layerData, d2 => d2.maxR) * 1.1)) + ", 0)rotate(" + (-sectorToRotationAngle(d)) + ")")
+            .attr("transform", d => "rotate(" + (-sectorToRotationAngle(d)) + ")")
             ;
 
-        this.tracks = this.container.append("g")
-            .attr("class", "tracks");
-
-        this.tracklets = this.container.append("g")
+        this.tracklets = this.rotatingContainer.append("g")
             .attr("class", "tracklets");
 
-        super.draw();
+        this.tracks = this.rotatingContainer.append("g")
+            .attr("class", "tracks");
+
+        //super.draw();
     }
 
     zoomed() {
@@ -102,6 +108,8 @@ class SuperModuleComponent extends ComponentBase {
         this.tracks.selectAll("path.track")
             .classed("selected", d => d.id == selectedTrack);
 
+        const sectorToRotationAngle = this.sectorToRotationAngle;
+
         if (eventData.trdTrack != null && eventData.trdTrack.trdTracklets != null) {
             let tracklets = this.tracklets
                 .selectAll(".tracklet")
@@ -111,13 +119,45 @@ class SuperModuleComponent extends ComponentBase {
 
             tracklets.enter()
                 .append("g")
-                .attr("transform", d => "rotate(" + (-10 - 20 * d.sector) + ")")
+                .attr("transform", d => "rotate(" + (sectorToRotationAngle(d.sector)) + ")")
                 .append("circle")
                 .attr("class", "tracklet")
                 .attr("cy", d => yscale(-d.localY))
                 .attr("cx", d => xscale((layerData[d.layer].maxR + layerData[d.layer].maxR) / 2))
-                .attr("r", 2);
+                .attr("r", this.r);
 
+            const sector = eventData.trdTrack.sector;
+
+            if (this.config.rotate) {
+                this.rotatingContainer
+                    .transition()
+                    .attr("transform", "rotate(" + ((sector - 4) * 20) + ")");
+
+                this.sectorNumbers
+                    .transition()
+                    .attr("transform", d => "rotate(" + (-sectorToRotationAngle(d) - ((sector - 4) * 20)) + ")");
+            }
+
+            this.detectors.classed("not-selected", d => d.sector != sector);
+        }
+        else {
+            if (this.config.rotate) {
+                this.rotatingContainer
+                    .transition()
+                    .attr("transform", "rotate(0)");
+
+                this.sectorNumbers
+                    .transition()
+                    .attr("transform", d => "rotate(" + (-sectorToRotationAngle(d)) + ")");
+            }
+
+            this.tracklets
+                .selectAll(".tracklet")
+                .remove();
+
+            this.detectors.classed("not-selected", false);
         }
     }
 }
+
+// -60 -270 120 120
