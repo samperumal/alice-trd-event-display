@@ -55,8 +55,10 @@ class SupermoduleViewComponent extends ComponentBase {
     }
 
     draw(eventData) {
+        const xscale = this.xscale, yscale = this.yscale;
         const line = this.line;
-        
+        const layerData = this.layerData;
+
         const selectedTrack = eventData.trdTrack != null ? eventData.trdTrack.id : null;
 
         let tracks = this.tracks
@@ -74,5 +76,27 @@ class SupermoduleViewComponent extends ComponentBase {
 
         this.tracks.selectAll("path.track")
             .classed("selected", d => d.id == selectedTrack);
+
+        if (eventData.trdTrack != null && eventData.trdTrack.trdTracklets != null) {
+            let tracklets = this.tracklets
+                .selectAll(".tracklet")
+                .data(eventData.trdTrack.trdTracklets, d => d.id);
+
+            tracklets.exit().remove();
+
+            tracklets.enter()
+                .append("g")
+                .append("circle")
+                .attr("class", "tracklet")
+                .attr("cy", d => {
+                    const layer = layerData.filter(l => l.layer == d.layer && l.stack == d.stack)[0];
+                    return yscale((layer.minR + layer.maxR) / 2);
+                })
+                .attr("cx", d => {
+                    const layer = layerData.filter(l => l.layer == d.layer && l.stack == d.stack)[0];
+                    return xscale(layer.minZ + (d.binZ + 0.5) * layer.zsize);
+                })
+                .attr("r", this.r);
+        }
     }
 }
