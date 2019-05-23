@@ -14,7 +14,7 @@ function marginDef(left, right, top, bottom) {
 }
 
 class ComponentBase {
-    constructor(id, width, height, margin) {
+    constructor(id, width, height, margin, viewBox) {
         this.height = height;
         this.width = width;
 
@@ -37,7 +37,9 @@ class ComponentBase {
         let container = d3.select(id);
         
         if (container.node().tagName == "svg") {
-            container.attr("viewBox", (-this.componentWidth / 2) + " " + (-this.componentHeight / 2) + " " + (this.componentWidth) + " " + (this.componentHeight));
+            if (viewBox == null)
+                container.attr("viewBox", (-this.componentWidth / 2) + " " + (-this.componentHeight / 2) + " " + (this.componentWidth) + " " + (this.componentHeight));
+            else container.attr("viewBox", viewBox);
             container = container.append("g").attr("class", "content");
         }
 
