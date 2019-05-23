@@ -2,16 +2,18 @@
 function trdTrackToJSTreeNode(t) {
     return {
         id: t.id,
-        text: "TrdTrack " + t.id + " Stack: " + t.stack + " Sector: " + t.sector,
+        text: "TrdTrack " + t.id.substring(4) + ": (Sector " + t.sector + ", Stack " + t.stack + ")",
         data: t,
         type: "TrdTrack"
     };
 }
 
 function eventToJSTreeNode(e) {
+    e.trdTracks.sort((a,b) => a.sector != b.sector ? a.sector - b.sector : a.stack - b.stack);
+
     return {
         id: e.id,
-        text: "Event " + e.id,
+        text: "Event " + e.id.substring(1),
         type: "Event",
         data: e,
         state: {
