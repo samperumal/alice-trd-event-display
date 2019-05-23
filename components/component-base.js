@@ -18,6 +18,8 @@ class ComponentBase {
         this.height = height;
         this.width = width;
 
+        this.margin = margin;
+
         this.componentWidth = width;
         this.componentHeight = height;
 
@@ -33,7 +35,7 @@ class ComponentBase {
             .range([-this.displayHeight / 2, this.displayHeight / 2]);
 
         let container = d3.select(id);
-
+        
         if (container.node().tagName == "svg") {
             container.attr("viewBox", (-this.componentWidth / 2) + " " + (-this.componentHeight / 2) + " " + (this.componentWidth) + " " + (this.componentHeight));
             container = container.append("g").attr("class", "content");

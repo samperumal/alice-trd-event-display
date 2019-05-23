@@ -13,3 +13,12 @@
     fill: none;
     stroke: red;
 }
+
+.supermodule-component .zoom {
+    fill: transparent;
+}
+
+.supermodule-component text.sector-number {
+    text-anchor: middle;
+    dominant-baseline: central;
+}

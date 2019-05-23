@@ -13,7 +13,21 @@ class SuperModuleComponent extends ComponentBase {
 
         this.line = d3.line().x(d => xscale(d.x)).y(d => yscale(-d.y));
 
-        this.container.classed("supermodule-component", true);
+        this.container
+            .classed("supermodule-component", true);
+
+        const zoom = d3.zoom()
+            .scaleExtent([1, 40])
+            .translateExtent([[-this.displayWidth / 2, -this.displayHeight / 2],[this.displayWidth / 2, this.displayHeight / 2]])
+            .extent([[-this.displayWidth / 2, -this.displayHeight / 2],[this.displayWidth / 2, this.displayHeight / 2]])
+            .on("zoom", this.zoomed.bind(this));
+
+        this.container.append("rect")
+            .attr("class", "zoom")
+            .attr("width", this.displayWidth)
+            .attr("height", this.displayHeight)
+            .attr("transform", "translate(" + (-this.displayWidth / 2) + "," + (-this.displayHeight / 2) + ")")
+            .call(zoom);
 
         this.detectors = this.container
             .append("g")
@@ -21,7 +35,6 @@ class SuperModuleComponent extends ComponentBase {
             .selectAll("g.detector")
             .data(this.detectorData)
             .enter()
-
             .append("g")
             .attr("class", "detector")
             .attr("transform", d => "rotate(" + d.rot + ")translate(" + xscale(d.minR / 10) + ",0)");
@@ -33,6 +46,20 @@ class SuperModuleComponent extends ComponentBase {
             .attr("height", d => dist(d.minLocalY, d.maxLocalY, yscale))
             .attr("width", d => dist(d.minR / 10, d.maxR / 10, xscale));
 
+        this.container
+            .append("g")
+            .attr("class", "sector-number")
+            .selectAll("g")
+            .data(d3.range(18))
+            .enter()
+            .append("g")
+            .attr("transform", d => "rotate(" + (-10 - 20 * d) + ")")
+            .append("text")
+            .attr("class", "sector-number")
+            .text(d => d)
+            .attr("transform", d => "translate(" + (xscale(d3.max(layerData, d2 => d2.maxR) * 0.11)) + ", 0)rotate(" + (-(-10 - 20 * d)) + ")")
+            ;
+
         this.tracks = this.container.append("g")
             .attr("class", "tracks");
 
@@ -40,6 +67,10 @@ class SuperModuleComponent extends ComponentBase {
             .attr("class", "tracklets");
 
         super.draw();
+    }
+
+    zoomed() {
+        console.log(d3.event.transform)
     }
 
     draw(eventData) {
