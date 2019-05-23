@@ -54,6 +54,14 @@ class SectorViewComponent extends ComponentBase {
             .attr("height", d => dist(d.minLocalY, d.maxLocalY, yscale))
             .attr("width", d => dist(d.minR, d.maxR, xscale));
 
+        this.detectors
+            .append("line")
+            .attr("class", "half-chamber-div")
+            .attr("x1", xscale(0))
+            .attr("x2", d => xscale(d.maxR))
+            .attr("y1", yscale(0))
+            .attr("y2", yscale(0));
+
         this.sectorNumbers = this.rotatingContainer
             .append("g")
             .attr("class", "sector-number")

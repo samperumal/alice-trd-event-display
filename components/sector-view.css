@@ -8,7 +8,6 @@
     stroke: lightskyblue;
 }
 
-
 .sector-view-component path.track.selected {
     fill: none;
     stroke: red;
@@ -25,4 +24,8 @@
 
 .sector-view-component .not-selected {
     opacity: 0.2;
+}
+
+.sector-view-component .half-chamber-div {
+    stroke: white;
 }
