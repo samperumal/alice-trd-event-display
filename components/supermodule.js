@@ -2,9 +2,11 @@ class SuperModuleComponent extends ComponentBase {
     constructor(id, width, height) {
         super(id, width, height, marginDef(20, 20, 20, 20));
 
+        const sectorToRotationAngle = this.sectorToRotationAngle;
+
         const layerData = this.layerData = getDimensions().filter(d => d.module == 2);
         this.detectorData = d3.range(18)
-            .map(s => layerData.map(l => Object.assign({ sector: s, rot: -10 - 20 * s }, l)))
+            .map(s => layerData.map(l => Object.assign({ sector: s, rot: sectorToRotationAngle(s) }, l)))
             .reduce((a, b) => a.concat(b));
 
         const xscale = this.xscale, yscale = this.yscale;
@@ -37,14 +39,14 @@ class SuperModuleComponent extends ComponentBase {
             .enter()
             .append("g")
             .attr("class", "detector")
-            .attr("transform", d => "rotate(" + d.rot + ")translate(" + xscale(d.minR / 10) + ",0)");
+            .attr("transform", d => "rotate(" + d.rot + ")translate(" + xscale(d.minR) + ",0)");
 
         this.detectors
             .append("rect")
             .attr("class", "detector")
             .attr("y", d => yscale(d.minLocalY))
             .attr("height", d => dist(d.minLocalY, d.maxLocalY, yscale))
-            .attr("width", d => dist(d.minR / 10, d.maxR / 10, xscale));
+            .attr("width", d => dist(d.minR, d.maxR, xscale));
 
         this.container
             .append("g")
@@ -53,11 +55,11 @@ class SuperModuleComponent extends ComponentBase {
             .data(d3.range(18))
             .enter()
             .append("g")
-            .attr("transform", d => "rotate(" + (-10 - 20 * d) + ")")
+            .attr("transform", d => "rotate(" + sectorToRotationAngle(d) + ")")
             .append("text")
             .attr("class", "sector-number")
             .text(d => d)
-            .attr("transform", d => "translate(" + (xscale(d3.max(layerData, d2 => d2.maxR) * 0.11)) + ", 0)rotate(" + (-(-10 - 20 * d)) + ")")
+            .attr("transform", d => "translate(" + (xscale(d3.max(layerData, d2 => d2.maxR) * 1.1)) + ", 0)rotate(" + (-sectorToRotationAngle(d)) + ")")
             ;
 
         this.tracks = this.container.append("g")
@@ -71,6 +73,10 @@ class SuperModuleComponent extends ComponentBase {
 
     zoomed() {
         console.log(d3.event.transform)
+    }
+
+    sectorToRotationAngle(sector) {
+        return -10 - 20 * sector;
     }
 
     draw(eventData) {
