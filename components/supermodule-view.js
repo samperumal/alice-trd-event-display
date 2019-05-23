@@ -20,14 +20,39 @@ class SupermoduleViewComponent extends ComponentBase {
 
         this.detectors = this.container
             .append("g")
-            .attr("class", "detectors");
-
-        this.detectors
-            .selectAll("rect.detector")
+            .attr("class", "detectors")
+            .selectAll("g.detector")
             .data(layerData)
             .enter()
+            .append("g")
+            .attr("class", "detector");
+
+        this.detectors
             .append("rect")
             .attr("class", "detector")
+            .attr("x", d => xscale(d.minZ))
+            .attr("width", d => xscale(d.maxZ) - xscale(d.minZ))
+            .attr("y", d => yscale(d.maxR))
+            .attr("height", d => yscale(d.minR) - yscale(d.maxR));
+
+        this.detectors
+            .selectAll("line.bin")
+            .data(d => d3.range(1, d.zegments).map(z => ({
+                x: xscale(d.minZ + z * d.zsize),
+                y1: yscale(d.minR),
+                y2: yscale(d.maxR)
+            })))
+            .enter()
+            .append("line")
+            .attr("class", "bin")
+            .attr("x1", d => d.x)
+            .attr("x2", d => d.x)
+            .attr("y1", d => d.y1)
+            .attr("y2", d => d.y2);
+
+        this.detectors
+            .append("rect")
+            .attr("class", "detector-outline")
             .attr("x", d => xscale(d.minZ))
             .attr("width", d => xscale(d.maxZ) - xscale(d.minZ))
             .attr("y", d => yscale(d.maxR))
@@ -44,8 +69,6 @@ class SupermoduleViewComponent extends ComponentBase {
             .text(d => d.stack)
             .attr("x", d => xscale((d.minZ + d.maxZ) / 2))
             .attr("y", d => yscale(d.maxR + 10));
-
-
 
         this.tracklets = this.container.append("g")
             .attr("class", "tracklets");

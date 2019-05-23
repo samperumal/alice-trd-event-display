@@ -1,5 +1,10 @@
 .supermodule-view-component rect.detector {
     fill: lightgray;
+    stroke: none;
+}
+
+.supermodule-view-component rect.detector-outline {
+    fill: none;
     stroke: white;
 }
 
@@ -14,3 +19,6 @@
     stroke: red;
 }
 
+.supermodule-view-component line.bin {
+    stroke: rgb(233, 233, 233);    
+}
