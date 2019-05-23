@@ -1,6 +1,6 @@
 .sector-view-component rect.detector {
-    fill: none;
-    stroke: darkgray;
+    fill: lightgray;
+    stroke: white;
 }
 
 .sector-view-component path.track {
