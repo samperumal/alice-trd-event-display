@@ -44,7 +44,7 @@
         }
 
         #sector-view-zoom {
-            stroke-width: 0.5;
+            stroke-width: 0.3;
             font-size: x-small;
         }
     </style>
@@ -82,7 +82,7 @@
         const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
 
         coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
-        coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-25 -137 50 50", { r: 1, rotate: true }));
+        coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-25 -137 50 50", { r: 0.75, rotate: true }));
         coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 700, 400, "-350 -200 700 120"));
 
     </script>
