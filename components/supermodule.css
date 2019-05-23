@@ -22,3 +22,7 @@
     text-anchor: middle;
     dominant-baseline: central;
 }
+
+.supermodule-component .not-selected {
+    opacity: 0.3;
+}
