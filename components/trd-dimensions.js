@@ -13,8 +13,8 @@ function getDimensions() { return [
         "maxLocalY": 46.8,
         "minBinY": -2925,
         "maxBinY": 2925,
-        "minR": 2945,
-        "maxR": 3065
+        "minR": 294.5,
+        "maxR": 306.5
     },
     {
         "layer": 0,
@@ -30,8 +30,8 @@ function getDimensions() { return [
         "maxLocalY": 46.8,
         "minBinY": -2925,
         "maxBinY": 2925,
-        "minR": 2945,
-        "maxR": 3065
+        "minR": 294.5,
+        "maxR": 306.5
     },
     {
         "layer": 0,
@@ -47,8 +47,8 @@ function getDimensions() { return [
         "maxLocalY": 46.8,
         "minBinY": -2925,
         "maxBinY": 2925,
-        "minR": 2945,
-        "maxR": 3065
+        "minR": 294.5,
+        "maxR": 306.5
     },
     {
         "layer": 0,
@@ -64,8 +64,8 @@ function getDimensions() { return [
         "maxLocalY": 46.8,
         "minBinY": -2925,
         "maxBinY": 2925,
-        "minR": 2945,
-        "maxR": 3065
+        "minR": 294.5,
+        "maxR": 306.5
     },
     {
         "layer": 0,
@@ -81,8 +81,8 @@ function getDimensions() { return [
         "maxLocalY": 46.8,
         "minBinY": -2925,
         "maxBinY": 2925,
-        "minR": 2945,
-        "maxR": 3065
+        "minR": 294.5,
+        "maxR": 306.5
     },
     {
         "layer": 1,
@@ -98,8 +98,8 @@ function getDimensions() { return [
         "maxLocalY": 49.05,
         "minBinY": -3065,
         "maxBinY": 3065,
-        "minR": 3071,
-        "maxR": 3191
+        "minR": 307.1,
+        "maxR": 319.1
     },
     {
         "layer": 1,
@@ -115,8 +115,8 @@ function getDimensions() { return [
         "maxLocalY": 49.05,
         "minBinY": -3065,
         "maxBinY": 3065,
-        "minR": 3071,
-        "maxR": 3191
+        "minR": 307.1,
+        "maxR": 319.1
     },
     {
         "layer": 1,
@@ -132,8 +132,8 @@ function getDimensions() { return [
         "maxLocalY": 49.05,
         "minBinY": -3065,
         "maxBinY": 3065,
-        "minR": 3071,
-        "maxR": 3191
+        "minR": 307.1,
+        "maxR": 319.1
     },
     {
         "layer": 1,
@@ -149,8 +149,8 @@ function getDimensions() { return [
         "maxLocalY": 49.05,
         "minBinY": -3065,
         "maxBinY": 3065,
-        "minR": 3071,
-        "maxR": 3191
+        "minR": 307.1,
+        "maxR": 319.1
     },
     {
         "layer": 1,
@@ -166,8 +166,8 @@ function getDimensions() { return [
         "maxLocalY": 49.05,
         "minBinY": -3065,
         "maxBinY": 3065,
-        "minR": 3071,
-        "maxR": 3191
+        "minR": 307.1,
+        "maxR": 319.1
     },
     {
         "layer": 2,
@@ -183,8 +183,8 @@ function getDimensions() { return [
         "maxLocalY": 51.25,
         "minBinY": -3203,
         "maxBinY": 3203,
-        "minR": 3197,
-        "maxR": 3317
+        "minR": 319.7,
+        "maxR": 331.7
     },
     {
         "layer": 2,
@@ -200,8 +200,8 @@ function getDimensions() { return [
         "maxLocalY": 51.25,
         "minBinY": -3203,
         "maxBinY": 3203,
-        "minR": 3197,
-        "maxR": 3317
+        "minR": 319.7,
+        "maxR": 331.7
     },
     {
         "layer": 2,
@@ -217,8 +217,8 @@ function getDimensions() { return [
         "maxLocalY": 51.25,
         "minBinY": -3203,
         "maxBinY": 3203,
-        "minR": 3197,
-        "maxR": 3317
+        "minR": 319.7,
+        "maxR": 331.7
     },
     {
         "layer": 2,
@@ -234,8 +234,8 @@ function getDimensions() { return [
         "maxLocalY": 51.25,
         "minBinY": -3203,
         "maxBinY": 3203,
-        "minR": 3197,
-        "maxR": 3317
+        "minR": 319.7,
+        "maxR": 331.7
     },
     {
         "layer": 2,
@@ -251,8 +251,8 @@ function getDimensions() { return [
         "maxLocalY": 51.25,
         "minBinY": -3203,
         "maxBinY": 3203,
-        "minR": 3197,
-        "maxR": 3317
+        "minR": 319.7,
+        "maxR": 331.7
     },
     {
         "layer": 3,
@@ -268,8 +268,8 @@ function getDimensions() { return [
         "maxLocalY": 53.45,
         "minBinY": -3340,
         "maxBinY": 3340,
-        "minR": 3323,
-        "maxR": 3443
+        "minR": 332.3,
+        "maxR": 344.3
     },
     {
         "layer": 3,
@@ -285,8 +285,8 @@ function getDimensions() { return [
         "maxLocalY": 53.45,
         "minBinY": -3340,
         "maxBinY": 3340,
-        "minR": 3323,
-        "maxR": 3443
+        "minR": 332.3,
+        "maxR": 344.3
     },
     {
         "layer": 3,
@@ -302,8 +302,8 @@ function getDimensions() { return [
         "maxLocalY": 53.45,
         "minBinY": -3340,
         "maxBinY": 3340,
-        "minR": 3323,
-        "maxR": 3443
+        "minR": 332.3,
+        "maxR": 344.3
     },
     {
         "layer": 3,
@@ -319,8 +319,8 @@ function getDimensions() { return [
         "maxLocalY": 53.45,
         "minBinY": -3340,
         "maxBinY": 3340,
-        "minR": 3323,
-        "maxR": 3443
+        "minR": 332.3,
+        "maxR": 344.3
     },
     {
         "layer": 3,
@@ -336,8 +336,8 @@ function getDimensions() { return [
         "maxLocalY": 53.45,
         "minBinY": -3340,
         "maxBinY": 3340,
-        "minR": 3323,
-        "maxR": 3443
+        "minR": 332.3,
+        "maxR": 344.3
     },
     {
         "layer": 4,
@@ -353,8 +353,8 @@ function getDimensions() { return [
         "maxLocalY": 55.7,
         "minBinY": -3481,
         "maxBinY": 3481,
-        "minR": 3449,
-        "maxR": 3569
+        "minR": 344.9,
+        "maxR": 356.9
     },
     {
         "layer": 4,
@@ -370,8 +370,8 @@ function getDimensions() { return [
         "maxLocalY": 55.7,
         "minBinY": -3481,
         "maxBinY": 3481,
-        "minR": 3449,
-        "maxR": 3569
+        "minR": 344.9,
+        "maxR": 356.9
     },
     {
         "layer": 4,
@@ -387,8 +387,8 @@ function getDimensions() { return [
         "maxLocalY": 55.7,
         "minBinY": -3481,
         "maxBinY": 3481,
-        "minR": 3449,
-        "maxR": 3569
+        "minR": 344.9,
+        "maxR": 356.9
     },
     {
         "layer": 4,
@@ -404,8 +404,8 @@ function getDimensions() { return [
         "maxLocalY": 55.7,
         "minBinY": -3481,
         "maxBinY": 3481,
-        "minR": 3449,
-        "maxR": 3569
+        "minR": 344.9,
+        "maxR": 356.9
     },
     {
         "layer": 4,
@@ -421,8 +421,8 @@ function getDimensions() { return [
         "maxLocalY": 55.7,
         "minBinY": -3481,
         "maxBinY": 3481,
-        "minR": 3449,
-        "maxR": 3569
+        "minR": 344.9,
+        "maxR": 356.9
     },
     {
         "layer": 5,
@@ -438,8 +438,8 @@ function getDimensions() { return [
         "maxLocalY": 57.9,
         "minBinY": -3618,
         "maxBinY": 3618,
-        "minR": 3575,
-        "maxR": 3695
+        "minR": 357.5,
+        "maxR": 369.5
     },
     {
         "layer": 5,
@@ -455,8 +455,8 @@ function getDimensions() { return [
         "maxLocalY": 57.9,
         "minBinY": -3618,
         "maxBinY": 3618,
-        "minR": 3575,
-        "maxR": 3695
+        "minR": 357.5,
+        "maxR": 369.5
     },
     {
         "layer": 5,
@@ -472,8 +472,8 @@ function getDimensions() { return [
         "maxLocalY": 57.9,
         "minBinY": -3618,
         "maxBinY": 3618,
-        "minR": 3575,
-        "maxR": 3695
+        "minR": 357.5,
+        "maxR": 369.5
     },
     {
         "layer": 5,
@@ -489,8 +489,8 @@ function getDimensions() { return [
         "maxLocalY": 57.9,
         "minBinY": -3618,
         "maxBinY": 3618,
-        "minR": 3575,
-        "maxR": 3695
+        "minR": 357.5,
+        "maxR": 369.5
     },
     {
         "layer": 5,
@@ -506,8 +506,8 @@ function getDimensions() { return [
         "maxLocalY": 57.9,
         "minBinY": -3618,
         "maxBinY": 3618,
-        "minR": 3575,
-        "maxR": 3695
+        "minR": 357.5,
+        "maxR": 369.5
     }
 ];
 }

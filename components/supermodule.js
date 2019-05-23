@@ -115,7 +115,7 @@ class SuperModuleComponent extends ComponentBase {
                 .append("circle")
                 .attr("class", "tracklet")
                 .attr("cy", d => yscale(-d.localY))
-                .attr("cx", d => xscale((layerData[d.layer].minR + layerData[d.layer].maxR) / 2 / 10))
+                .attr("cx", d => xscale((layerData[d.layer].maxR + layerData[d.layer].maxR) / 2))
                 .attr("r", 2);
 
         }
