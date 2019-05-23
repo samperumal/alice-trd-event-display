@@ -1,0 +1,28 @@
+.sector-view-component rect.detector {
+    fill: none;
+    stroke: darkgray;
+}
+
+.sector-view-component path.track {
+    fill: none;
+    stroke: lightskyblue;
+}
+
+
+.sector-view-component path.track.selected {
+    fill: none;
+    stroke: red;
+}
+
+.sector-view-component .zoom {
+    fill: transparent;
+}
+
+.sector-view-component text.sector-number {
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+.sector-view-component .not-selected {
+    opacity: 0.2;
+}

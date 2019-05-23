@@ -1,4 +1,4 @@
-class SuperModuleComponent extends ComponentBase {
+class SectorViewComponent extends ComponentBase {
     constructor(id, width, height, viewBox, config) {
         super(id, width, height, marginDef(5, 5, 5, 5), viewBox);
 
@@ -32,7 +32,7 @@ class SuperModuleComponent extends ComponentBase {
             .call(zoom);
 
         this.rotatingContainer = this.container
-            .classed("supermodule-component", true)
+            .classed("sector-view-component", true)
             .append("g")
             .attr("class", "rotating")
             ;
@@ -73,8 +73,6 @@ class SuperModuleComponent extends ComponentBase {
 
         this.tracks = this.rotatingContainer.append("g")
             .attr("class", "tracks");
-
-        //super.draw();
     }
 
     zoomed() {

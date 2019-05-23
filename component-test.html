@@ -11,7 +11,7 @@
 
     <script src="components/trd-dimensions.js"></script>
     <script src="components/component-base.js"></script>
-    <script src="components/supermodule.js"></script>
+    <script src="components/sector-view.js"></script>
     <script src="components/event-tree.js"></script>
     <script src="components/component-coordinator.js"></script>
 
@@ -20,7 +20,7 @@
 
     <link href='./bootstrap/css/bootstrap.min.css' rel='stylesheet' />
     <link href='./proton/style.min.css' rel='stylesheet' />
-    <link href='./components/supermodule.css' rel='stylesheet' />
+    <link href='./components/sector-view.css' rel='stylesheet' />
 
     <style>
         svg {
@@ -71,8 +71,8 @@
 
         const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
 
-        coordinator.addComponent(new SuperModuleComponent("#supermodule", 300, 300));
-        coordinator.addComponent(new SuperModuleComponent("#supermodule-zoom", 300, 300, "-25 -137 50 50", { r: 1, rotate: true }));
+        coordinator.addComponent(new SectorViewComponent("#supermodule", 300, 300));
+        coordinator.addComponent(new SectorViewComponent("#supermodule-zoom", 300, 300, "-25 -137 50 50", { r: 1, rotate: true }));
 
     </script>
 </body>
