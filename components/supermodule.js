@@ -4,7 +4,7 @@ class SuperModuleComponent extends ComponentBase {
 
         const sectorToRotationAngle = this.sectorToRotationAngle;
 
-        const layerData = this.layerData = getDimensions().filter(d => d.module == 2);
+        const layerData = this.layerData = getDimensions().filter(d => d.stack == 2);
         this.detectorData = d3.range(18)
             .map(s => layerData.map(l => Object.assign({ sector: s, rot: sectorToRotationAngle(s) }, l)))
             .reduce((a, b) => a.concat(b));
