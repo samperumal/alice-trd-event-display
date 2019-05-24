@@ -8,6 +8,10 @@
     stroke: white;
 }
 
+.supermodule-view-component g.detector.not-selected {
+    opacity: 0.3;
+}
+
 .supermodule-view-component .track.selected path {
     fill: none;
     stroke: red;

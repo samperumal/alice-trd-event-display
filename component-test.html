@@ -51,6 +51,10 @@
         #sector-view .sector-view-component text.layer-number {
             display: none;
         }
+
+        #sector-view-zoom .detector.not-selected {
+            opacity: 0.1;
+        }
     </style>
 </head>
 
@@ -74,7 +78,10 @@
         </div>
         <div style="display:block;">
             <div class="component">
-                <svg id="supermodule-view" style="width: 610px; height: 200px;" preserveAspectRatio="none"></svg>
+                <svg id="supermodule-view" style="width: 300; height: 300px;" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+            <div class="component">
+                <svg id="supermodule-view-zoom" style="width: 300; height: 300px;" preserveAspectRatio="xMidYMid meet"></svg>
             </div>
         </div>
     </div>
@@ -87,7 +94,8 @@
 
         coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
         coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-25 -137 50 50", { r: 0.75, rotate: true }));
-        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 700, 400, "-350 -200 700 120"));
+        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
+        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view-zoom", 300, 300, null, { zoom: true }));
 
     </script>
 </body>
