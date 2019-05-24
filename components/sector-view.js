@@ -123,6 +123,7 @@ class SectorViewComponent extends ComponentBase {
             .classed("selected", d => d.id == selectedTrack);
 
         const sectorToRotationAngle = this.sectorToRotationAngle;
+        const transitionDuration = 750;
 
         if (eventData.trdTrack != null && eventData.trdTrack.trdTracklets != null) {
             let tracklets = this.tracklets
@@ -137,21 +138,22 @@ class SectorViewComponent extends ComponentBase {
                 .append("circle")
                 .attr("class", "tracklet")
                 .attr("cy", d => yscale(-d.localY))
-                .attr("cx", d => xscale((layerData[d.layer].minR + layerData[d.layer].maxR) / 2))
+                .attr("cx", d => xscale(layerData[d.layer].midR))
                 .attr("r", this.r);
 
             const sector = eventData.trdTrack.sector;
 
             if (this.config.rotate) {
                 this.rotatingContainer
-                    .transition()
+                    .transition().duration(transitionDuration)
                     .attr("transform", "rotate(" + ((sector - 4) * 20) + ")");
 
                 this.sectorNumbers
-                    .transition()
+                    .transition().duration(transitionDuration)
                     .attr("transform", d => "rotate(" + (-sectorToRotationAngle(d) - ((sector - 4) * 20)) + ")");
 
                 this.layerNumbers
+                    .transition().duration(transitionDuration)
                     .attr("transform", d => "translate(0," + yscale(d.minLocalY - 2) + ")rotate(" + (-d.rot - ((sector - 4) * 20)) + ")");
             }
 
@@ -160,14 +162,15 @@ class SectorViewComponent extends ComponentBase {
         else {
             if (this.config.rotate) {
                 this.rotatingContainer
-                    .transition()
+                    .transition().duration(transitionDuration)
                     .attr("transform", "rotate(0)");
 
                 this.sectorNumbers
-                    .transition()
+                    .transition().duration(transitionDuration)
                     .attr("transform", d => "rotate(" + (-sectorToRotationAngle(d)) + ")");
 
                 this.layerNumbers
+                    .transition().duration(transitionDuration)
                     .attr("transform", d => "translate(0," + yscale(d.minLocalY - 2) + ")rotate(" + (-d.rot) + ")");
             }
 
