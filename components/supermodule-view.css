@@ -8,15 +8,14 @@
     stroke: white;
 }
 
-.supermodule-view-component path.track {
-    fill: none;
-    stroke: lightskyblue;
-}
-
-
-.supermodule-view-component path.track.selected {
+.supermodule-view-component .track.selected path {
     fill: none;
     stroke: red;
+}
+
+.supermodule-view-component .track path {
+    fill: none;
+    stroke: lightskyblue;
 }
 
 .supermodule-view-component line.bin {

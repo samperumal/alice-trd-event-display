@@ -93,12 +93,15 @@ class SupermoduleViewComponent extends ComponentBase {
         tracks.enter()
             .append("g")
             .attr("class", "track")
+            .attr("data-trackid", d => d.id)
             .append("path")
             .attr("class", "track")
             .attr("d", d => line(d.track.path));
 
-        this.tracks.selectAll("path.track")
-            .classed("selected", d => d.id == selectedTrack);
+        this.tracks.selectAll("g.track")
+            .classed("selected", d => d.id == selectedTrack)
+            .filter(d => d.id == selectedTrack)
+            .raise();
 
         if (eventData.trdTrack != null && eventData.trdTrack.trdTracklets != null) {
             let tracklets = this.tracklets
@@ -113,7 +116,7 @@ class SupermoduleViewComponent extends ComponentBase {
                 .attr("class", "tracklet")
                 .attr("cy", d => {
                     const layer = layerData.filter(l => l.layer == d.layer && l.stack == d.stack)[0];
-                    return yscale((layer.minR + layer.maxR) / 2);
+                    return yscale(layer.midR);
                 })
                 .attr("cx", d => {
                     const layer = layerData.filter(l => l.layer == d.layer && l.stack == d.stack)[0];
