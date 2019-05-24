@@ -22,6 +22,12 @@
     dominant-baseline: central;
 }
 
+.sector-view-component text.layer-number {
+    text-anchor: end;
+    dominant-baseline: text-after-edge;
+    font-size: 3px;
+}
+
 .sector-view-component .not-selected {
     opacity: 0.2;
 }

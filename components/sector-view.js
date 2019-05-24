@@ -29,7 +29,8 @@ class SectorViewComponent extends ComponentBase {
             .attr("width", this.displayWidth)
             .attr("height", this.displayHeight)
             .attr("transform", "translate(" + (-this.displayWidth / 2) + "," + (-this.displayHeight / 2) + ")")
-            .call(zoom);
+            //.call(zoom)
+            ;
 
         this.rotatingContainer = this.container
             .classed("sector-view-component", true)
@@ -53,6 +54,13 @@ class SectorViewComponent extends ComponentBase {
             .attr("y", d => yscale(d.minLocalY))
             .attr("height", d => dist(d.minLocalY, d.maxLocalY, yscale))
             .attr("width", d => dist(d.minR, d.maxR, xscale));
+
+        this.layerNumbers = this.detectors
+            .append("g")
+            .append("text")
+            .attr("class", "layer-number")
+            .text(d => d.layer)
+            .attr("transform", d => "translate(0," + yscale(d.minLocalY - 2) + ")rotate(" + (-d.rot) + ")");
 
         this.detectors
             .append("line")
@@ -142,6 +150,9 @@ class SectorViewComponent extends ComponentBase {
                 this.sectorNumbers
                     .transition()
                     .attr("transform", d => "rotate(" + (-sectorToRotationAngle(d) - ((sector - 4) * 20)) + ")");
+
+                this.layerNumbers
+                    .attr("transform", d => "translate(0," + yscale(d.minLocalY - 2) + ")rotate(" + (-d.rot - ((sector - 4) * 20)) + ")");
             }
 
             this.detectors.classed("not-selected", d => d.sector != sector);
@@ -155,6 +166,9 @@ class SectorViewComponent extends ComponentBase {
                 this.sectorNumbers
                     .transition()
                     .attr("transform", d => "rotate(" + (-sectorToRotationAngle(d)) + ")");
+
+                this.layerNumbers
+                    .attr("transform", d => "translate(0," + yscale(d.minLocalY - 2) + ")rotate(" + (-d.rot) + ")");
             }
 
             this.tracklets
