@@ -15,9 +15,9 @@ function getDimensions() { return [
         "maxBinY": 2925,
         "minR": 294.5,
         "maxR": 306.5,
+        "midR": 300.5,
         "minZ": -294.42,
-        "maxZ": -173.94,
-        "zrange": 120.48
+        "maxZ": -173.94
     },
     {
         "layer": 0,
@@ -35,9 +35,9 @@ function getDimensions() { return [
         "maxBinY": 2925,
         "minR": 294.5,
         "maxR": 306.5,
+        "midR": 300.5,
         "minZ": -173.94,
-        "maxZ": -53.46,
-        "zrange": 120.48
+        "maxZ": -53.46
     },
     {
         "layer": 0,
@@ -55,9 +55,9 @@ function getDimensions() { return [
         "maxBinY": 2925,
         "minR": 294.5,
         "maxR": 306.5,
+        "midR": 300.5,
         "minZ": -53.46,
-        "maxZ": 53.46,
-        "zrange": 106.92
+        "maxZ": 53.46
     },
     {
         "layer": 0,
@@ -75,9 +75,9 @@ function getDimensions() { return [
         "maxBinY": 2925,
         "minR": 294.5,
         "maxR": 306.5,
+        "midR": 300.5,
         "minZ": 53.46,
-        "maxZ": 173.94,
-        "zrange": 120.48
+        "maxZ": 173.94
     },
     {
         "layer": 0,
@@ -95,9 +95,9 @@ function getDimensions() { return [
         "maxBinY": 2925,
         "minR": 294.5,
         "maxR": 306.5,
+        "midR": 300.5,
         "minZ": 173.94,
-        "maxZ": 294.42,
-        "zrange": 120.48
+        "maxZ": 294.42
     },
     {
         "layer": 1,
@@ -115,9 +115,9 @@ function getDimensions() { return [
         "maxBinY": 3065,
         "minR": 307.1,
         "maxR": 319.1,
+        "midR": 313.1,
         "minZ": -309.46000000000004,
-        "maxZ": -181.46,
-        "zrange": 128
+        "maxZ": -181.46
     },
     {
         "layer": 1,
@@ -135,9 +135,9 @@ function getDimensions() { return [
         "maxBinY": 3065,
         "minR": 307.1,
         "maxR": 319.1,
+        "midR": 313.1,
         "minZ": -181.46,
-        "maxZ": -53.46,
-        "zrange": 128
+        "maxZ": -53.46
     },
     {
         "layer": 1,
@@ -155,9 +155,9 @@ function getDimensions() { return [
         "maxBinY": 3065,
         "minR": 307.1,
         "maxR": 319.1,
+        "midR": 313.1,
         "minZ": -53.46,
-        "maxZ": 53.46,
-        "zrange": 106.92
+        "maxZ": 53.46
     },
     {
         "layer": 1,
@@ -175,9 +175,9 @@ function getDimensions() { return [
         "maxBinY": 3065,
         "minR": 307.1,
         "maxR": 319.1,
+        "midR": 313.1,
         "minZ": 53.46,
-        "maxZ": 181.46,
-        "zrange": 128
+        "maxZ": 181.46
     },
     {
         "layer": 1,
@@ -195,9 +195,9 @@ function getDimensions() { return [
         "maxBinY": 3065,
         "minR": 307.1,
         "maxR": 319.1,
+        "midR": 313.1,
         "minZ": 181.46,
-        "maxZ": 309.46000000000004,
-        "zrange": 128
+        "maxZ": 309.46000000000004
     },
     {
         "layer": 2,
@@ -215,9 +215,9 @@ function getDimensions() { return [
         "maxBinY": 3203,
         "minR": 319.7,
         "maxR": 331.7,
+        "midR": 325.7,
         "minZ": -320.18000000000006,
-        "maxZ": -188.82000000000002,
-        "zrange": 131.36
+        "maxZ": -188.82000000000002
     },
     {
         "layer": 2,
@@ -235,9 +235,9 @@ function getDimensions() { return [
         "maxBinY": 3203,
         "minR": 319.7,
         "maxR": 331.7,
+        "midR": 325.7,
         "minZ": -188.82000000000002,
-        "maxZ": -53.46,
-        "zrange": 135.36
+        "maxZ": -53.46
     },
     {
         "layer": 2,
@@ -255,9 +255,9 @@ function getDimensions() { return [
         "maxBinY": 3203,
         "minR": 319.7,
         "maxR": 331.7,
+        "midR": 325.7,
         "minZ": -53.46,
-        "maxZ": 53.46,
-        "zrange": 106.92
+        "maxZ": 53.46
     },
     {
         "layer": 2,
@@ -275,9 +275,9 @@ function getDimensions() { return [
         "maxBinY": 3203,
         "minR": 319.7,
         "maxR": 331.7,
+        "midR": 325.7,
         "minZ": 53.46,
-        "maxZ": 188.82000000000002,
-        "zrange": 135.36
+        "maxZ": 188.82000000000002
     },
     {
         "layer": 2,
@@ -295,9 +295,9 @@ function getDimensions() { return [
         "maxBinY": 3203,
         "minR": 319.7,
         "maxR": 331.7,
+        "midR": 325.7,
         "minZ": 188.82000000000002,
-        "maxZ": 320.18000000000006,
-        "zrange": 131.36
+        "maxZ": 320.18000000000006
     },
     {
         "layer": 3,
@@ -315,9 +315,9 @@ function getDimensions() { return [
         "maxBinY": 3340,
         "minR": 332.3,
         "maxR": 344.3,
+        "midR": 338.3,
         "minZ": -335.22,
-        "maxZ": -196.34,
-        "zrange": 138.88
+        "maxZ": -196.34
     },
     {
         "layer": 3,
@@ -335,9 +335,9 @@ function getDimensions() { return [
         "maxBinY": 3340,
         "minR": 332.3,
         "maxR": 344.3,
+        "midR": 338.3,
         "minZ": -196.34,
-        "maxZ": -53.46,
-        "zrange": 142.88
+        "maxZ": -53.46
     },
     {
         "layer": 3,
@@ -355,9 +355,9 @@ function getDimensions() { return [
         "maxBinY": 3340,
         "minR": 332.3,
         "maxR": 344.3,
+        "midR": 338.3,
         "minZ": -53.46,
-        "maxZ": 53.46,
-        "zrange": 106.92
+        "maxZ": 53.46
     },
     {
         "layer": 3,
@@ -375,9 +375,9 @@ function getDimensions() { return [
         "maxBinY": 3340,
         "minR": 332.3,
         "maxR": 344.3,
+        "midR": 338.3,
         "minZ": 53.46,
-        "maxZ": 196.34,
-        "zrange": 142.88
+        "maxZ": 196.34
     },
     {
         "layer": 3,
@@ -395,9 +395,9 @@ function getDimensions() { return [
         "maxBinY": 3340,
         "minR": 332.3,
         "maxR": 344.3,
+        "midR": 338.3,
         "minZ": 196.34,
-        "maxZ": 335.22,
-        "zrange": 138.88
+        "maxZ": 335.22
     },
     {
         "layer": 4,
@@ -415,9 +415,9 @@ function getDimensions() { return [
         "maxBinY": 3481,
         "minR": 344.9,
         "maxR": 356.9,
+        "midR": 350.9,
         "minZ": -342.26,
-        "maxZ": -203.38,
-        "zrange": 138.88
+        "maxZ": -203.38
     },
     {
         "layer": 4,
@@ -435,9 +435,9 @@ function getDimensions() { return [
         "maxBinY": 3481,
         "minR": 344.9,
         "maxR": 356.9,
+        "midR": 350.9,
         "minZ": -203.38,
-        "maxZ": -53.46,
-        "zrange": 149.92
+        "maxZ": -53.46
     },
     {
         "layer": 4,
@@ -455,9 +455,9 @@ function getDimensions() { return [
         "maxBinY": 3481,
         "minR": 344.9,
         "maxR": 356.9,
+        "midR": 350.9,
         "minZ": -53.46,
-        "maxZ": 53.46,
-        "zrange": 106.92
+        "maxZ": 53.46
     },
     {
         "layer": 4,
@@ -475,9 +475,9 @@ function getDimensions() { return [
         "maxBinY": 3481,
         "minR": 344.9,
         "maxR": 356.9,
+        "midR": 350.9,
         "minZ": 53.46,
-        "maxZ": 203.38,
-        "zrange": 149.92
+        "maxZ": 203.38
     },
     {
         "layer": 4,
@@ -495,9 +495,9 @@ function getDimensions() { return [
         "maxBinY": 3481,
         "minR": 344.9,
         "maxR": 356.9,
+        "midR": 350.9,
         "minZ": 203.38,
-        "maxZ": 342.26,
-        "zrange": 138.88
+        "maxZ": 342.26
     },
     {
         "layer": 5,
@@ -515,9 +515,9 @@ function getDimensions() { return [
         "maxBinY": 3618,
         "minR": 357.5,
         "maxR": 369.5,
+        "midR": 363.5,
         "minZ": -342.33000000000004,
-        "maxZ": -210.9,
-        "zrange": 131.43
+        "maxZ": -210.9
     },
     {
         "layer": 5,
@@ -535,9 +535,9 @@ function getDimensions() { return [
         "maxBinY": 3618,
         "minR": 357.5,
         "maxR": 369.5,
+        "midR": 363.5,
         "minZ": -210.9,
-        "maxZ": -53.46,
-        "zrange": 157.44
+        "maxZ": -53.46
     },
     {
         "layer": 5,
@@ -555,9 +555,9 @@ function getDimensions() { return [
         "maxBinY": 3618,
         "minR": 357.5,
         "maxR": 369.5,
+        "midR": 363.5,
         "minZ": -53.46,
-        "maxZ": 53.46,
-        "zrange": 106.92
+        "maxZ": 53.46
     },
     {
         "layer": 5,
@@ -575,9 +575,9 @@ function getDimensions() { return [
         "maxBinY": 3618,
         "minR": 357.5,
         "maxR": 369.5,
+        "midR": 363.5,
         "minZ": 53.46,
-        "maxZ": 210.9,
-        "zrange": 157.44
+        "maxZ": 210.9
     },
     {
         "layer": 5,
@@ -595,9 +595,9 @@ function getDimensions() { return [
         "maxBinY": 3618,
         "minR": 357.5,
         "maxR": 369.5,
+        "midR": 363.5,
         "minZ": 210.9,
-        "maxZ": 342.33000000000004,
-        "zrange": 131.43
+        "maxZ": 342.33000000000004
     }
 ];
 }
