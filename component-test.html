@@ -43,6 +43,12 @@
             margin-bottom: 1.5em;
         }
 
+        div.component p {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 0.25em;
+        }
+
         #sector-view-zoom {
             stroke-width: 0.3;
             font-size: x-small;
@@ -70,18 +76,23 @@
     <div style="display:inline-block;">
         <div style="display:block;">
             <div class="component">
+                <p>Sector view - XY plane</p>
                 <svg id="sector-view" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
             </div>
             <div class="component">
-                <svg id="sector-view-zoom" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
+                <p>Supermodule view - ZY plane</p>
+                <svg id="supermodule-view" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
             </div>
         </div>
         <div style="display:block;">
             <div class="component">
-                <svg id="supermodule-view" style="width: 300; height: 300px;" preserveAspectRatio="xMidYMid meet"></svg>
+                    <p>Sector detail view - XY plane</p>
+                <svg id="sector-view-zoom" style="width: 300; height: 300px;" preserveAspectRatio="xMidYMid meet"></svg>
             </div>
             <div class="component">
-                <svg id="supermodule-view-zoom" style="width: 300; height: 300px;" preserveAspectRatio="xMidYMid meet"></svg>
+                    <p>Supermodule detail view - ZY plane</p>
+                <svg id="supermodule-view-zoom" style="width: 300; height: 300px;"
+                    preserveAspectRatio="xMidYMid meet"></svg>
             </div>
         </div>
     </div>
