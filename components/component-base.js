@@ -49,6 +49,12 @@ class ComponentBase {
         this.container = container;
     }
 
+    transitionViewBox(viewBox, duration) {
+        this.svg    
+            .transition().duration(duration)
+            .attr("viewBox", viewBox);
+    }
+
     draw(event, selectedTrack, selectedTracklet) {
         this.container.selectAll("rect.default").remove();
 

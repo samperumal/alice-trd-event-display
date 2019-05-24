@@ -77,7 +77,7 @@ class SupermoduleViewComponent extends ComponentBase {
             .attr("class", "tracks");
 
         if (this.config.zoom) {
-            this.setViewBox();
+            this.setViewBox(2, 5000);
         }
     }
 
@@ -145,10 +145,12 @@ class SupermoduleViewComponent extends ComponentBase {
         }
     }
 
-    setViewBox(stack) {
+    setViewBox(stack, transitionDuration) {
         if (stack == null) stack = 2;
 
-        const transitionDuration = 750;
+        if (transitionDuration == null) 
+            transitionDuration = 750;
+
         const xscale = this.xscale, yscale = this.yscale;
 
         const thisStack = this.layerData.filter(d => d.stack == stack);

@@ -1,6 +1,6 @@
 class SectorViewComponent extends ComponentBase {
     constructor(id, width, height, viewBox, config) {
-        super(id, width, height, marginDef(5, 5, 5, 5), viewBox);
+        super(id, width, height, marginDef(5, 5, 5, 5));
 
         const sectorToRotationAngle = this.sectorToRotationAngle;
 
@@ -89,6 +89,9 @@ class SectorViewComponent extends ComponentBase {
 
         this.tracks = this.rotatingContainer.append("g")
             .attr("class", "tracks");
+
+        if (viewBox != null)
+            this.transitionViewBox(viewBox, 5000);
     }
 
     zoomed() {
