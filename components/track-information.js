@@ -27,5 +27,10 @@ class TrackInformationComponent {
                 this.elements[el].text(eventData.trdTrack[el]);
             }
         }
+        else {
+            for (const el in this.elements) {
+                this.elements[el].text("");
+            }
+        }
     }
 }
