@@ -84,6 +84,22 @@ class SectorViewComponent extends ComponentBase {
             .attr("transform", d => "rotate(" + (-sectorToRotationAngle(d)) + ")")
             ;
 
+        this.zoomBox = this.container
+            .append("g")
+            .attr("class", "zoom-box")
+            .attr("transform", "rotate(-80)");
+            
+        this.zoomBox.append("line")
+            .attr("class", "zoom-box")
+            .attr("x1", xscale(0)).attr("y1", yscale(0))
+            .attr("x2", xscale.range()[1]).attr("y2", yscale(0));
+
+        this.zoomBox.append("line")
+            .attr("class", "zoom-box")
+            .attr("transform", "rotate(-20)")
+            .attr("x1", xscale(0)).attr("y1", yscale(0))
+            .attr("x2", xscale.range()[1]).attr("y2", yscale(0));
+
         this.tracklets = this.rotatingContainer.append("g")
             .attr("class", "tracklets");
 
@@ -91,7 +107,7 @@ class SectorViewComponent extends ComponentBase {
             .attr("class", "tracks");
 
         if (viewBox != null)
-            this.transitionViewBox(viewBox, 5000);
+            this.transitionViewBox(viewBox, 750);
     }
 
     zoomed() {
@@ -159,6 +175,11 @@ class SectorViewComponent extends ComponentBase {
                     .transition().duration(transitionDuration)
                     .attr("transform", d => "translate(0," + yscale(d.minLocalY - 2) + ")rotate(" + (-d.rot - ((sector - 4) * 20)) + ")");
             }
+            else {
+                this.zoomBox
+                    .transition().duration(transitionDuration)
+                    .attr("transform", "rotate(" + (-sector * 20) + ")");
+            }
 
             this.detectors.classed("not-selected", d => d.sector != sector);
         }
@@ -176,6 +197,11 @@ class SectorViewComponent extends ComponentBase {
                     .transition().duration(transitionDuration)
                     .attr("transform", d => "translate(0," + yscale(d.minLocalY - 2) + ")rotate(" + (-d.rot) + ")");
             }
+            else {
+                this.zoomBox
+                    .transition().duration(transitionDuration)
+                    .attr("transform", "rotate(" + (-4 * 20) + ")");
+            }
 
             this.tracklets
                 .selectAll(".tracklet")
@@ -185,5 +211,3 @@ class SectorViewComponent extends ComponentBase {
         }
     }
 }
-
-// -60 -270 120 120

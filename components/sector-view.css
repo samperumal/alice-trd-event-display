@@ -35,3 +35,7 @@
 .sector-view-component .half-chamber-div {
     stroke: white;
 }
+
+.sector-view-component .zoom-box {
+    stroke: darkgray;
+}

@@ -25,3 +25,8 @@
 .supermodule-view-component line.bin {
     stroke: rgb(233, 233, 233);    
 }
+
+.supermodule-view-component rect.zoom-box {
+    stroke: lightgray;    
+    fill: none;
+}
