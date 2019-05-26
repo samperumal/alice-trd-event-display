@@ -6,8 +6,11 @@ class SectorViewComponent extends ComponentBase {
 
         const layerData = this.layerData = getDimensions().filter(d => d.stack == 2);
         this.detectorData = d3.range(18)
-            .map(s => layerData.map(l => Object.assign({ sector: s, rot: sectorToRotationAngle(s) }, l)))
-            .reduce((a, b) => a.concat(b));
+            .map(s => ({
+                sector: s,
+                rot: sectorToRotationAngle(s),
+                layerData: layerData.map(l => Object.assign({ sector: s, rot: sectorToRotationAngle(s) }, l))
+            }));
 
         this.config = config != null ? config : {};
         this.r = (this.config.r != null) ? this.config.r : 2;
@@ -28,9 +31,7 @@ class SectorViewComponent extends ComponentBase {
             .attr("class", "zoom")
             .attr("width", this.displayWidth)
             .attr("height", this.displayHeight)
-            .attr("transform", "translate(" + (-this.displayWidth / 2) + "," + (-this.displayHeight / 2) + ")")
-            //.call(zoom)
-            ;
+            .attr("transform", "translate(" + (-this.displayWidth / 2) + "," + (-this.displayHeight / 2) + ")");
 
         this.zoomBox = this.container
             .append("g")
@@ -53,15 +54,23 @@ class SectorViewComponent extends ComponentBase {
             .append("g")
             .attr("class", "rotating");
 
-        this.detectors = this.rotatingContainer
+        this.sectors = this.rotatingContainer
             .append("g")
-            .attr("class", "detectors")
-            .selectAll("g.detector")
+            .attr("class", "sectors")
+            .selectAll("g.sector")
             .data(this.detectorData)
             .enter()
             .append("g")
+            .attr("class", "sector")
+            .attr("transform", d => "rotate(" + d.rot + ")");
+
+        this.detectors = this.sectors
+            .selectAll("g.detector")
+            .data(d => d.layerData)
+            .enter()
+            .append("g")
             .attr("class", "detector")
-            .attr("transform", d => "rotate(" + d.rot + ")translate(" + xscale(d.minR) + ",0)");
+            .attr("transform", d => "translate(" + xscale(d.minR) + ", 0)");
 
         this.detectors
             .append("rect")
@@ -80,8 +89,8 @@ class SectorViewComponent extends ComponentBase {
         this.detectors
             .append("line")
             .attr("class", "half-chamber-div")
-            .attr("x1", xscale(0))
-            .attr("x2", d => xscale(d.minR))
+            .attr("x1", 0)
+            .attr("x2", d => xscale(d.maxR) - xscale(d.minR))
             .attr("y1", yscale(0))
             .attr("y2", yscale(0));
 
