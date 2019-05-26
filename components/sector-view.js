@@ -32,11 +32,26 @@ class SectorViewComponent extends ComponentBase {
             //.call(zoom)
             ;
 
+        this.zoomBox = this.container
+            .append("g")
+            .attr("class", "zoom-box")
+            .attr("transform", "rotate(-80)");
+
+        const zoomPath = [
+            [xscale(0), yscale(0)],
+            [xscale.range()[1], yscale(0)],
+            [xscale.range()[1] * Math.cos(20 / 180 * Math.PI), -xscale.range()[1] * Math.sin(20 / 180 * Math.PI)],
+            [xscale(0), yscale(0)]
+        ];
+
+        this.zoomBox.append("path")
+            .attr("class", "zoom-box")
+            .attr("d", d3.line()(zoomPath));
+
         this.rotatingContainer = this.container
             .classed("sector-view-component", true)
             .append("g")
-            .attr("class", "rotating")
-            ;
+            .attr("class", "rotating");
 
         this.detectors = this.rotatingContainer
             .append("g")
@@ -66,7 +81,7 @@ class SectorViewComponent extends ComponentBase {
             .append("line")
             .attr("class", "half-chamber-div")
             .attr("x1", xscale(0))
-            .attr("x2", d => xscale(d.maxR))
+            .attr("x2", d => xscale(d.minR))
             .attr("y1", yscale(0))
             .attr("y2", yscale(0));
 
@@ -83,22 +98,6 @@ class SectorViewComponent extends ComponentBase {
             .text(d => d)
             .attr("transform", d => "rotate(" + (-sectorToRotationAngle(d)) + ")")
             ;
-
-        this.zoomBox = this.container
-            .append("g")
-            .attr("class", "zoom-box")
-            .attr("transform", "rotate(-80)");
-            
-        this.zoomBox.append("line")
-            .attr("class", "zoom-box")
-            .attr("x1", xscale(0)).attr("y1", yscale(0))
-            .attr("x2", xscale.range()[1]).attr("y2", yscale(0));
-
-        this.zoomBox.append("line")
-            .attr("class", "zoom-box")
-            .attr("transform", "rotate(-20)")
-            .attr("x1", xscale(0)).attr("y1", yscale(0))
-            .attr("x2", xscale.range()[1]).attr("y2", yscale(0));
 
         this.tracklets = this.rotatingContainer.append("g")
             .attr("class", "tracklets");

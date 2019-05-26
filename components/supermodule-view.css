@@ -27,6 +27,7 @@
 }
 
 .supermodule-view-component rect.zoom-box {
-    stroke: lightgray;    
-    fill: none;
+    fill: darkgray;
+    stroke: darkgray;
+    opacity: 0.19;
 }

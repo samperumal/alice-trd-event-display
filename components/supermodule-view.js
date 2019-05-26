@@ -18,6 +18,8 @@ class SupermoduleViewComponent extends ComponentBase {
         this.container
             .attr("class", "supermodule-view-component");
 
+        this.zoomBox = this.container.append("rect");
+
         this.detectors = this.container
             .append("g")
             .attr("class", "detectors")
@@ -75,8 +77,6 @@ class SupermoduleViewComponent extends ComponentBase {
 
         this.tracks = this.container.append("g")
             .attr("class", "tracks");
-
-        this.zoomBox = this.container.append("rect");
 
         this.setViewBox(null, 750);
     }
