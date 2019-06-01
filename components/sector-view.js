@@ -15,6 +15,8 @@ class SectorViewComponent extends ComponentBase {
         this.config = config != null ? config : {};
         this.r = (this.config.r != null) ? this.config.r : 2;
 
+        this.selectedEventId = null;
+
         const xscale = this.xscale, yscale = this.yscale;
         xscale.domain([-450, 450]);
         yscale.domain([-450, 450]);
@@ -131,7 +133,13 @@ class SectorViewComponent extends ComponentBase {
         const line = this.line;
         const layerData = this.layerData;
 
+        const sectorToRotationAngle = this.sectorToRotationAngle;
+        const transitionDuration = 750;
+
         const selectedTrack = eventData.trdTrack != null ? eventData.trdTrack.id : null;
+
+        if (this.selectedEventId != eventData.event.id) {
+            this.selectedEventId = eventData.event.id;
 
         let tracks = this.tracks
             .selectAll("g.track")
@@ -146,11 +154,11 @@ class SectorViewComponent extends ComponentBase {
             .attr("class", "track")
             .attr("d", d => line(d.track.path));
 
+        }
+
         this.tracks.selectAll("path.track")
             .classed("selected", d => d.id == selectedTrack);
 
-        const sectorToRotationAngle = this.sectorToRotationAngle;
-        const transitionDuration = 750;
 
         if (eventData.trdTrack != null && eventData.trdTrack.trdTracklets != null) {
             let tracklets = this.tracklets

@@ -9,6 +9,8 @@ class SupermoduleViewComponent extends ComponentBase {
         this.config = config != null ? config : {};
         this.r = (this.config.r != null) ? this.config.r : 2;
 
+        this.selectedEventId = null;
+
         const xscale = this.xscale, yscale = this.yscale;
         xscale.domain([-350, 350]);
         yscale.domain([400, 0]);
@@ -88,19 +90,22 @@ class SupermoduleViewComponent extends ComponentBase {
 
         const selectedTrack = eventData.trdTrack != null ? eventData.trdTrack.id : null;
 
-        let tracks = this.tracks
-            .selectAll("g.track")
-            .data(eventData.event.trdTracks.filter(d => d.track != null && d.track.path != null), d => d.id);
+        if (this.selectedEventId != eventData.event.id) {
+            this.selectedEventId = eventData.event.id;
+            let tracks = this.tracks
+                .selectAll("g.track")
+                .data(eventData.event.trdTracks.filter(d => d.track != null && d.track.path != null), d => d.id);
 
-        tracks.exit().remove();
+            tracks.exit().remove();
 
-        tracks.enter()
-            .append("g")
-            .attr("class", "track")
-            .attr("data-trackid", d => d.id)
-            .append("path")
-            .attr("class", "track")
-            .attr("d", d => line(d.track.path));
+            tracks.enter()
+                .append("g")
+                .attr("class", "track")
+                .attr("data-trackid", d => d.id)
+                .append("path")
+                .attr("class", "track")
+                .attr("d", d => line(d.track.path));
+        }
 
         this.tracks.selectAll("g.track")
             .classed("selected", d => d.id == selectedTrack)
