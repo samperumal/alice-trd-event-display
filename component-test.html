@@ -112,7 +112,14 @@
         </div>
     </div>
     <script>
+        const layerData = this.layerData = getDimensions();
+
         const data = getData();
+        data.forEach(ev => {
+            ev.trdTracklets.forEach(trklt => {
+                trklt.layer = layerData.filter(l => l.layer == trklt.layer && l.stack == trklt.stack)[0];
+            })
+        });
 
         const coordinator = new ComponentCoordinator(data);
 
