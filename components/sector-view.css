@@ -41,3 +41,13 @@
     stroke: darkgray;
     opacity: 0.4;
 }
+
+.sector-view-component .tracklet-plane {
+    stroke: rgb(15, 190, 103);
+    fill: none;
+}
+
+.sector-view-component .tracklet-plane.selected {
+    stroke: red;
+    fill: none;
+}

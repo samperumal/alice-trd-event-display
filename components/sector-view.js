@@ -113,6 +113,9 @@ class SectorViewComponent extends ComponentBase {
         this.tracklets = this.rotatingContainer.append("g")
             .attr("class", "tracklets");
 
+        this.trackletPlanes = this.rotatingContainer.append("g")
+            .attr("class", "trackletPlanes");
+
         this.tracks = this.rotatingContainer.append("g")
             .attr("class", "tracks");
 
@@ -141,19 +144,37 @@ class SectorViewComponent extends ComponentBase {
         if (this.selectedEventId != eventData.event.id) {
             this.selectedEventId = eventData.event.id;
 
-        let tracks = this.tracks
-            .selectAll("g.track")
-            .data(eventData.event.trdTracks.filter(d => d.track != null && d.track.path != null), d => d.id);
+            let tracks = this.tracks
+                .selectAll("g.track")
+                .data(eventData.event.trdTracks.filter(d => d.track != null && d.track.path != null), d => d.id);
 
-        tracks.exit().remove();
+            tracks.exit().remove();
 
-        tracks.enter()
-            .append("g")
-            .attr("class", "track")
-            .append("path")
-            .attr("class", "track")
-            .attr("d", d => line(d.track.path));
+            tracks.enter()
+                .append("g")
+                .attr("class", "track")
+                .append("path")
+                .attr("class", "track")
+                .attr("d", d => line(d.track.path));
 
+            let trackletPlanes = this.trackletPlanes
+                .selectAll("g.tracklet-plane")
+                .data(eventData.event.trdTracklets, d => d.id);
+
+            trackletPlanes.exit().remove();
+
+            trackletPlanes.enter()
+                .append("g")
+                .attr("class", "tracklet-plane")
+                .attr("data-trackletid", d => d.id)
+                .attr("transform", d => "rotate(" + (sectorToRotationAngle(d.sector)) + ")")                
+                .append("line")
+                .attr("class", "tracklet-plane")
+                .attr("y1", d => yscale(-d.localY))
+                .attr("y2", d => yscale(-d.localY))
+                .attr("x1", d => xscale(d.layer.maxR))
+                .attr("x2", d => xscale(d.layer.minR))
+                ;
         }
 
         this.tracks.selectAll("path.track")
