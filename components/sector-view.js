@@ -110,14 +110,11 @@ class SectorViewComponent extends ComponentBase {
             .attr("transform", d => "rotate(" + (-sectorToRotationAngle(d)) + ")")
             ;
 
-        this.tracklets = this.rotatingContainer.append("g")
-            .attr("class", "tracklets");
+        this.tracks = this.rotatingContainer.append("g")
+            .attr("class", "tracks");
 
         this.trackletPlanes = this.rotatingContainer.append("g")
             .attr("class", "trackletPlanes");
-
-        this.tracks = this.rotatingContainer.append("g")
-            .attr("class", "tracks");
 
         if (viewBox != null)
             this.transitionViewBox(viewBox, 750);
@@ -167,35 +164,27 @@ class SectorViewComponent extends ComponentBase {
                 .append("g")
                 .attr("class", "tracklet-plane")
                 .attr("data-trackletid", d => d.id)
-                .attr("transform", d => "rotate(" + (sectorToRotationAngle(d.sector)) + ")")                
+                .attr("transform", d => "rotate(" + (sectorToRotationAngle(d.sector)) + ")")
                 .append("line")
                 .attr("class", "tracklet-plane")
                 .attr("y1", d => yscale(-d.localY))
-                .attr("y2", d => yscale(-d.localY))
+                .attr("y2", d => yscale(-d.localY + (d.dyDx * Math.abs(d.layer.maxR - d.layer.minR))))
                 .attr("x1", d => xscale(d.layer.maxR))
                 .attr("x2", d => xscale(d.layer.minR))
                 ;
         }
 
         this.tracks.selectAll("path.track")
-            .classed("selected", d => d.id == selectedTrack);
-
+            .classed("not-selected", d =>eventData.trdTrack != null && d.id != selectedTrack);
 
         if (eventData.trdTrack != null && eventData.trdTrack.trdTracklets != null) {
-            let tracklets = this.tracklets
-                .selectAll(".tracklet")
-                .data(eventData.trdTrack.trdTracklets, d => d.id);
+            const trackletIds = eventData.trdTrack.trdTracklets.map(d => d.id);
 
-            tracklets.exit().remove();
+            this.trackletPlanes.selectAll(".tracklet-plane")
+                .classed("not-selected", d => !trackletIds.includes(d.id));
 
-            tracklets.enter()
-                .append("g")
-                .attr("transform", d => "rotate(" + (sectorToRotationAngle(d.sector)) + ")")
-                .append("circle")
-                .attr("class", "tracklet")
-                .attr("cy", d => yscale(-d.localY))
-                .attr("cx", d => xscale(layerData[d.layer].midR))
-                .attr("r", this.r);
+            this.trackletPlanes.selectAll(".tracklet-plane")
+                .classed("selected", d => trackletIds.includes(d.id));
 
             const sector = eventData.trdTrack.sector;
 
@@ -240,9 +229,9 @@ class SectorViewComponent extends ComponentBase {
                     .attr("transform", "rotate(" + (-4 * 20) + ")");
             }
 
-            this.tracklets
-                .selectAll(".tracklet")
-                .remove();
+            this.trackletPlanes.selectAll(".tracklet-plane")
+                .classed("selected", false)
+                .classed("not-selected", false);
 
             this.detectors.classed("not-selected", false);
         }

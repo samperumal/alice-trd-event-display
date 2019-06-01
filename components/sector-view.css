@@ -1,16 +1,12 @@
 .sector-view-component rect.detector {
-    fill: lightgray;
-    stroke: white;
+    fill: none;
+    stroke: lightgray;
 }
 
 .sector-view-component path.track {
     fill: none;
     stroke: lightskyblue;
-}
-
-.sector-view-component path.track.selected {
-    fill: none;
-    stroke: red;
+    stroke-dasharray: 5;
 }
 
 .sector-view-component .zoom {
@@ -33,7 +29,7 @@
 }
 
 .sector-view-component .half-chamber-div {
-    stroke: white;
+    stroke: lightgray;
 }
 
 .sector-view-component .zoom-box {
@@ -43,11 +39,14 @@
 }
 
 .sector-view-component .tracklet-plane {
-    stroke: rgb(15, 190, 103);
+    stroke: #f99997;
     fill: none;
+}
+
+.sector-view-component .tracklet-plane.not-selected {
+    opacity: 0.3;
 }
 
 .sector-view-component .tracklet-plane.selected {
     stroke: red;
-    fill: none;
 }
