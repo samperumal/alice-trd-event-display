@@ -32,14 +32,6 @@ class SupermoduleViewComponent extends ComponentBase {
             .attr("class", "detector");
 
         this.detectors
-            .append("rect")
-            .attr("class", "detector")
-            .attr("x", d => xscale(d.minZ))
-            .attr("width", d => xscale(d.maxZ) - xscale(d.minZ))
-            .attr("y", d => yscale(d.maxR))
-            .attr("height", d => yscale(d.minR) - yscale(d.maxR));
-
-        this.detectors
             .selectAll("line.bin")
             .data(d => d3.range(1, d.zegments).map(z => ({
                 x: xscale(d.minZ + z * d.zsize),
@@ -56,7 +48,7 @@ class SupermoduleViewComponent extends ComponentBase {
 
         this.detectors
             .append("rect")
-            .attr("class", "detector-outline")
+            .attr("class", "detector")
             .attr("x", d => xscale(d.minZ))
             .attr("width", d => xscale(d.maxZ) - xscale(d.minZ))
             .attr("y", d => yscale(d.maxR))
@@ -108,9 +100,12 @@ class SupermoduleViewComponent extends ComponentBase {
         }
 
         this.tracks.selectAll("g.track")
-            .classed("selected", d => d.id == selectedTrack)
+            .classed("not-selected", d => eventData.trdTrack != null && d.id != selectedTrack)
             .filter(d => d.id == selectedTrack)
             .raise();
+
+        this.detectors
+            .classed("not-selected", d => eventData.trdTrack != null && d.stack != eventData.trdTrack.stack);
 
         if (eventData.trdTrack != null && eventData.trdTrack.trdTracklets != null) {
             let tracklets = this.tracklets
@@ -133,15 +128,9 @@ class SupermoduleViewComponent extends ComponentBase {
                 })
                 .attr("r", this.r);
 
-            this.detectors
-                .classed("not-selected", d => d.stack != eventData.trdTrack.stack);
-
             this.setViewBox(eventData.trdTrack.stack);
         }
         else {
-            this.detectors
-                .classed("not-selected", false);
-
             this.setViewBox();
         }
     }

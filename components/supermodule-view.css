@@ -1,25 +1,22 @@
 .supermodule-view-component rect.detector {
-    fill: lightgray;
-    stroke: none;
+    fill: none;
+    stroke: lightgray;
 }
 
 .supermodule-view-component rect.detector-outline {
     fill: none;
-    stroke: white;
+    stroke: none;
 }
 
-.supermodule-view-component g.detector.not-selected {
-    opacity: 0.3;
-}
-
-.supermodule-view-component .track.selected path {
-    fill: none;
-    stroke: red;
+.supermodule-view-component .not-selected {
+    opacity: 0.2;
 }
 
 .supermodule-view-component .track path {
     fill: none;
     stroke: lightskyblue;
+    stroke-dasharray: 5;
+    stroke-width: 2px;
 }
 
 .supermodule-view-component line.bin {
@@ -27,7 +24,7 @@
 }
 
 .supermodule-view-component rect.zoom-box {
-    fill: darkgray;
+    fill: lightgray;
     stroke: darkgray;
-    opacity: 0.19;
+    opacity: 0.15;
 }

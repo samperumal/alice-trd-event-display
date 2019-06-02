@@ -7,6 +7,7 @@
     fill: none;
     stroke: lightskyblue;
     stroke-dasharray: 5;
+    stroke-width: 2px;
 }
 
 .sector-view-component .zoom {
@@ -33,9 +34,9 @@
 }
 
 .sector-view-component .zoom-box {
-    fill: darkgray;
+    fill: lightgray;
     stroke: darkgray;
-    opacity: 0.4;
+    opacity: 0.15;
 }
 
 .sector-view-component .tracklet-plane {

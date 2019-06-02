@@ -37,7 +37,7 @@ class SectorViewComponent extends ComponentBase {
 
         this.zoomBox = this.container
             .append("g")
-            .attr("class", "zoom-box")
+            .attr("class", "zoom-box-group")
             .attr("transform", "rotate(-80)");
 
         const zoomPath = [
@@ -175,7 +175,7 @@ class SectorViewComponent extends ComponentBase {
         }
 
         this.tracks.selectAll("path.track")
-            .classed("not-selected", d =>eventData.trdTrack != null && d.id != selectedTrack);
+            .classed("not-selected", d => eventData.trdTrack != null && d.id != selectedTrack);
 
         if (eventData.trdTrack != null && eventData.trdTrack.trdTracklets != null) {
             const trackletIds = eventData.trdTrack.trdTracklets.map(d => d.id);
