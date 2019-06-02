@@ -168,9 +168,9 @@ class SectorViewComponent extends ComponentBase {
                 .append("line")
                 .attr("class", "tracklet-plane")
                 .attr("y1", d => yscale(-d.localY))
-                .attr("y2", d => yscale(-d.localY + (d.dyDx * Math.abs(d.layer.maxR - d.layer.minR))))
-                .attr("x1", d => xscale(d.layer.maxR))
-                .attr("x2", d => xscale(d.layer.minR))
+                .attr("y2", d => yscale(-d.localY + (d.dyDx * Math.abs(d.layerDim.maxR - d.layerDim.minR))))
+                .attr("x1", d => xscale(d.layerDim.maxR))
+                .attr("x2", d => xscale(d.layerDim.minR))
                 ;
         }
 

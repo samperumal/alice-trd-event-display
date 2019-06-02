@@ -122,12 +122,13 @@
         </div>
     </div>
     <script>
-        const layerData = this.layerData = getDimensions();
+        const stackedLayerData = getStackedLayerDimensions();
 
         const data = getData();
         data.forEach(ev => {
-            ev.trdTracklets.forEach(trklt => {
-                trklt.layer = layerData.filter(l => l.layer == trklt.layer && l.stack == trklt.stack)[0];
+            ev.trdTracklets
+                .forEach(trklt => {
+                    trklt.layerDim = stackedLayerData.get(trklt.stack).get(trklt.layer);
             })
         });
 
