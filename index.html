@@ -18,16 +18,34 @@
     <script src="components/track-information.js"></script>
 
     <script src="data.min.js"></script>
+    
     <title>ALICE TRD Event Display - Alpha</title>
 
-    <link href='./bootstrap/css/bootstrap.min.css' rel='stylesheet' />
     <link href='./proton/style.min.css' rel='stylesheet' />
     <link href='./components/sector-view.css' rel='stylesheet' />
     <link href='./components/supermodule-view.css' rel='stylesheet' />
 
     <style>
+        *,
+        *:before,
+        *:after {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.428571429;
+        }
+
         svg {
             border: 1px solid black;
+        }
+
+        p {
+            margin: 0 0 10px;
         }
 
         div.navigation {
