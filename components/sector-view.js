@@ -23,12 +23,6 @@ class SectorViewComponent extends ComponentBase {
 
         this.line = d3.line().x(d => xscale(d.x)).y(d => yscale(-d.y));
 
-        const zoom = d3.zoom()
-            .scaleExtent([1, 40])
-            .translateExtent([[-this.displayWidth / 2, -this.displayHeight / 2], [this.displayWidth / 2, this.displayHeight / 2]])
-            .extent([[-this.displayWidth / 2, -this.displayHeight / 2], [this.displayWidth / 2, this.displayHeight / 2]])
-            .on("zoom", this.zoomed.bind(this));
-
         this.container.append("rect")
             .attr("class", "zoom")
             .attr("width", this.displayWidth)
@@ -86,7 +80,7 @@ class SectorViewComponent extends ComponentBase {
             .append("text")
             .attr("class", "layer-number")
             .text(d => d.layer)
-            .attr("transform", d => "translate(0," + yscale(d.minLocalY - 2) + ")rotate(" + (-d.rot) + ")");
+            .attr("transform", this.layerNumberPosition.bind(this, 4));
 
         this.detectors
             .append("line")
@@ -96,6 +90,8 @@ class SectorViewComponent extends ComponentBase {
             .attr("y1", yscale(0))
             .attr("y2", yscale(0));
 
+        const rotate = this.config.rotate;
+
         this.sectorNumbers = this.rotatingContainer
             .append("g")
             .attr("class", "sector-number")
@@ -103,7 +99,7 @@ class SectorViewComponent extends ComponentBase {
             .data(d3.range(18))
             .enter()
             .append("g")
-            .attr("transform", d => "rotate(" + sectorToRotationAngle(d) + ")translate(" + (xscale(d3.max(layerData, d2 => d2.maxR) * 1.1)) + ", 0)")
+            .attr("transform", d => "rotate(" + sectorToRotationAngle(d) + ")translate(" + (xscale(d3.max(layerData, d2 => d2.maxR) * (rotate ? 1.04 : 1.1))) + ", 0)")
             .append("text")
             .attr("class", "sector-number")
             .text(d => d)
@@ -197,7 +193,7 @@ class SectorViewComponent extends ComponentBase {
 
                 this.layerNumbers
                     .transition().duration(transitionDuration)
-                    .attr("transform", d => "translate(0," + yscale(d.minLocalY - 2) + ")rotate(" + (-d.rot - ((sector - 4) * 20)) + ")");
+                    .attr("transform", this.layerNumberPosition.bind(this, sector));
             }
             else {
                 this.zoomBox
@@ -219,7 +215,7 @@ class SectorViewComponent extends ComponentBase {
 
                 this.layerNumbers
                     .transition().duration(transitionDuration)
-                    .attr("transform", d => "translate(0," + yscale(d.minLocalY - 2) + ")rotate(" + (-d.rot) + ")");
+                    .attr("transform", this.layerNumberPosition.bind(this, 4));
             }
             else {
                 this.zoomBox
@@ -233,5 +229,9 @@ class SectorViewComponent extends ComponentBase {
 
             this.detectors.classed("not-selected", false);
         }
+    }
+
+    layerNumberPosition(sector, d) {
+        return "translate(" + this.xscale(0) + "," + this.yscale(d.minLocalY - 4) + ")rotate(" + (-d.rot - ((sector - 4) * 20)) + ")";
     }
 }

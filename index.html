@@ -18,7 +18,7 @@
     <script src="components/track-information.js"></script>
 
     <script src="data.min.js"></script>
-    
+
     <title>ALICE TRD Event Display - Alpha</title>
 
     <link href='./proton/style.min.css' rel='stylesheet' />
@@ -68,7 +68,15 @@
             margin-bottom: 0.25em;
         }
 
-        #sector-view-zoom,
+        #sector-view-zoom {
+            stroke-width: 0.1;
+            font-size: 5px;
+        }
+
+        #sector-view-zoom g.tracklet-plane {
+            stroke-width: 0.3;
+        }
+
         #supermodule-view-zoom {
             stroke-width: 0.3;
             font-size: x-small;
@@ -76,6 +84,10 @@
 
         #sector-view .sector-view-component text.layer-number {
             display: none;
+        }
+
+        #sector-view-zoom .sector-view-component text.layer-number {
+            font-size: 2px;
         }
 
         #sector-view-zoom .detector.not-selected {
@@ -163,12 +175,12 @@
         const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
 
         coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
-        coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-25 -137 50 50", { r: 0.75, rotate: true }));
+        coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-22 -129 44 44", { r: 0.75, rotate: true }));
         coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
         coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view-zoom", 300, 300, null, { zoom: true }));
         coordinator.addComponent(new TrackInformationComponent("#track-information"));
 
-        if (false)
+        if (true)
             setTimeout(() => $("#dataTree").jstree("select_node", tree.treeData[1].children[0]), 500);
 
     </script>
