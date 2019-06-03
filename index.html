@@ -144,6 +144,9 @@
         coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view-zoom", 300, 300, null, { zoom: true }));
         coordinator.addComponent(new TrackInformationComponent("#track-information"));
 
+        if (false)
+            setTimeout(() => $("#dataTree").jstree("select_node", tree.treeData[1].children[0]), 500);
+
     </script>
 </body>
 
