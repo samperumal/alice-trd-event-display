@@ -32,7 +32,7 @@
 
         div.navigation {
             width: 300px;
-            max-height: 300px;
+            max-height: 600px;
             display: inline-block;
             overflow: auto;
             vertical-align: top;
@@ -83,11 +83,17 @@
 
 <body>
     <div class="navigation">
+        <div style="margin: 1em;">
+            <p style="font-size: medium; ">Available events</p>
+            <div id="dataTree">
+            </div>
+        </div>
+        <div style="margin: 1em;">
+            <p style="font-size: medium; ">Older versions</p>
+            <a href="index.v1.html">Version 1</a>
+        </div>
         <div style="display: none;">
             <img src="alice-coord.png" style="width: 300px;" />
-        </div>
-        <div id="dataTree">
-
         </div>
     </div>
     <div style="display:inline-block;">
@@ -102,7 +108,7 @@
             </div>
             <div class="component" style="vertical-align: top;">
                 <p>Track Information</p>
-                <div style="width: 300px; height: 300px;">
+                <div style="width: 300px; height: 300px; padding: 1em; border: 1px solid black;">
                     <table>
                         <tbody id="track-information">
 
@@ -131,7 +137,7 @@
             ev.trdTracklets
                 .forEach(trklt => {
                     trklt.layerDim = stackedLayerData.get(trklt.stack).get(trklt.layer);
-            })
+                })
         });
 
         const coordinator = new ComponentCoordinator(data);
