@@ -1,14 +1,9 @@
 .supermodule-view-component rect.detector {
     fill: none;
-    stroke: lightgray;
+    stroke: darkgray;
 }
 
-.supermodule-view-component rect.detector-outline {
-    fill: none;
-    stroke: none;
-}
-
-.supermodule-view-component .not-selected {
+.supermodule-view-component .detector.not-selected, .supermodule-view-component g.track.not-selected {
     opacity: 0.2;
 }
 
@@ -19,8 +14,21 @@
     stroke-width: 2px;
 }
 
-.supermodule-view-component line.bin {
-    stroke: rgb(233, 233, 233);    
+.supermodule-view-component rect.bin {
+    stroke: rgb(233, 233, 233);   
+    fill: none; 
+}
+
+.supermodule-view-component rect.tracklet {
+    fill: #f99997;
+}
+
+.supermodule-view-component rect.tracklet.selected {
+    fill: rgb(209, 39, 39); 
+}
+
+.supermodule-view-component rect.tracklet.not-selected {
+    fill: #fdf4f4;
 }
 
 .supermodule-view-component rect.zoom-box {

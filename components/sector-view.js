@@ -181,9 +181,7 @@ class SectorViewComponent extends ComponentBase {
             const trackletIds = eventData.trdTrack.trdTracklets.map(d => d.id);
 
             this.trackletPlanes.selectAll(".tracklet-plane")
-                .classed("not-selected", d => !trackletIds.includes(d.id));
-
-            this.trackletPlanes.selectAll(".tracklet-plane")
+                .classed("not-selected", d => !trackletIds.includes(d.id))
                 .classed("selected", d => trackletIds.includes(d.id));
 
             const sector = eventData.trdTrack.sector;

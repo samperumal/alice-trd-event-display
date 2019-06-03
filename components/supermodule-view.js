@@ -22,6 +22,9 @@ class SupermoduleViewComponent extends ComponentBase {
 
         this.zoomBox = this.container.append("rect");
 
+        this.tracklets = this.container.append("g")
+            .attr("class", "tracklets");
+
         this.detectors = this.container
             .append("g")
             .attr("class", "detectors")
@@ -32,19 +35,22 @@ class SupermoduleViewComponent extends ComponentBase {
             .attr("class", "detector");
 
         this.detectors
-            .selectAll("line.bin")
-            .data(d => d3.range(1, d.zegments).map(z => ({
-                x: xscale(d.minZ + z * d.zsize),
-                y1: yscale(d.minR),
-                y2: yscale(d.maxR)
+            .selectAll("rect.bin")
+            .data(d => d3.range(0, d.zegments).map(z => ({
+                detector: d,
+                bin: z,
+                x: xscale(d.minZ),
+                width: xscale((z + 1) * d.zsize),
+                y: yscale(d.maxR),
+                height: Math.abs(yscale(d.maxR) - yscale(d.minR))
             })))
             .enter()
-            .append("line")
+            .append("rect")
             .attr("class", "bin")
-            .attr("x1", d => d.x)
-            .attr("x2", d => d.x)
-            .attr("y1", d => d.y1)
-            .attr("y2", d => d.y2);
+            .attr("x", d => d.x)
+            .attr("y", d => d.y)
+            .attr("width", d => d.width)
+            .attr("height", d => d.height);
 
         this.detectors
             .append("rect")
@@ -65,9 +71,6 @@ class SupermoduleViewComponent extends ComponentBase {
             .text(d => d.stack)
             .attr("x", d => xscale((d.minZ + d.maxZ) / 2))
             .attr("y", d => yscale(d.maxR + 10));
-
-        this.tracklets = this.container.append("g")
-            .attr("class", "tracklets");
 
         this.tracks = this.container.append("g")
             .attr("class", "tracks");
@@ -97,6 +100,21 @@ class SupermoduleViewComponent extends ComponentBase {
                 .append("path")
                 .attr("class", "track")
                 .attr("d", d => line(d.track.path));
+
+            let trackletPlanes = this.tracklets
+                .selectAll("rect.tracklet")
+                .data(eventData.event.trdTracklets, d => d.id);
+
+            trackletPlanes.exit().remove();
+
+            trackletPlanes.enter()
+                .append("rect")
+                .attr("class", "tracklet")
+                .attr("data-trackletid", d => d.id)
+                .attr("x", d => xscale(d.layerDim.minZ + d.binZ * d.layerDim.zsize))
+                .attr("y", d => yscale(d.layerDim.maxR))
+                .attr("width", d => xscale(d.layerDim.zsize))
+                .attr("height", d => Math.abs(yscale(d.layerDim.maxR) - yscale(d.layerDim.minR)));
         }
 
         this.tracks.selectAll("g.track")
@@ -108,30 +126,21 @@ class SupermoduleViewComponent extends ComponentBase {
             .classed("not-selected", d => eventData.trdTrack != null && d.stack != eventData.trdTrack.stack);
 
         if (eventData.trdTrack != null && eventData.trdTrack.trdTracklets != null) {
-            let tracklets = this.tracklets
-                .selectAll(".tracklet")
-                .data(eventData.trdTrack.trdTracklets, d => d.id);
+            const trackletIds = eventData.trdTrack.trdTracklets.map(d => d.id);
+            this.tracklets.selectAll("rect.tracklet")
+                .classed("not-selected", d => !trackletIds.includes(d.id))
+                .classed("selected", d => trackletIds.includes(d.id));
 
-            tracklets.exit().remove();
-
-            tracklets.enter()
-                .append("g")
-                .append("circle")
-                .attr("class", "tracklet")
-                .attr("cy", d => {
-                    const layer = layerData.filter(l => l.layer == d.layer && l.stack == d.stack)[0];
-                    return yscale(layer.midR);
-                })
-                .attr("cx", d => {
-                    const layer = layerData.filter(l => l.layer == d.layer && l.stack == d.stack)[0];
-                    return xscale(layer.minZ + (d.binZ + 0.5) * layer.zsize);
-                })
-                .attr("r", this.r);
+            this.tracklets.selectAll("rect.tracklet.selected").raise();
 
             this.setViewBox(eventData.trdTrack.stack);
         }
         else {
             this.setViewBox();
+
+            this.tracklets.selectAll("rect.tracklet")
+                .classed("not-selected", d => false)
+                .classed("selected", d => false);
         }
     }
 
