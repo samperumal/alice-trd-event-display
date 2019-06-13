@@ -5,3 +5,4 @@ openday/
 data/*
 data/data*.js
 geometry/*.json
+js/
