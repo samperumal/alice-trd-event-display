@@ -13,6 +13,7 @@
     <script src="components/component-base.js"></script>
     <script src="components/sector-view.js"></script>
     <script src="components/supermodule-view.js"></script>
+    <script src="components/digits-view.js"></script>
     <script src="components/event-tree.js"></script>
     <script src="components/component-coordinator.js"></script>
     <script src="components/track-information.js"></script>
@@ -24,6 +25,7 @@
     <link href='./proton/style.min.css' rel='stylesheet' />
     <link href='./components/sector-view.css' rel='stylesheet' />
     <link href='./components/supermodule-view.css' rel='stylesheet' />
+    <link href='./components/digits-view.css' rel='stylesheet' />
 
     <style>
         *,
@@ -50,10 +52,13 @@
 
         div.navigation {
             width: 300px;
-            max-height: 600px;
             display: inline-block;
-            overflow: auto;
             vertical-align: top;
+        }
+
+        #tree-container {
+            height: 450px;
+            overflow: auto;
         }
 
         div.component {
@@ -109,10 +114,33 @@
 
 <body>
     <div class="navigation">
-        <div style="margin: 1em;">
+        <div style="margin: 1em;" id="tree-container">
             <p style="font-size: medium; ">Available events</p>
             <div id="dataTree">
             </div>
+        </div>
+        <div style="margin: 1em" id="digit-input-container">
+            <p style="font-size: medium">Digit view controls</p>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Sector:</td>
+                        <td><input type="number" value="0" id="sector-input" min="0" max="17" /></td>
+                    </tr>
+                    <tr>
+                        <td>Stack:</td>
+                        <td><input type="number" value="0" id="stack-input" min="0" max="4" /></td>
+                    </tr>
+                    <tr>
+                        <td>Layer:</td>
+                        <td><input type="number" value="0" id="layer-input" min="0" max="5" /></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><input type="button" value="Load" /></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         <div style="margin: 1em;">
             <p style="font-size: medium; ">Older versions</p>
@@ -132,15 +160,9 @@
                 <p>Supermodule view - ZY plane</p>
                 <svg id="supermodule-view" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
             </div> -->
-            <div class="component" style="vertical-align: top;">
-                <p>Track Information</p>
-                <div style="width: 300px; height: 300px; padding: 1em; border: 1px solid black;">
-                    <table>
-                        <tbody id="track-information">
-
-                        </tbody>
-                    </table>
-                </div>
+            <div class="component">
+                <p>Digits detail view</p>
+                <svg id="digits-view" style="width: 600px; height: 300px;" preserveAspectRatio="xMidYMid meet"></svg>
             </div>
         </div>
         <div style="display:block;">
@@ -153,6 +175,16 @@
                 <svg id="supermodule-view-zoom" style="width: 300px; height: 300px;"
                     preserveAspectRatio="xMidYMid meet"></svg>
             </div> -->
+            <!-- <div class="component" style="vertical-align: top;">
+                <p>Track Information</p>
+                <div style="width: 300px; height: 300px; padding: 1em; border: 1px solid black;">
+                    <table>
+                        <tbody id="track-information">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div> -->
         </div>
     </div>
     <script>
@@ -161,12 +193,12 @@
         function ajoin(a, b) { return a.concat(b); }
 
         const data = getData();
-        
+
         data.forEach(ev => {
             ev.trdTracks = ev.trdTracks
                 .filter(t => t.track != null && t.track.path != null && t.track.path.length > 0)
-            
-            // Performance filtering
+
+                // Performance filtering
                 .slice(0, 25);
             const usedTracklets = ev.trdTracks.map(t => t.trdTracklets.map(tl => tl.id)).reduce(ajoin);
             ev.trdTracklets = ev.trdTracklets.filter(tl => usedTracklets.includes(tl.id) || Math.random() < 0.1);
@@ -185,7 +217,13 @@
         // coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-22 -129 44 44", { r: 0.75, rotate: true }));
         // coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
         // coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view-zoom", 300, 300, null, { zoom: true }));
-        coordinator.addComponent(new TrackInformationComponent("#track-information"));
+        // coordinator.addComponent(new TrackInformationComponent("#track-information"));
+
+        coordinator.addComponent(new DigitsViewComponent("#digits-view", 600, 300, null, {
+            sectorInput: "#sector-input",
+            stackInput: "#stack-input",
+            layerInput: "#layer-input"
+        }));
 
         if (true)
             setTimeout(() => $("#dataTree").jstree("select_node", tree.treeData[1].children[0]), 500);
