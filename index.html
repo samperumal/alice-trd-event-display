@@ -163,8 +163,10 @@
         <div style="display:block;">
             <div class="component">
                 <p>Digits detail view</p>
-                <svg id="digits-view" style="width: 800px; height: 600px;" preserveAspectRatio="xMidYMid meet"></svg>
+                <svg id="digits-view" style="width: 1000px; height: 600px;" preserveAspectRatio="xMidYMid meet"></svg>
             </div>
+            </div>
+        <div style="display:block;">
             <div class="component" style="margin: 1em; vertical-align: top;" id="digit-input-container">
                 <p style="font-size: medium">Digit view controls</p>
                 <table>
@@ -226,7 +228,7 @@
         coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view-zoom", 300, 300, null, { zoom: true }));
         coordinator.addComponent(new TrackInformationComponent("#track-information"));
 
-        const digitsView = new DigitsViewComponent("#digits-view", 800, 600, null, {
+        const digitsView = new DigitsViewComponent("#digits-view", 1000, 600, null, {
             eventInput: "#event-input",
             sectorInput: "#sector-input",
             stackInput: "#stack-input",

@@ -7,3 +7,8 @@ rect.pad-background {
     stroke: black;
     fill: white;
 }
+
+path.pad-row {
+    fill: none;
+    stroke: black;
+}

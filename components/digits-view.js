@@ -1,8 +1,8 @@
-const padw = 5, padh = 5;
+const padw = 4, padh = 5;
         
 class DigitsViewComponent extends ComponentBase {
     constructor(id, width, height, viewBox, config) {
-        super(id, width, height, marginDef(5, 5, 5, 5));
+        super(id, width, height, marginDef(5, 5, 5, 5), `0 0 ${width} ${height}`);
 
         this.eventInput = d3.select(config.eventInput).node();
         this.sectorInput = d3.select(config.sectorInput).node();
@@ -17,7 +17,10 @@ class DigitsViewComponent extends ComponentBase {
         this.dataLoadUrl = config.dataLoadUrl;
 
         this.sumGroup = this.container.append("g")
-            .attr("transform", `translate(-${padw * 72}, -${this.componentHeight / 2})`);
+            .attr("transform", `translate(30, 20)`);
+
+        this.graphGroup = this.container.append("g")
+            .attr("transform", `translate(650, 0)`);
     }
 
     draw(eventData) {
@@ -54,7 +57,7 @@ class DigitsViewComponent extends ComponentBase {
 
             allLayers.enter().append("g")
                 .attr("class", "layer")
-                .on("mouseenter", d => console.log(d))
+                .on("mouseenter", this.drawPadRows.bind(this))
                 .append("rect")
                 .attr("class", "pad-background")
                 .attr("x", -2)
@@ -66,7 +69,7 @@ class DigitsViewComponent extends ComponentBase {
 
             const allPads = this.sumGroup
                 .selectAll("g.layer")
-                .attr("transform", d => `translate(0, ${(5 - d.layer) * padh * 18 + 20})`)
+                .attr("transform", d => `translate(0, ${(5 - d.layer) * padh * 19})`)
                 .selectAll("rect.pad-sum")
                 .data(d => d.pads, d => d.row * 144 + d.col);
 
@@ -96,5 +99,52 @@ class DigitsViewComponent extends ComponentBase {
         catch (err) {
             console.error(err);
         }
+    }
+
+    drawPadRows(d) {
+        const rows = d3.range(16).map(d => ({
+            row: d,
+            pads: []
+        }));
+
+        for (const pad of d.pads) {
+            pad.y 
+            rows[pad.row].pads.push(pad);
+        }
+
+        const yband = d3.scaleBand().domain(d3.range(16))
+            .range([10, this.componentHeight - 20])
+            .paddingInner(0.1);
+
+        const xscale = d3.scaleLinear().domain([0, 144]).range([0, 300]);
+
+        const line = d3.line().x(d => xscale(d.col)).y(d => d.yscale(d.tsum));
+
+        for (const row of rows) {            
+            row.pads.sort((a, b) => a.col - b.col);
+            row.yscale = d3.scaleLinear()
+                .domain(d3.extent(row.pads, d => d.tsum))
+                .range([yband(row.row) + yband.bandwidth(), yband(row.row)]);
+
+            row.line = d3.line().x(d => xscale(d.col)).y(d => row.yscale(d.tsum));
+        }
+
+        this.graphGroup
+            .selectAll("g.pad-row")
+            .remove();
+
+        this.graphGroup
+            .selectAll("g.pad-row")
+            .data(rows, d => d.row)
+            .enter()
+            .append("g")
+            .attr("class", "pad-row")
+            .append("path")
+            .attr("class", "pad-row");
+
+        this.graphGroup.selectAll("path.pad-row")
+            .attr("d", d => d.line(d.pads));
+
+        console.log(rows);
     }
 }
