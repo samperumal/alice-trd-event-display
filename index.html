@@ -124,6 +124,10 @@
             <table>
                 <tbody>
                     <tr>
+                        <td></td>Event:</td>
+                        <td><input type="number" value="0" id="event-input" min="0" /></td>
+                    </tr>
+                    <tr>
                         <td>Sector:</td>
                         <td><input type="number" value="0" id="sector-input" min="0" max="17" /></td>
                     </tr>
@@ -137,7 +141,7 @@
                     </tr>
                     <tr>
                         <td></td>
-                        <td><input type="button" value="Load" /></td>
+                        <td><input type="button" value="Load" id="load-digits" /></td>
                     </tr>
                 </tbody>
             </table>
@@ -219,14 +223,23 @@
         // coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view-zoom", 300, 300, null, { zoom: true }));
         // coordinator.addComponent(new TrackInformationComponent("#track-information"));
 
-        coordinator.addComponent(new DigitsViewComponent("#digits-view", 600, 300, null, {
+        const digitsView = new DigitsViewComponent("#digits-view", 750, 300, null, {
+            eventInput: "#event-input",
             sectorInput: "#sector-input",
             stackInput: "#stack-input",
-            layerInput: "#layer-input"
-        }));
+            layerInput: "#layer-input",
+            buttons: ["#load-digits"],
+            dataLoadUrl: "data/"
+        });
 
-        if (true)
-            setTimeout(() => $("#dataTree").jstree("select_node", tree.treeData[1].children[0]), 500);
+        coordinator.addComponent(digitsView);
+
+        if (true) {
+            setTimeout(function () {
+                $("#dataTree").jstree("select_node", tree.treeData[1].children[0]);
+                digitsView.drawDigits();
+            }, 500);
+        }
 
     </script>
 </body>
