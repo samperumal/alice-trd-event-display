@@ -1,3 +1,5 @@
+const padw = 5, padh = 5;
+        
 class DigitsViewComponent extends ComponentBase {
     constructor(id, width, height, viewBox, config) {
         super(id, width, height, marginDef(5, 5, 5, 5));
@@ -15,7 +17,7 @@ class DigitsViewComponent extends ComponentBase {
         this.dataLoadUrl = config.dataLoadUrl;
 
         this.sumGroup = this.container.append("g")
-            .attr("transform", `translate(-${this.componentWidth / 2}, 0)`);
+            .attr("transform", `translate(-${padw * 72}, -${this.componentHeight / 2})`);
     }
 
     draw(eventData) {
@@ -40,22 +42,30 @@ class DigitsViewComponent extends ComponentBase {
         const eventNo = this.eventInput.attr("value");
         const sector = this.sectorInput.attr("value");
         const stack = this.stackInput.attr("value");
-        const layer = this.layerInput.attr("value");
-
-        const padw = 5, padh = 5;
+        //const layer = this.layerInput.attr("value");
 
         try {
-            console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack} Layer: ${layer}`);            
-            const data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.${layer}.json`);
+            console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}`);            
+            const data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
             console.log(data);
 
-            const allRows = this.sumGroup.selectAll("rect.pad-sum")
-                .data(data.pads, d => d.row * 144 + d.col);
+            const allLayers = this.sumGroup.selectAll("g.layer")
+                .data(data.layers);
+
+            allLayers.enter().append("g").attr("class", "layer");
+
+            allLayers.exit().remove();
+
+            const allRows = this.sumGroup
+                .selectAll("g.layer")
+                .attr("transform", d => `translate(0, ${d.layer * padh * 17})`)
+                .selectAll("rect.pad-sum")
+                .data(d => d.pads, d => d.row * 144 + d.col);
 
             allRows.exit().remove();
 
             function fillColour(d) {
-                const gray = Math.min(256 - 256 * d.tsum / 512, 225);
+                const gray = Math.min(256 - 256 * d.tsum / 512, 240);
 
                 return `rgb(${gray}, ${gray}, ${gray})`;
             }
@@ -63,10 +73,10 @@ class DigitsViewComponent extends ComponentBase {
             allRows.enter()
                 .append("rect")
                 .attr("class", "pad-sum")
-                .attr("x", d => d.col * padw)
-                .attr("y", d => d.row * padh)
-                .attr("width", padw)
-                .attr("height", padh)
+                .attr("x", d => d.col * padw + 1)
+                .attr("y", d => d.row * padh + 1)
+                .attr("width", padw - 1)
+                .attr("height", padh - 1)
                 .style("fill", fillColour)
                 ;
 
