@@ -163,36 +163,13 @@
         <div style="display:block;">
             <div class="component">
                 <p>Digits detail view</p>
+                <p>
+                    <span><label for="event-input">Event: </label><input type="number" value="0" id="event-input" min="0" /></span>
+                    <span><label for="sector-input">Sector: </label><input type="number" value="0" id="sector-input" min="0" /></span>
+                    <span><label for="stack-input">Stack: </label><input type="number" value="0" id="stack-input" min="0" /></span>
+                    <span><input type="button" value="Load" id="load-digits" /></span>
+                </p>
                 <svg id="digits-view" style="width: 1000px; height: 600px;" preserveAspectRatio="xMidYMid meet"></svg>
-            </div>
-            </div>
-        <div style="display:block;">
-            <div class="component" style="margin: 1em; vertical-align: top;" id="digit-input-container">
-                <p style="font-size: medium">Digit view controls</p>
-                <table>
-                    <tbody>
-                        <tr>
-                            <td>Event:</td>
-                            <td><input type="number" value="0" id="event-input" min="0" /></td>
-                        </tr>
-                        <tr>
-                            <td>Sector:</td>
-                            <td><input type="number" value="0" id="sector-input" min="0" max="17" /></td>
-                        </tr>
-                        <tr>
-                            <td>Stack:</td>
-                            <td><input type="number" value="0" id="stack-input" min="0" max="4" /></td>
-                        </tr>
-                        <tr>
-                            <td>Layer:</td>
-                            <td><input type="number" value="0" id="layer-input" min="0" max="5" /></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td><input type="button" value="Load" id="load-digits" /></td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>

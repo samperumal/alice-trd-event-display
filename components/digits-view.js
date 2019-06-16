@@ -114,7 +114,7 @@ class DigitsViewComponent extends ComponentBase {
 
         const yband = d3.scaleBand().domain(d3.range(16))
             .range([10, this.componentHeight - 20])
-            .paddingInner(0.1);
+            .paddingInner(0.2);
 
         const xscale = d3.scaleLinear().domain([0, 144]).range([0, 300]);
 
