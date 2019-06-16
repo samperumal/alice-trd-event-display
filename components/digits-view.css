@@ -2,3 +2,8 @@ rect.pad-sum {
     stroke: none;
     fill: none;
 }
+
+rect.pad-background {
+    stroke: black;
+    fill: white;
+}

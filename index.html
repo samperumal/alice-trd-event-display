@@ -119,33 +119,6 @@
             <div id="dataTree">
             </div>
         </div>
-        <div style="margin: 1em" id="digit-input-container">
-            <p style="font-size: medium">Digit view controls</p>
-            <table>
-                <tbody>
-                    <tr>
-                        <td></td>Event:</td>
-                        <td><input type="number" value="0" id="event-input" min="0" /></td>
-                    </tr>
-                    <tr>
-                        <td>Sector:</td>
-                        <td><input type="number" value="0" id="sector-input" min="0" max="17" /></td>
-                    </tr>
-                    <tr>
-                        <td>Stack:</td>
-                        <td><input type="number" value="0" id="stack-input" min="0" max="4" /></td>
-                    </tr>
-                    <tr>
-                        <td>Layer:</td>
-                        <td><input type="number" value="0" id="layer-input" min="0" max="5" /></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td><input type="button" value="Load" id="load-digits" /></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
         <div style="margin: 1em;">
             <p style="font-size: medium; ">Older versions</p>
             <a href="index.v1.html">Version 1</a>
@@ -156,30 +129,27 @@
     </div>
     <div style="display:inline-block;">
         <div style="display:block;">
-            <!-- <div class="component">
+            <div class="component">
                 <p>Sector view - XY plane</p>
                 <svg id="sector-view" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
             </div>
             <div class="component">
                 <p>Supermodule view - ZY plane</p>
                 <svg id="supermodule-view" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
-            </div> -->
-            <div class="component">
-                <p>Digits detail view</p>
-                <svg id="digits-view" style="width: 800px; height: 550px;" preserveAspectRatio="xMidYMid meet"></svg>
             </div>
         </div>
         <div style="display:block;">
-            <!-- <div class="component">
+            <div class="component">
                 <p>Sector detail view - XY plane</p>
-                <svg id="sector-view-zoom" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid meet"></svg>
+                <svg id="sector-view-zoom" style="width: 300px; height: 300px;"
+                    preserveAspectRatio="xMidYMid meet"></svg>
             </div>
             <div class="component">
                 <p>Supermodule detail view - ZY plane</p>
                 <svg id="supermodule-view-zoom" style="width: 300px; height: 300px;"
                     preserveAspectRatio="xMidYMid meet"></svg>
-            </div> -->
-            <!-- <div class="component" style="vertical-align: top;">
+            </div>
+            <div class="component" style="vertical-align: top;">
                 <p>Track Information</p>
                 <div style="width: 300px; height: 300px; padding: 1em; border: 1px solid black;">
                     <table>
@@ -188,7 +158,40 @@
                         </tbody>
                     </table>
                 </div>
-            </div> -->
+            </div>
+        </div>
+        <div style="display:block;">
+            <div class="component">
+                <p>Digits detail view</p>
+                <svg id="digits-view" style="width: 800px; height: 600px;" preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
+            <div class="component" style="margin: 1em; vertical-align: top;" id="digit-input-container">
+                <p style="font-size: medium">Digit view controls</p>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>Event:</td>
+                            <td><input type="number" value="0" id="event-input" min="0" /></td>
+                        </tr>
+                        <tr>
+                            <td>Sector:</td>
+                            <td><input type="number" value="0" id="sector-input" min="0" max="17" /></td>
+                        </tr>
+                        <tr>
+                            <td>Stack:</td>
+                            <td><input type="number" value="0" id="stack-input" min="0" max="4" /></td>
+                        </tr>
+                        <tr>
+                            <td>Layer:</td>
+                            <td><input type="number" value="0" id="layer-input" min="0" max="5" /></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td><input type="button" value="Load" id="load-digits" /></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     <script>
@@ -217,13 +220,13 @@
 
         const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
 
-        // coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
-        // coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-22 -129 44 44", { r: 0.75, rotate: true }));
-        // coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
-        // coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view-zoom", 300, 300, null, { zoom: true }));
-        // coordinator.addComponent(new TrackInformationComponent("#track-information"));
+        coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
+        coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-22 -129 44 44", { r: 0.75, rotate: true }));
+        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
+        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view-zoom", 300, 300, null, { zoom: true }));
+        coordinator.addComponent(new TrackInformationComponent("#track-information"));
 
-        const digitsView = new DigitsViewComponent("#digits-view", 800, 550, null, {
+        const digitsView = new DigitsViewComponent("#digits-view", 800, 600, null, {
             eventInput: "#event-input",
             sectorInput: "#sector-input",
             stackInput: "#stack-input",
