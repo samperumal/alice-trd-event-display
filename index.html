@@ -90,10 +90,6 @@
             font-size: 2px;
         }
 
-        #sector-view-zoom .detector.not-selected {
-            opacity: 0.1;
-        }
-
         #sector-view-zoom .zoom-box {
             display: none;
         }
@@ -162,8 +158,19 @@
     <script>
         const stackedLayerData = getStackedLayerDimensions();
 
+        function ajoin(a, b) { return a.concat(b); }
+
         const data = getData();
+        
         data.forEach(ev => {
+            ev.trdTracks = ev.trdTracks
+                .filter(t => t.track != null && t.track.path != null && t.track.path.length > 0)
+            
+            // Performance filtering
+                .slice(0, 25);
+            const usedTracklets = ev.trdTracks.map(t => t.trdTracklets.map(tl => tl.id)).reduce(ajoin);
+            ev.trdTracklets = ev.trdTracklets.filter(tl => usedTracklets.includes(tl.id) || Math.random() < 0.1);
+
             ev.trdTracklets
                 .forEach(trklt => {
                     trklt.layerDim = stackedLayerData.get(trklt.stack).get(trklt.layer);

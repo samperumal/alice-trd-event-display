@@ -4,7 +4,7 @@
 }
 
 .supermodule-view-component .detector.not-selected, .supermodule-view-component g.track.not-selected {
-    opacity: 0.2;
+    stroke: #ffdddd;
 }
 
 .supermodule-view-component .track path {
@@ -12,6 +12,12 @@
     stroke: lightskyblue;
     stroke-dasharray: 5;
     stroke-width: 2px;
+}
+
+.supermodule-view-component .track.not-selected path {
+    stroke: rgb(234, 246, 255);
+    
+    stroke-width: 0.1;
 }
 
 .supermodule-view-component rect.bin {
@@ -32,7 +38,7 @@
 }
 
 .supermodule-view-component rect.zoom-box {
-    fill: lightgray;
+    fill: rgb(250, 250, 250);
     stroke: darkgray;
-    opacity: 0.15;
+    
 }
