@@ -144,7 +144,7 @@ class PadSubView {
 
         this.yscale = d3.scaleBand().domain(d3.range(30)).range([20, height - 20]).paddingInner(0.2).paddingOuter(0.2);
 
-        this.xscale = d3.scaleBand().domain(d3.range(90, 99)).range([0, width - 20]);
+        this.xscale = d3.scaleBand().domain(d3.range(90, 99)).range([0, width - 20]).paddingInner(0.1).paddingOuter(0.1);
 
         this.yaxis = this.tbsumContainer.append("g").attr("class", "y-axis")
             .attr("transform", `translate(${this.width - 20}, 0)`)
@@ -154,8 +154,8 @@ class PadSubView {
             .attr("transform", `translate(0, ${height - 20})`)
             .call(d3.axisBottom(this.xscale));
 
-        this.content = this.tbsumContainer.append("g")
-            .attr("transform", `translate(${this.xscale.range()[0]}, ${this.yscale.range()[0]})`);
+        this.content = this.tbsumContainer.append("g");
+            //.attr("transform", `translate(${this.xscale.range()[0]}, ${this.yscale.range()[0]})`);
     }
 
     draw(trdTrackletData, digitsData) {
@@ -163,10 +163,42 @@ class PadSubView {
 
         const padMapping = d3.scaleLinear().domain([layerDim.minBinY, layerDim.maxBinY]).range([0, 143]);
         const minPad = Math.floor(padMapping(trdTrackletData.binY)) - 2;
-        const maxPad = minPad + 4;
+        const maxPad = minPad + 5;
+
+        const padIndices = d3.range(minPad, maxPad + 1);
+
+        const pads = digitsData.pads.filter(p => p.row == trdTrackletData.binZ && padIndices.includes(p.col))
+            .map(p => p.tbins.map((t, i) =>  ({
+                pad: p.col,
+                tbin: i,
+                val: t
+            })))
+            .reduce(ajoin)
+            .filter(p => p.val > 0);
+
+            console.log(pads);
 
         this.xscale.domain(d3.range(minPad, maxPad + 1));
 
         this.xaxis.call(d3.axisBottom(this.xscale));
+
+        const xscale = this.xscale, yscale = this.yscale;
+
+        const maxVal = d3.max(pads, d => d.val);
+
+        const colScale = d3.scaleLinear().domain([0, maxVal]).range([0, 255]);
+
+        this.content.selectAll("rect.tbin").remove();
+
+        const allPads = this.content.selectAll("rect.tbin")
+            .data(pads)
+            .enter()
+            .append("rect")
+            .attr("class", "tbin")
+            .attr("x", d => xscale(d.pad))
+            .attr("width", xscale.bandwidth())
+            .attr("y", d => yscale(d.tbin))
+            .attr("height", yscale.bandwidth())
+            .style("fill", d => `rgb(255, ${255 - colScale(d.val)}, ${255 - colScale(d.val)})`);
     }
 }

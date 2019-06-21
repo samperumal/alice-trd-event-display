@@ -2,3 +2,8 @@ rect.tbsum {
     stroke: black;
     fill: #777;
 }
+
+rect.tbin {
+    fill: #eee;
+    stroke: none;
+}
