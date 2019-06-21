@@ -16,11 +16,35 @@ class DigitsViewComponent extends ComponentBase {
 
         this.dataLoadUrl = config.dataLoadUrl;
 
+        const yband = this.yband = d3.scaleBand().domain(d3.range(16))
+            .range([0, this.componentHeight - 70])
+            .paddingInner(0.2);        
+
         this.sumGroup = this.container.append("g")
-            .attr("transform", `translate(30, 20)`);
+            .attr("transform", `translate(30, 30)`);
 
         this.graphGroup = this.container.append("g")
-            .attr("transform", `translate(650, 0)`);
+            .attr("transform", `translate(650, 30)`);
+
+        this.sumGroup.append("text").text("Layers").attr("transform", "translate(300, -10)");
+
+        this.graphGroup.append("text").text("Pad Rows").attr("transform", "translate(150, -10)");
+
+        this.sumGroup.append("g").attr("class", "layer-numbers")
+            .selectAll("text")
+            .data(d3.range(6))
+            .enter()
+            .append("text")
+            .text(d => d)
+            .attr("transform", d => `translate(-20, ${(5 - d) * padh * 19 + 9 * padh})`);
+
+        this.graphGroup.append("g").attr("class", "row-numbers")
+            .selectAll("text")
+            .data(d3.range(16))
+            .enter()
+            .append("text")
+            .text(d => d)
+            .attr("transform", d => `translate(0, ${yband(d) + yband.bandwidth() / 2})`);
     }
 
     draw(eventData) {
@@ -112,11 +136,9 @@ class DigitsViewComponent extends ComponentBase {
             rows[pad.row].pads.push(pad);
         }
 
-        const yband = d3.scaleBand().domain(d3.range(16))
-            .range([10, this.componentHeight - 20])
-            .paddingInner(0.2);
+        const yband = this.yband;
 
-        const xscale = d3.scaleLinear().domain([0, 144]).range([0, 300]);
+        const xscale = d3.scaleLinear().domain([0, 144]).range([20, 300]);
 
         const line = d3.line().x(d => xscale(d.col)).y(d => d.yscale(d.tsum));
 
