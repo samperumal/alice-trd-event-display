@@ -145,7 +145,7 @@ class DigitsViewComponent extends ComponentBase {
         for (const row of rows) {            
             row.pads.sort((a, b) => a.col - b.col);
             row.yscale = d3.scaleLinear()
-                .domain(d3.extent(row.pads, d => d.tsum))
+                .domain([0, 10000]) 
                 .range([yband(row.row) + yband.bandwidth(), yband(row.row)]);
 
             row.line = d3.line().x(d => xscale(d.col)).y(d => row.yscale(d.tsum));
