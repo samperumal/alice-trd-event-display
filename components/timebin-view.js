@@ -86,7 +86,6 @@ class TbsumSubView {
             .call(d3.axisBottom(this.xscale));
 
         this.content = this.tbsumContainer.append("g");
-            //.attr("transform", `translate(${this.xscale.range()[0]}, ${this.yscale.range()[0]})`);
     }
 
     draw(trdTrackletData, digitsData) {
@@ -155,7 +154,6 @@ class PadSubView {
             .call(d3.axisBottom(this.xscale));
 
         this.content = this.tbsumContainer.append("g");
-            //.attr("transform", `translate(${this.xscale.range()[0]}, ${this.yscale.range()[0]})`);
     }
 
     draw(trdTrackletData, digitsData) {
@@ -176,8 +174,6 @@ class PadSubView {
             .reduce(ajoin)
             .filter(p => p.val > 0);
 
-            console.log(pads);
-
         this.xscale.domain(d3.range(minPad, maxPad + 1));
 
         this.xaxis.call(d3.axisBottom(this.xscale));
@@ -188,6 +184,8 @@ class PadSubView {
 
         const colScale = d3.scaleLinear().domain([0, maxVal]).range([0, 255]);
 
+        const heightScale = d3.scaleLinear().range([0, yscale.bandwidth()]).domain([0, maxVal]);
+
         this.content.selectAll("rect.tbin").remove();
 
         const allPads = this.content.selectAll("rect.tbin")
@@ -197,8 +195,8 @@ class PadSubView {
             .attr("class", "tbin")
             .attr("x", d => xscale(d.pad))
             .attr("width", xscale.bandwidth())
-            .attr("y", d => yscale(d.tbin))
-            .attr("height", yscale.bandwidth())
+            .attr("y", d => yscale(d.tbin) + yscale.bandwidth() - heightScale(d.val))
+            .attr("height", d => heightScale(d.val))
             .style("fill", d => `rgb(255, ${255 - colScale(d.val)}, ${255 - colScale(d.val)})`);
     }
 }
