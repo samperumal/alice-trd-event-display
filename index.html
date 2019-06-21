@@ -17,6 +17,7 @@
     <script src="components/event-tree.js"></script>
     <script src="components/component-coordinator.js"></script>
     <script src="components/track-information.js"></script>
+    <script src="components/timebin-view.js"></script>
 
     <script src="data.min.js"></script>
 
@@ -26,6 +27,7 @@
     <link href='./components/sector-view.css' rel='stylesheet' />
     <link href='./components/supermodule-view.css' rel='stylesheet' />
     <link href='./components/digits-view.css' rel='stylesheet' />
+    <link href='./components/timebin-view.css' rel='stylesheet' />
 
     <style>
         *,
@@ -59,6 +61,10 @@
         #tree-container {
             height: 450px;
             overflow: auto;
+        }
+
+        div.component-container {
+            display: inline-block;
         }
 
         div.component {
@@ -171,7 +177,13 @@
                 </p>
                 <svg id="digits-view" style="width: 1000px; height: 600px;" preserveAspectRatio="xMidYMid meet"></svg>
             </div>
+        <div class="component-container">
+            <div class="component">                
+                <p>Time-bin view</p>
+                <svg id="timebin-view-zoom" style="width: 600px; height: 400px;"
+                    preserveAspectRatio="xMidYMid meet"></svg>
         </div>
+    </div>
     </div>
     <script>
         const stackedLayerData = getStackedLayerDimensions();
@@ -199,10 +211,10 @@
 
         const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
 
-        coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
-        coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-22 -129 44 44", { r: 0.75, rotate: true }));
-        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
-        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view-zoom", 300, 300, null, { zoom: true }));
+        coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 600, 400, null, {
+            dataLoadUrl: "data/"
+        }));
+
         coordinator.addComponent(new TrackInformationComponent("#track-information"));
 
         const digitsView = new DigitsViewComponent("#digits-view", 1000, 600, null, {
