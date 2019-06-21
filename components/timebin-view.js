@@ -56,7 +56,8 @@ class TimebinViewComponent extends ComponentBase {
             console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}`);
             const data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
 
-            this.tbsumSubView.draw(eventData.trdTrack.trdTracklets[0], data);
+            this.tbsumSubView.draw(eventData.trdTrack.trdTracklets[0], data.layers[0]);
+            this.padSubView.draw(eventData.trdTrack.trdTracklets[0], data.layers[0]);
         }
         catch (err) {
             console.error(err);
@@ -74,13 +75,13 @@ class TbsumSubView {
 
         this.yscale = d3.scaleBand().domain(d3.range(30)).range([20, height - 20]).paddingInner(0.1);
 
-        this.xscale = d3.scaleLinear().domain([0, 1000]).range([20, width - 20]);
+        this.xscale = d3.scaleLinear().domain([1000, 0]).range([20, width - 20]);
 
-        this.tbsumContainer.append("g").attr("class", "x-axis")
+        this.yaxis = this.tbsumContainer.append("g").attr("class", "y-axis")
             .attr("transform", "translate(20, 0)")
             .call(d3.axisLeft(this.yscale));
 
-        this.tbsumContainer.append("g").attr("class", "y-axis")
+        this.xaxis = this.tbsumContainer.append("g").attr("class", "x-axis")
             .attr("transform", `translate(0, ${height - 20})`)
             .call(d3.axisBottom(this.xscale));
 
@@ -90,8 +91,19 @@ class TbsumSubView {
 
     draw(trdTrackletData, digitsData) {
         const layerDim = this.dimensions.filter(d => d.stack == trdTrackletData.stack && d.layer == trdTrackletData.layer)[0];
-        console.log(layerDim);
-        //console.log(trdTrackletData, digitsData.layers[trdTrackletData.layer].pads.filter(d => d.row == trdTrackletData.binZ));
+
+        const padMapping = d3.scaleLinear().domain([layerDim.minBinY, layerDim.maxBinY]).range([0, 143]);
+        const minPad = Math.floor(padMapping(trdTrackletData.binY)) - 2;
+        const maxPad = minPad + 4;
+        const padIndices = d3.range(minPad, maxPad + 1);
+
+        const pads = digitsData.pads.filter(p => p.row == trdTrackletData.binZ && padIndices.includes(p.col));
+
+        const maxAdcCount = Math.max(d3.max(pads, p => p.tsum), 1000);
+
+        this.xscale.domain([maxAdcCount, 0]);
+
+        this.xaxis.call(d3.axisBottom(this.xscale));
     }
 }
 
@@ -108,11 +120,11 @@ class PadSubView {
 
         this.xscale = d3.scaleBand().domain(d3.range(90, 99)).range([0, width - 20]);
 
-        this.tbsumContainer.append("g").attr("class", "x-axis")
+        this.yaxis = this.tbsumContainer.append("g").attr("class", "y-axis")
             .attr("transform", `translate(${this.width - 20}, 0)`)
             .call(d3.axisRight(this.yscale));
 
-        this.tbsumContainer.append("g").attr("class", "y-axis")
+        this.xaxis = this.tbsumContainer.append("g").attr("class", "x-axis")
             .attr("transform", `translate(0, ${height - 20})`)
             .call(d3.axisBottom(this.xscale));
 
@@ -121,8 +133,14 @@ class PadSubView {
     }
 
     draw(trdTrackletData, digitsData) {
-        // const layerDim = this.dimensions.filter(d => d.stack == trdTrackletData.stack && d.layer == trdTrackletData.layer)[0];
-        // console.log(layerDim);
-        //console.log(trdTrackletData, digitsData.layers[trdTrackletData.layer].pads.filter(d => d.row == trdTrackletData.binZ));
+        const layerDim = this.dimensions.filter(d => d.stack == trdTrackletData.stack && d.layer == trdTrackletData.layer)[0];
+
+        const padMapping = d3.scaleLinear().domain([layerDim.minBinY, layerDim.maxBinY]).range([0, 143]);
+        const minPad = Math.floor(padMapping(trdTrackletData.binY)) - 2;
+        const maxPad = minPad + 4;
+
+        this.xscale.domain(d3.range(minPad, maxPad + 1));
+
+        this.xaxis.call(d3.axisBottom(this.xscale));
     }
 }
