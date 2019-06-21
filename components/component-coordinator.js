@@ -38,7 +38,8 @@ class ComponentCoordinator {
 
         const drawData = {
             event: event,
-            trdTrack: trdTrack
+            trdTrack: trdTrack,
+            type: ev.type == "select_node" ? "select" : (ev.type == "hover_node" ? "hover" : "hover")
         };
 
         for (const component of this.components) {

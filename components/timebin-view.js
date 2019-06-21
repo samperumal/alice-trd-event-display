@@ -40,7 +40,7 @@ class TimebinViewComponent extends ComponentBase {
     }
 
     draw(eventData) {
-        if (eventData.trdTrack != null) {
+        if (eventData.type == "select" && eventData.trdTrack != null) {
             this.drawDigits(eventData);
         }
     }
