@@ -82,11 +82,9 @@ class TbsumSubView {
             .call(d3.axisLeft(this.yscale));
 
         this.xaxis = this.tbsumContainer.append("g").attr("class", "x-axis")
-            .attr("transform", `translate(0, ${height - 20})`)
-            .call(d3.axisBottom(this.xscale));
+            .attr("transform", `translate(0, ${height - 20})`);
 
         this.content = this.tbsumContainer.append("g");
-            //.attr("transform", `translate(${this.xscale.range()[0]}, ${this.yscale.range()[0]})`);
     }
 
     draw(trdTrackletData, digitsData) {
@@ -112,7 +110,7 @@ class TbsumSubView {
 
         this.xscale.domain([maxAdcCount, 0]);
 
-        this.xaxis.call(d3.axisBottom(this.xscale));
+        this.xaxis.call(d3.axisBottom(this.xscale).ticks(5));
 
         console.log(tbinSum);
 
