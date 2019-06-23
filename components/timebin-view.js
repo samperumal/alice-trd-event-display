@@ -6,37 +6,34 @@ class TimebinViewComponent extends ComponentBase {
 
         this.dataLoadUrl = config.dataLoadUrl;
 
-        this.splitBand = d3.scaleBand().domain(d3.range(2))
+        this.splitXBand = d3.scaleBand().domain(d3.range(2))
             .range([this.margin.left, this.margin.left + this.displayWidth])
             .paddingInner(0.2);
 
+        this.splitYBand = d3.scaleBand().domain(d3.range(6))
+            .range([this.margin.top, this.margin.top + this.displayHeight])
+            .paddingInner(0.2);
+
         this.groupSpacing = 0;
-        this.tbsumGroupWidth = (this.displayWidth - this.groupSpacing) * 2 / 4;
-        this.padGroupWidth = (this.displayWidth - this.groupSpacing) * 2 / 4;
+        this.tbsumGroupWidth = this.splitXBand.bandwidth();
+        this.padGroupWidth = this.splitXBand.bandwidth();
+        this.layerGroupHeight = this.splitYBand.bandwidth();
 
-        this.tbsumGroup = this.container.append("g").attr("class", "tbsum-group")
-            .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`);
+        this.tbsumSubViews = [];
+        this.padSubViews = [];
 
-        this.tbsumSubView = new TbsumSubView(this.tbsumGroupWidth, this.displayHeight, this.tbsumGroup);
+        for (const layer of d3.range(6)) {
 
-        this.padGroup = this.container.append("g").attr("class", "pad-group")
-            .attr("transform", `translate(${this.margin.left + this.tbsumGroupWidth + this.groupSpacing}, ${this.margin.top})`);
+            const tbsumGroup = this.container.append("g").attr("class", "tbsum-group")
+                .attr("transform", `translate(${this.splitXBand(0)}, ${this.splitYBand(5 - layer)})`);
 
-        this.padSubView = new PadSubView(this.padGroupWidth, this.displayHeight, this.padGroup);
+            this.tbsumSubViews.push(new TbsumSubView(this.tbsumGroupWidth, this.layerGroupHeight, tbsumGroup));
 
-        // const sectorToRotationAngle = this.sectorToRotationAngle;
+            const padGroup = this.container.append("g").attr("class", "pad-group")
+                .attr("transform", `translate(${this.splitXBand(1)}, ${this.splitYBand(5 - layer)})`);
 
-        // const layerData = this.layerData = getDimensions().filter(d => d.stack == 2);
-        // this.detectorData = d3.range(18)
-        //     .map(s => ({
-        //         sector: s,
-        //         rot: sectorToRotationAngle(s),
-        //         layerData: layerData.map(l => Object.assign({ sector: s, rot: sectorToRotationAngle(s) }, l))
-        //     }));
-
-        // this.config = config != null ? config : {};
-        // this.r = (this.config.r != null) ? this.config.r : 2;
-
+            this.padSubViews.push(new PadSubView(this.padGroupWidth, this.layerGroupHeight, padGroup));
+        }
     }
 
     draw(eventData) {
@@ -56,8 +53,10 @@ class TimebinViewComponent extends ComponentBase {
             console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}`);
             const data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
 
-            this.tbsumSubView.draw(eventData.trdTrack.trdTracklets[0], data.layers[0]);
-            this.padSubView.draw(eventData.trdTrack.trdTracklets[0], data.layers[0]);
+            for (const layer of d3.range(6)) {
+                this.tbsumSubViews[layer].draw(eventData.trdTrack.trdTracklets[layer], data.layers[layer]);
+                this.padSubViews[layer].draw(eventData.trdTrack.trdTracklets[layer], data.layers[layer]);
+            }
         }
         catch (err) {
             console.error(err);
@@ -88,6 +87,14 @@ class TbsumSubView {
     }
 
     draw(trdTrackletData, digitsData) {
+        if (trdTrackletData == null) {
+            this.content.selectAll("rect.tbsum").remove();
+            this.xscale.domain([256, 0]);
+            this.xaxis.call(d3.axisBottom(this.xscale).ticks(5));
+
+            return;
+        }
+
         const layerDim = this.dimensions.filter(d => d.stack == trdTrackletData.stack && d.layer == trdTrackletData.layer)[0];
 
         const padMapping = d3.scaleLinear().domain([layerDim.minBinY, layerDim.maxBinY]).range([0, 143]);
@@ -102,7 +109,7 @@ class TbsumSubView {
             tbinSum[index] = 0;
 
         for (const pad of pads) {
-            for (let i = 0; i < 30; i++) 
+            for (let i = 0; i < 30; i++)
                 tbinSum[i] += pad.tbins[i];
         }
 
@@ -127,7 +134,7 @@ class TbsumSubView {
 
         this.content.selectAll("rect.tbsum")
             .attr("x", d => xscale(d))
-            .attr("width", d => xscale(0) -xscale(d));
+            .attr("width", d => xscale(0) - xscale(d));
     }
 }
 
@@ -153,10 +160,14 @@ class PadSubView {
             .call(d3.axisBottom(this.xscale));
 
         this.content = this.tbsumContainer.append("g");
-            //.attr("transform", `translate(${this.xscale.range()[0]}, ${this.yscale.range()[0]})`);
+        //.attr("transform", `translate(${this.xscale.range()[0]}, ${this.yscale.range()[0]})`);
     }
 
     draw(trdTrackletData, digitsData) {
+        this.content.selectAll("rect.tbin").remove();
+
+        if (trdTrackletData == null) return;
+
         const layerDim = this.dimensions.filter(d => d.stack == trdTrackletData.stack && d.layer == trdTrackletData.layer)[0];
 
         const padMapping = d3.scaleLinear().domain([layerDim.minBinY, layerDim.maxBinY]).range([0, 143]);
@@ -166,15 +177,15 @@ class PadSubView {
         const padIndices = d3.range(minPad, maxPad + 1);
 
         const pads = digitsData.pads.filter(p => p.row == trdTrackletData.binZ && padIndices.includes(p.col))
-            .map(p => p.tbins.map((t, i) =>  ({
+            .map(p => p.tbins.map((t, i) => ({
                 pad: p.col,
                 tbin: i,
                 val: t
             })))
-            .reduce(ajoin)
+            .reduce(ajoin, [])
             .filter(p => p.val > 0);
 
-            console.log(pads);
+        console.log(pads);
 
         this.xscale.domain(d3.range(minPad, maxPad + 1));
 
@@ -185,8 +196,6 @@ class PadSubView {
         const maxVal = d3.max(pads, d => d.val);
 
         const colScale = d3.scaleLinear().domain([0, maxVal]).range([0, 255]);
-
-        this.content.selectAll("rect.tbin").remove();
 
         const allPads = this.content.selectAll("rect.tbin")
             .data(pads)
