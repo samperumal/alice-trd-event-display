@@ -1,0 +1,43 @@
+{
+	"event": 8,
+	"sector": 13,
+	"stack": 2,
+	"layers": [
+		{
+			"layer": 0,
+			"det": 402,
+			"pads": [
+			]
+		},
+		{
+			"layer": 1,
+			"det": 403,
+			"pads": [
+			]
+		},
+		{
+			"layer": 2,
+			"det": 404,
+			"pads": [
+			]
+		},
+		{
+			"layer": 3,
+			"det": 405,
+			"pads": [
+			]
+		},
+		{
+			"layer": 4,
+			"det": 406,
+			"pads": [
+			]
+		},
+		{
+			"layer": 5,
+			"det": 407,
+			"pads": [
+			]
+		}
+	]
+}
