@@ -42,6 +42,7 @@
             font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             font-size: 14px;
             line-height: 1.428571429;
+            /* background-color: #6d6d6d; */
         }
 
         svg {
@@ -58,13 +59,19 @@
             vertical-align: top;
         }
 
+        div.main-content {
+            display:inline-block;
+            overflow-y: scroll;
+            max-height: 700px;
+        }
+
         #tree-container {
             height: 450px;
             overflow: auto;
         }
 
         div.component-container {
-            display: inline-block;
+            display: block;
         }
 
         div.component {
@@ -133,8 +140,8 @@
             <img src="alice-coord.png" style="width: 300px;" />
         </div>
     </div>
-    <div style="display:inline-block;">
-        <div style="display:block;">
+    <div class="main-content">
+        <div class="component-container">
             <div class="component">
                 <p>Sector view - XY plane</p>
                 <svg id="sector-view" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
@@ -144,7 +151,7 @@
                 <svg id="supermodule-view" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
             </div>
         </div>
-        <div style="display:block;">
+        <div class="component-container">
             <div class="component">
                 <p>Sector detail view - XY plane</p>
                 <svg id="sector-view-zoom" style="width: 300px; height: 300px;"
@@ -155,7 +162,7 @@
                 <svg id="supermodule-view-zoom" style="width: 300px; height: 300px;"
                     preserveAspectRatio="xMidYMid meet"></svg>
             </div>
-            <div class="component" style="vertical-align: top;">
+            <!-- <div class="component" style="vertical-align: top;">
                 <p>Track Information</p>
                 <div style="width: 300px; height: 300px; padding: 1em; border: 1px solid black;">
                     <table>
@@ -164,9 +171,9 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </div> -->
         </div>
-        <div style="display:block;">
+        <!-- <div class="component-container">
             <div class="component">
                 <p>Digits detail view</p>
                 <p>
@@ -177,13 +184,14 @@
                 </p>
                 <svg id="digits-view" style="width: 1000px; height: 600px;" preserveAspectRatio="xMidYMid meet"></svg>
             </div>
+        </div> -->
         <div class="component-container">
             <div class="component">                
                 <p>Time-bin view</p>
-                <svg id="timebin-view-zoom" style="width: 600px; height: 400px;"
+                <svg id="timebin-view-zoom" style="width: 600px; height: 1600px;"
                     preserveAspectRatio="xMidYMid meet"></svg>
+            </div>
         </div>
-    </div>
     </div>
     <script>
         const stackedLayerData = getStackedLayerDimensions();
@@ -211,27 +219,31 @@
 
         const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
 
-        coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 600, 400, null, {
+        coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
+        coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-22 -129 44 44", { r: 0.75, rotate: true }));
+        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
+        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view-zoom", 300, 300, null, { zoom: true }));
+        coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 600, 1600, null, {
             dataLoadUrl: "data/"
         }));
 
         coordinator.addComponent(new TrackInformationComponent("#track-information"));
 
-        const digitsView = new DigitsViewComponent("#digits-view", 1000, 600, null, {
-            eventInput: "#event-input",
-            sectorInput: "#sector-input",
-            stackInput: "#stack-input",
-            layerInput: "#layer-input",
-            buttons: ["#load-digits"],
-            dataLoadUrl: "data/"
-        });
+        // const digitsView = new DigitsViewComponent("#digits-view", 1000, 600, null, {
+        //     eventInput: "#event-input",
+        //     sectorInput: "#sector-input",
+        //     stackInput: "#stack-input",
+        //     layerInput: "#layer-input",
+        //     buttons: ["#load-digits"],
+        //     dataLoadUrl: "data/"
+        // });
 
-        coordinator.addComponent(digitsView);
+        // coordinator.addComponent(digitsView);
 
         if (true) {
             setTimeout(function () {
-                $("#dataTree").jstree("select_node", tree.treeData[1].children[0]);
-                digitsView.drawDigits();
+                $("#dataTree").jstree("select_node", tree.treeData[1].children[13]);
+                //digitsView.drawDigits();
             }, 500);
         }
 

@@ -54,8 +54,9 @@ class TimebinViewComponent extends ComponentBase {
             const data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
 
             for (const layer of d3.range(6)) {
-                this.tbsumSubViews[layer].draw(eventData.trdTrack.trdTracklets[layer], data.layers[layer]);
-                this.padSubViews[layer].draw(eventData.trdTrack.trdTracklets[layer], data.layers[layer]);
+                const trackletData = eventData.trdTrack.trdTracklets.find(t => t.layer == layer);
+                this.tbsumSubViews[layer].draw(trackletData, data.layers[layer]);
+                this.padSubViews[layer].draw(trackletData, data.layers[layer]);
             }
         }
         catch (err) {
