@@ -63,6 +63,9 @@ class DigitsViewComponent extends ComponentBase {
             this.stackInput.value = 0;
             //this.layerInput.attr("value", 0);
         }
+
+        if (eventData.type == "select")
+            this.drawDigits();
     }
 
     async drawDigits() {
