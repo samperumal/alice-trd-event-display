@@ -12,3 +12,8 @@ rect.tbin {
     text-anchor: middle;
     dominant-baseline: text-before-edge;
 }
+
+.time-bin-view .tick text {
+    font-size: 6px;
+    font-weight: bold;
+}

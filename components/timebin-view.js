@@ -2,6 +2,8 @@ class TimebinViewComponent extends ComponentBase {
     constructor(id, width, height, viewBox, config) {
         super(id, width, height, marginDef(5, 5, 5, 5), `0 0 ${width} ${height}`);
 
+        this.container.classed("time-bin-view", true);
+
         this.dimensions = getDimensions();
 
         this.dataLoadUrl = config.dataLoadUrl;
@@ -89,22 +91,12 @@ class TimebinViewComponent extends ComponentBase {
             console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}`);
             const data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
 
-            let tbinSumMax = 0;
-
             for (const layer of d3.range(6)) {
                 const trackletData = eventData.trdTrack.trdTracklets.find(t => t.layer == layer);
+
                 this.tbsumSubViews[layer].draw(trackletData, data.layers[layer]);
-                this.padSubViews[layer].draw(trackletData, data.layers[layer], d => tbinSumMax = Math.max(d, tbinSumMax));
+                this.padSubViews[layer].draw(trackletData, data.layers[layer], this.colourScale);
             }
-
-            this.colourScale.domain([0, tbinSumMax]);
-
-            for (const layer of d3.range(6)) {
-                //this.tbsumSubViews[layer].updateColours(this.colourScale);
-                this.padSubViews[layer].updateColours(this.colourScale);
-            }
-
-            console.log(tbinSumMax);
         }
         catch (err) {
             console.error(err);
@@ -182,11 +174,6 @@ class TbsumSubView {
             .attr("x", d => xscale(d))
             .attr("width", d => xscale(0) - xscale(d));
     }
-
-    updateColours(colourScale) {
-        // this.content.selectAll("rect.tbsum")
-        //     .style("fill", d => colourScale(d));
-    }
 }
 
 class PadSubView {
@@ -211,10 +198,9 @@ class PadSubView {
             .call(d3.axisBottom(this.xscale));
 
         this.content = this.tbsumContainer.append("g");
-        //.attr("transform", `translate(${this.xscale.range()[0]}, ${this.yscale.range()[0]})`);
     }
 
-    draw(trdTrackletData, digitsData, tbinMax) {
+    draw(trdTrackletData, digitsData, colourScale) {
         this.content.selectAll("rect.tbin").remove();
 
         if (trdTrackletData == null) return;
@@ -244,9 +230,7 @@ class PadSubView {
 
         const maxVal = d3.max(pads, d => d.val);
 
-        tbinMax(maxVal);
-
-        const colScale = d3.scaleLinear().domain([0, maxVal]).range([0, 255]);
+        colourScale.domain([0, maxVal]);
 
         const allPads = this.content.selectAll("rect.tbin")
             .data(pads)
@@ -256,12 +240,7 @@ class PadSubView {
             .attr("x", d => xscale(d.pad))
             .attr("width", xscale.bandwidth())
             .attr("y", d => yscale(d.tbin))
-            .attr("height", yscale.bandwidth());
-            //.style("fill", d => `rgb(255, ${255 - colScale(d.val)}, ${255 - colScale(d.val)})`);
-    }
-
-    updateColours(colourScale) {
-        this.content.selectAll("rect.tbin")
+            .attr("height", yscale.bandwidth())
             .style("fill", d => colourScale(d.val));
     }
 }
