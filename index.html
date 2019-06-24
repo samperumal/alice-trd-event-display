@@ -80,7 +80,7 @@
         }
 
         #tree-container {
-            height: 450px;
+            height: 290px;
             overflow: auto;
         }
 
@@ -98,6 +98,11 @@
             text-align: center;
             font-weight: bold;
             margin-bottom: 0.25em;
+        }
+
+        div.time-bin-view {
+            max-height: 670px;
+            overflow-y: scroll;
         }
 
         #sector-view-zoom {
@@ -142,74 +147,81 @@
 <body>
     <div class="row">
         <div class="column">
-            <div style="margin: 1em;" id="tree-container">
+            <div style="margin: 1em;">
                 <p style="font-size: medium; ">Available events</p>
-                <div id="dataTree">
+                <div id="tree-container">
+                    <div id="dataTree">
+                    </div>
                 </div>
             </div>
-            <div style="margin: 1em;">
+            <div style="margin: 1em; display: none;">
                 <p style="font-size: medium; ">Older versions</p>
                 <a href="index.v1.html">Version 1</a>
             </div>
             <div style="display: none;">
                 <img src="alice-coord.png" style="width: 300px;" />
             </div>
-        </div>
-        <div class="column main-content">
-            <div class="component-container">
-                <div class="component">
-                    <p>Sector view - XY plane</p>
-                    <svg id="sector-view" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
-                </div>
-                <div class="component">
-                    <p>Supermodule view - ZY plane</p>
-                    <svg id="supermodule-view" style="width: 300px; height: 300px;"
-                        preserveAspectRatio="xMidYMid"></svg>
+            <div class="component" style="vertical-align: top;">
+                <p>Track Information</p>
+                <div style="width: 300px; height: 300px; padding: 1em; border: 1px solid black;">
+                    <table>
+                        <tbody id="track-information">
+
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <div class="component-container">
-                <div class="component">
-                    <p>Sector detail view - XY plane</p>
-                    <svg id="sector-view-zoom" style="width: 300px; height: 300px;"
-                        preserveAspectRatio="xMidYMid meet"></svg>
-                </div>
-                <div class="component">
-                    <p>Supermodule detail view - ZY plane</p>
-                    <svg id="supermodule-view-zoom" style="width: 300px; height: 300px;"
-                        preserveAspectRatio="xMidYMid meet"></svg>
-                </div>
-                <div class="component" style="vertical-align: top;">
-                    <p>Track Information</p>
-                    <div style="width: 300px; height: 300px; padding: 1em; border: 1px solid black;">
-                        <table>
-                            <tbody id="track-information">
+        </div>
+        <div class="column main-content">
+            <div class="row">
+                <div class="column">
+                    <div class="component">
+                        <p>Sector view - XY plane</p>
+                        <svg id="sector-view" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
+                    </div>
+                    <div class="component">
+                        <p>Sector detail view - XY plane</p>
+                        <svg id="sector-view-zoom" style="width: 300px; height: 300px;"
+                            preserveAspectRatio="xMidYMid meet"></svg>
+                    </div>
 
-                            </tbody>
-                        </table>
+                </div>
+                <div class="column">
+                    <div class="component">
+                        <p>Supermodule view - ZY plane</p>
+                        <svg id="supermodule-view" style="width: 300px; height: 300px;"
+                            preserveAspectRatio="xMidYMid"></svg>
+                    </div>
+                    <div class="component">
+                        <p>Supermodule detail view - ZY plane</p>
+                        <svg id="supermodule-view-zoom" style="width: 300px; height: 300px;"
+                            preserveAspectRatio="xMidYMid meet"></svg>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="component time-bin-view">
+                        <p>Time-bin view</p>
+                        <svg id="timebin-view-zoom" style="width: 500px; height: 1600px;"
+                            preserveAspectRatio="xMidYMid meet"></svg>
                     </div>
                 </div>
             </div>
-            <div class="component-container">
-                <div class="component">
-                    <p>Time-bin view</p>
-                    <svg id="timebin-view-zoom" style="width: 600px; height: 1600px;"
-                        preserveAspectRatio="xMidYMid meet"></svg>
-                </div>
-            </div>
-            <div class="component-container">
-                <div class="component">
-                    <p>Digits detail view</p>
-                    <p>
-                        <span><label for="event-input">Event: </label><input type="number" value="0" id="event-input"
-                                min="0" /></span>
-                        <span><label for="sector-input">Sector: </label><input type="number" value="0" id="sector-input"
-                                min="0" /></span>
-                        <span><label for="stack-input">Stack: </label><input type="number" value="0" id="stack-input"
-                                min="0" /></span>
-                        <span><input type="button" value="Load" id="load-digits" /></span>
-                    </p>
-                    <svg id="digits-view" style="width: 1000px; height: 600px;"
-                        preserveAspectRatio="xMidYMid meet"></svg>
+            <div class="row">
+                <div class="component-container">
+                    <div class="component">
+                        <p>Digits detail view</p>
+                        <p>
+                            <span><label for="event-input">Event: </label><input type="number" value="0"
+                                    id="event-input" min="0" /></span>
+                            <span><label for="sector-input">Sector: </label><input type="number" value="0"
+                                    id="sector-input" min="0" /></span>
+                            <span><label for="stack-input">Stack: </label><input type="number" value="0"
+                                    id="stack-input" min="0" /></span>
+                            <span><input type="button" value="Load" id="load-digits" /></span>
+                        </p>
+                        <svg id="digits-view" style="width: 1000px; height: 600px;"
+                            preserveAspectRatio="xMidYMid meet"></svg>
+                    </div>
                 </div>
             </div>
         </div>
@@ -244,7 +256,7 @@
         coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-22 -129 44 44", { r: 0.75, rotate: true }));
         coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
         coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view-zoom", 300, 300, null, { zoom: true }));
-        coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 600, 1600, null, {
+        coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
             dataLoadUrl: "data/"
         }));
 

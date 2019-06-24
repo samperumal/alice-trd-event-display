@@ -12,7 +12,7 @@ class TimebinViewComponent extends ComponentBase {
 
         this.splitYBand = d3.scaleBand().domain(d3.range(6))
             .range([this.margin.top, this.margin.top + this.displayHeight])
-            .paddingInner(0.2);
+            .paddingInner(0.05);
 
         this.groupSpacing = 0;
         this.tbsumGroupWidth = this.splitXBand.bandwidth();
