@@ -8,12 +8,17 @@ rect.tbin {
     stroke: none;
 }
 
-.time-bin-view text.panel-label {
+.time-bin-view .panel-label {
     text-anchor: middle;
     dominant-baseline: text-before-edge;
 }
 
-.time-bin-view .tick text {
+.time-bin-view .pad-adc-label {
+    font-size: 9px;
+    font-weight: bold;
+}
+
+.time-bin-view .y-axis .tick text {
     font-size: 6px;
     font-weight: bold;
 }

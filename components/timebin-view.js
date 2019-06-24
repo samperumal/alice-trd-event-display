@@ -14,7 +14,7 @@ class TimebinViewComponent extends ComponentBase {
 
         this.splitYBand = d3.scaleBand().domain(d3.range(6))
             .range([this.margin.top, this.margin.top + this.displayHeight])
-            .paddingInner(0.15);
+            .paddingInner(0.15).paddingOuter(0.15);
 
         this.groupSpacing = 0;
         this.tbsumGroupWidth = this.splitXBand.bandwidth();
@@ -26,6 +26,8 @@ class TimebinViewComponent extends ComponentBase {
         this.padSubViews = [];
 
         this.colourScale = d3.scaleSequential(d3.interpolateViridis).domain([0, 100]);
+
+        const midColour = this.colourScale(65);
 
         this.gradient = this.svg.append('defs')
             .raise()
@@ -48,12 +50,6 @@ class TimebinViewComponent extends ComponentBase {
             const layerGroup = this.container.append("g")
                 .attr("transform", `translate(0, ${this.splitYBand(5 - layer)})`);
 
-            layerGroup.append("rect")
-                .attr("x", this.splitXBand(0) + this.splitXBand.bandwidth() * (1 + 0.025))
-                .attr("width", this.splitXBand.bandwidth() * 0.05)
-                .attr("height", this.splitYBand.bandwidth())
-                .style("fill", "url(#gradient)");
-
             this.layerGroups.push(layerGroup);
 
             const tbsumGroup = layerGroup.append("g").attr("class", "tbsum-group")
@@ -70,7 +66,7 @@ class TimebinViewComponent extends ComponentBase {
             padGroup.append("text").text(`Time-bin ADC counts - Layer ${layer}`).attr("class", "panel-label")
                 .attr("x", this.splitXBand.bandwidth() / 2);
 
-            this.padSubViews.push(new PadSubView(this.padGroupWidth, this.layerGroupHeight, padGroup));
+            this.padSubViews.push(new PadSubView(this.padGroupWidth, this.layerGroupHeight, padGroup, midColour));
         }
     }
 
@@ -130,7 +126,7 @@ class TbsumSubView {
         if (trdTrackletData == null) {
             this.content.selectAll("rect.tbsum").remove();
             this.xscale.domain([256, 0]);
-            this.xaxis.call(d3.axisBottom(this.xscale).ticks(5));
+            this.xaxis.call(d3.axisBottom(this.xscale).ticks(5, "s"));
 
             return;
         }
@@ -157,7 +153,7 @@ class TbsumSubView {
 
         this.xscale.domain([maxAdcCount, 0]);
 
-        this.xaxis.call(d3.axisBottom(this.xscale).ticks(5));
+        this.xaxis.call(d3.axisBottom(this.xscale).ticks(5, "s"));
 
         const allRects = this.content.selectAll("rect.tbsum")
             .data(tbinSum);
@@ -178,10 +174,12 @@ class TbsumSubView {
 
 class PadSubView {
 
-    constructor(width, height, tbsumContainer) {
-        this.tbsumContainer = tbsumContainer;
+    constructor(width, height, tbsumContainer, midColour) {
+        this.padContainer = tbsumContainer;
         this.width = width;
         this.height = height;
+
+        this.midColour = midColour;
 
         this.dimensions = getDimensions();
 
@@ -189,15 +187,28 @@ class PadSubView {
 
         this.xscale = d3.scaleBand().domain(d3.range(90, 99)).range([0, width - 20]).paddingInner(0.1).paddingOuter(0.1);
 
-        this.yaxis = this.tbsumContainer.append("g").attr("class", "y-axis")
+        this.yaxis = this.padContainer.append("g").attr("class", "y-axis")
             .attr("transform", `translate(${this.width - 20}, 0)`)
-            .call(d3.axisRight(this.yscale));
+            .call(d3.axisRight(this.yscale).ticks(5));
 
-        this.xaxis = this.tbsumContainer.append("g").attr("class", "x-axis")
+        this.xaxis = this.padContainer.append("g").attr("class", "x-axis")
             .attr("transform", `translate(0, ${height - 20})`)
             .call(d3.axisBottom(this.xscale));
 
-        this.content = this.tbsumContainer.append("g");
+        this.padContainer.append("rect")
+                .attr("x", -25)
+                .attr("width", 10)
+                .attr("y", 20)
+                .attr("height", height - 40)
+                .style("fill", "url(#gradient)");
+
+        this.colourAxisGroup = this.padContainer.append("g").attr("transform", "translate(-25, 0)");
+
+        const padAdcCountGroup = this.padContainer.append("g").attr("class", "panel-label pad-adc-label").style("fill", this.midColour);
+        padAdcCountGroup.append("text").text("Pad ADC").attr("transform", `translate(-30, ${height - 10})`);
+        padAdcCountGroup.append("text").text("Count").attr("transform", `translate(-30, ${height - 0})`);
+
+        this.content = this.padContainer.append("g");
     }
 
     draw(trdTrackletData, digitsData, colourScale) {
@@ -231,6 +242,12 @@ class PadSubView {
         const maxVal = d3.max(pads, d => d.val);
 
         colourScale.domain([0, maxVal]);
+
+        const zscale = d3.scaleLinear().domain(colourScale.domain()).range(this.yscale.range());
+
+        this.colourAxisGroup.call(d3.axisLeft(zscale));
+
+        this.colourAxisGroup.selectAll("text").style("fill", this.midColour);
 
         const allPads = this.content.selectAll("rect.tbin")
             .data(pads)
