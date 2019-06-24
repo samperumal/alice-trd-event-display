@@ -18,6 +18,21 @@ rect.tbin {
     font-weight: bold;
 }
 
+.time-bin-view .axis-name {
+    font-size: 9px;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.time-bin-view .vis-name {
+    font-size: 10px;
+    font-weight: bold;
+}
+
 .time-bin-view .y-axis .tick text {
     font-size: 9px;
+}
+
+.time-bin-view line.divider {
+    stroke: black;
 }

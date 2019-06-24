@@ -10,11 +10,11 @@ class TimebinViewComponent extends ComponentBase {
 
         this.splitXBand = d3.scaleBand().domain(d3.range(2))
             .range([this.margin.left, this.margin.left + this.displayWidth])
-            .paddingInner(0.2);
+            .paddingInner(0.2).paddingOuter(0.1);
 
         this.splitYBand = d3.scaleBand().domain(d3.range(6))
             .range([this.margin.top, this.margin.top + this.displayHeight])
-            .paddingInner(0.15).paddingOuter(0.15);
+            .paddingInner(0.15).paddingOuter(0.05);
 
         this.groupSpacing = 0;
         this.tbsumGroupWidth = this.splitXBand.bandwidth();
@@ -24,6 +24,7 @@ class TimebinViewComponent extends ComponentBase {
         this.layerGroups = [];
         this.tbsumSubViews = [];
         this.padSubViews = [];
+        this.layerLabels = [];
 
         this.colourScale = d3.scaleSequential(d3.interpolateViridis).domain([0, 100]);
 
@@ -39,7 +40,7 @@ class TimebinViewComponent extends ComponentBase {
             .attr('y2', '0%')
             .attr('spreadMethod', 'pad');
 
-        for (let i =0; i <= 100; i += 10) {
+        for (let i = 0; i <= 100; i += 10) {
             this.gradient.append('stop')
                 .attr('offset', `${i}%`)
                 .attr('stop-color', this.colourScale(i))
@@ -50,12 +51,23 @@ class TimebinViewComponent extends ComponentBase {
             const layerGroup = this.container.append("g")
                 .attr("transform", `translate(0, ${this.splitYBand(5 - layer)})`);
 
+            if (layer < 5)
+                layerGroup.append("line").attr("class", "divider")
+                    .attr("y1", -20).attr("y2", -20)
+                    .attr("x1", this.splitXBand(0)).attr("x2", this.splitXBand(1) + this.splitXBand.bandwidth());
+
+            this.layerLabels.push(
+                layerGroup.append("text").attr("class", "panel-label")
+                    .attr("y", -15)
+                    .attr("x", this.displayWidth / 2)
+            );
+
             this.layerGroups.push(layerGroup);
 
             const tbsumGroup = layerGroup.append("g").attr("class", "tbsum-group")
                 .attr("transform", `translate(${this.splitXBand(0)}, 0)`);
 
-            tbsumGroup.append("text").text(`Time-bin sums - Layer ${layer}`).attr("class", "panel-label")
+            tbsumGroup.append("text").text(`Time-bin sums`).attr("class", "panel-label vis-name")
                 .attr("x", this.splitXBand.bandwidth() / 2);
 
             this.tbsumSubViews.push(new TbsumSubView(this.tbsumGroupWidth, this.layerGroupHeight, tbsumGroup));
@@ -63,7 +75,7 @@ class TimebinViewComponent extends ComponentBase {
             const padGroup = layerGroup.append("g").attr("class", "pad-group")
                 .attr("transform", `translate(${this.splitXBand(1)}, 0)`);
 
-            padGroup.append("text").text(`Time-bin ADC counts - Layer ${layer}`).attr("class", "panel-label")
+            padGroup.append("text").text(`Pad ADC counts`).attr("class", "panel-label vis-name")
                 .attr("x", this.splitXBand.bandwidth() / 2);
 
             this.padSubViews.push(new PadSubView(this.padGroupWidth, this.layerGroupHeight, padGroup, midColour));
@@ -89,6 +101,9 @@ class TimebinViewComponent extends ComponentBase {
 
             for (const layer of d3.range(6)) {
                 const trackletData = eventData.trdTrack.trdTracklets.find(t => t.layer == layer);
+                if (trackletData != null)
+                    this.layerLabels[layer].text(`Layer ${layer} Pad row ${trackletData.binZ}`);
+                else this.layerLabels[layer].text(`Layer ${layer}`);
 
                 this.tbsumSubViews[layer].draw(trackletData, data.layers[layer]);
                 this.padSubViews[layer].draw(trackletData, data.layers[layer], this.colourScale);
@@ -118,6 +133,10 @@ class TbsumSubView {
 
         this.xaxis = this.tbsumContainer.append("g").attr("class", "x-axis")
             .attr("transform", `translate(0, ${height - 20})`);
+
+        this.tbsumContainer.append("text").text("ADC sum for displayed pads")
+            .attr("class", "panel-label axis-name")
+            .attr("transform", `translate(${this.width / 2}, ${this.height + 2})`);
 
         this.content = this.tbsumContainer.append("g");
     }
@@ -196,11 +215,11 @@ class PadSubView {
             .call(d3.axisBottom(this.xscale));
 
         this.padContainer.append("rect")
-                .attr("x", -25)
-                .attr("width", 10)
-                .attr("y", 20)
-                .attr("height", height - 40)
-                .style("fill", "url(#gradient)");
+            .attr("x", -25)
+            .attr("width", 10)
+            .attr("y", 20)
+            .attr("height", height - 40)
+            .style("fill", "url(#gradient)");
 
         this.colourAxisGroup = this.padContainer.append("g").attr("transform", "translate(-25, 0)");
 
@@ -208,13 +227,23 @@ class PadSubView {
         padAdcCountGroup.append("text").text("Pad ADC").attr("transform", `translate(-30, ${height - 10})`);
         padAdcCountGroup.append("text").text("Count").attr("transform", `translate(-30, ${height - 0})`);
 
+        this.padContainer.append("text").text("Pad numbers")
+            .attr("class", "panel-label axis-name")
+            .attr("transform", `translate(${this.width / 2}, ${this.height + 2})`);
+
         this.content = this.padContainer.append("g");
     }
 
     draw(trdTrackletData, digitsData, colourScale) {
         this.content.selectAll("rect.tbin").remove();
 
-        if (trdTrackletData == null) return;
+        if (trdTrackletData == null) {
+            this.colourAxisGroup.style("display", "none");
+            return;
+        }
+        else {
+            this.colourAxisGroup.style("display", "inherit");
+        }
 
         const layerDim = this.dimensions.filter(d => d.stack == trdTrackletData.stack && d.layer == trdTrackletData.layer)[0];
 
@@ -233,7 +262,7 @@ class PadSubView {
             .reduce(ajoin, [])
             .filter(p => p.val > 0);
 
-        this.xscale.domain(d3.range(minPad, maxPad + 1));
+        this.xscale.domain(d3.range(maxPad, minPad - 1, -1));
 
         this.xaxis.call(d3.axisBottom(this.xscale));
 
