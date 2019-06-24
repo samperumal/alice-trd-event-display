@@ -273,8 +273,9 @@
 
         coordinator.addComponent(digitsView);
 
-        if (false) {
+        if (true) {
             setTimeout(function () {
+                console.log("selecting");
                 $("#dataTree").jstree("select_node", tree.treeData[1].children[13]);
             }, 500);
         }
