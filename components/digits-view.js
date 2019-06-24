@@ -1,5 +1,5 @@
 const padw = 4, padh = 5;
-        
+
 class DigitsViewComponent extends ComponentBase {
     constructor(id, width, height, viewBox, config) {
         super(id, width, height, marginDef(5, 5, 5, 5), `0 0 ${width} ${height}`);
@@ -8,7 +8,7 @@ class DigitsViewComponent extends ComponentBase {
         this.sectorInput = d3.select(config.sectorInput).node();
         this.stackInput = d3.select(config.stackInput).node();
         //this.layerInput = d3.select(config.layerInput);
-        this.buttons = [];        
+        this.buttons = [];
 
         for (const input of config.buttons) {
             this.buttons.push(d3.select(input).on("click", this.drawDigits.bind(this)));
@@ -18,7 +18,7 @@ class DigitsViewComponent extends ComponentBase {
 
         const yband = this.yband = d3.scaleBand().domain(d3.range(16))
             .range([0, this.componentHeight - 70])
-            .paddingInner(0.2);        
+            .paddingInner(0.2);
 
         this.sumGroup = this.container.append("g")
             .attr("transform", `translate(30, 30)`);
@@ -50,11 +50,14 @@ class DigitsViewComponent extends ComponentBase {
     draw(eventData) {
         if (eventData != null && eventData.trdTrack != null && eventData.trdTrack.trdTracklets != null && eventData.trdTrack.trdTracklets.length > 0) {
             this.eventInput.value = eventData.event.evno;
-            
+
             const tracklet = eventData.trdTrack.trdTracklets[0];
             this.sectorInput.value = tracklet.sector;
             this.stackInput.value = tracklet.stack;
             //this.layerInput.attr("value", tracklet.layer);
+
+            if (eventData.type == "select")
+                this.drawDigits();
         }
         else {
             this.eventInput.value = 0;
@@ -63,9 +66,6 @@ class DigitsViewComponent extends ComponentBase {
             this.stackInput.value = 0;
             //this.layerInput.attr("value", 0);
         }
-
-        if (eventData.type == "select")
-            this.drawDigits();
     }
 
     async drawDigits() {
@@ -75,7 +75,7 @@ class DigitsViewComponent extends ComponentBase {
         //const layer = this.layerInput.attr("value");
 
         try {
-            console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}`);            
+            console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}`);
             const data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
             console.log(data);
 
@@ -120,7 +120,7 @@ class DigitsViewComponent extends ComponentBase {
                 .style("fill", fillColour)
                 ;
 
-            
+
 
         }
         catch (err) {
@@ -135,7 +135,7 @@ class DigitsViewComponent extends ComponentBase {
         }));
 
         for (const pad of d.pads) {
-            pad.y 
+            pad.y
             rows[pad.row].pads.push(pad);
         }
 
@@ -145,10 +145,10 @@ class DigitsViewComponent extends ComponentBase {
 
         const line = d3.line().x(d => xscale(d.col)).y(d => d.yscale(d.tsum));
 
-        for (const row of rows) {            
+        for (const row of rows) {
             row.pads.sort((a, b) => a.col - b.col);
             row.yscale = d3.scaleLinear()
-                .domain([0, 10000]) 
+                .domain([0, 10000])
                 .range([yband(row.row) + yband.bandwidth(), yband(row.row)]);
 
             row.line = d3.line().x(d => xscale(d.col)).y(d => row.yscale(d.tsum));
