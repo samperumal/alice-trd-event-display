@@ -19,6 +19,5 @@ rect.tbin {
 }
 
 .time-bin-view .y-axis .tick text {
-    font-size: 6px;
-    font-weight: bold;
+    font-size: 9px;
 }

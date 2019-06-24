@@ -114,7 +114,7 @@ class TbsumSubView {
 
         this.yaxis = this.tbsumContainer.append("g").attr("class", "y-axis")
             .attr("transform", "translate(20, 0)")
-            .call(d3.axisLeft(this.yscale));
+            .call(d3.axisLeft(this.yscale).tickValues(d3.range(0, 30, 3)));
 
         this.xaxis = this.tbsumContainer.append("g").attr("class", "x-axis")
             .attr("transform", `translate(0, ${height - 20})`);
@@ -189,7 +189,7 @@ class PadSubView {
 
         this.yaxis = this.padContainer.append("g").attr("class", "y-axis")
             .attr("transform", `translate(${this.width - 20}, 0)`)
-            .call(d3.axisRight(this.yscale).ticks(5));
+            .call(d3.axisRight(this.yscale).tickValues(d3.range(0, 30, 3)));
 
         this.xaxis = this.padContainer.append("g").attr("class", "x-axis")
             .attr("transform", `translate(0, ${height - 20})`)
