@@ -12,7 +12,7 @@ class TimebinViewComponent extends ComponentBase {
 
         this.splitYBand = d3.scaleBand().domain(d3.range(6))
             .range([this.margin.top, this.margin.top + this.displayHeight])
-            .paddingInner(0.05);
+            .paddingInner(0.15);
 
         this.groupSpacing = 0;
         this.tbsumGroupWidth = this.splitXBand.bandwidth();
@@ -27,10 +27,16 @@ class TimebinViewComponent extends ComponentBase {
             const tbsumGroup = this.container.append("g").attr("class", "tbsum-group")
                 .attr("transform", `translate(${this.splitXBand(0)}, ${this.splitYBand(5 - layer)})`);
 
+            tbsumGroup.append("text").text(`Time-bin sums - Layer ${layer}`).attr("class", "panel-label")
+                .attr("x", this.splitXBand.bandwidth() / 2);
+
             this.tbsumSubViews.push(new TbsumSubView(this.tbsumGroupWidth, this.layerGroupHeight, tbsumGroup));
 
             const padGroup = this.container.append("g").attr("class", "pad-group")
                 .attr("transform", `translate(${this.splitXBand(1)}, ${this.splitYBand(5 - layer)})`);
+
+            padGroup.append("text").text(`Time-bin ADC counts - Layer ${layer}`).attr("class", "panel-label")
+                .attr("x", this.splitXBand.bandwidth() / 2);
 
             this.padSubViews.push(new PadSubView(this.padGroupWidth, this.layerGroupHeight, padGroup));
         }
@@ -120,8 +126,6 @@ class TbsumSubView {
 
         this.xaxis.call(d3.axisBottom(this.xscale).ticks(5));
 
-        console.log(tbinSum);
-
         const allRects = this.content.selectAll("rect.tbsum")
             .data(tbinSum);
 
@@ -185,8 +189,6 @@ class PadSubView {
             })))
             .reduce(ajoin, [])
             .filter(p => p.val > 0);
-
-        console.log(pads);
 
         this.xscale.domain(d3.range(minPad, maxPad + 1));
 

@@ -7,3 +7,8 @@ rect.tbin {
     fill: #eee;
     stroke: none;
 }
+
+.time-bin-view text.panel-label {
+    text-anchor: middle;
+    dominant-baseline: text-before-edge;
+}
