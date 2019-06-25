@@ -101,12 +101,21 @@ class TimebinViewComponent extends ComponentBase {
 
             for (const layer of d3.range(6)) {
                 const trackletData = eventData.trdTrack.trdTracklets.find(t => t.layer == layer);
-                if (trackletData != null)
+                let location = null;
+                if (trackletData != null) {
                     this.layerLabels[layer].text(`Layer ${layer} Pad row ${trackletData.binZ}`);
+                    location = {
+                        stack: trackletData.stack,
+                        layer: trackletData.layer,
+                        row: trackletData.binZ,
+                        binY: trackletData.binY,
+                        col: -1
+                    }
+                }
                 else this.layerLabels[layer].text(`Layer ${layer}`);
 
-                this.tbsumSubViews[layer].draw(trackletData, data.layers[layer]);
-                this.padSubViews[layer].draw(trackletData, data.layers[layer], this.colourScale);
+                this.tbsumSubViews[layer].draw(location, data.layers[layer]);
+                this.padSubViews[layer].draw(location, data.layers[layer], this.colourScale);
             }
         }
         catch (err) {
@@ -114,8 +123,25 @@ class TimebinViewComponent extends ComponentBase {
         }
     }
 
-    updatePad(data) {
-        console.log(data);
+    updatePad(updateData) {
+        console.log(updateData);
+        
+        let location = null;
+        if (updateData != null) {
+            const layer = updateData.pos.layer;
+
+            this.layerLabels[layer].text(`Layer ${layer} Pad row ${updateData.pos.row}`);
+            location = {
+                stack: updateData.data.stack,
+                layer: layer,
+                row: updateData.pos.row,
+                binY: null,
+                col: updateData.pos.col
+            };
+
+            this.tbsumSubViews[layer].draw(location, updateData.data);
+            this.padSubViews[layer].draw(location, updateData.data, this.colourScale);
+        }
     }
 }
 
@@ -145,8 +171,8 @@ class TbsumSubView {
         this.content = this.tbsumContainer.append("g");
     }
 
-    draw(trdTrackletData, digitsData) {
-        if (trdTrackletData == null) {
+    draw(location, digitsData) {
+        if (location == null) {
             this.content.selectAll("rect.tbsum").remove();
             this.xscale.domain([256, 0]);
             this.xaxis.call(d3.axisBottom(this.xscale).ticks(5, "s"));
@@ -154,21 +180,30 @@ class TbsumSubView {
             return;
         }
 
-        const layerDim = this.dimensions.filter(d => d.stack == trdTrackletData.stack && d.layer == trdTrackletData.layer)[0];
+        const layerDim = this.dimensions.filter(d => d.stack == location.stack && d.layer == location.layer)[0];
 
-        const padMapping = d3.scaleLinear().domain([layerDim.minBinY, layerDim.maxBinY]).range([0, 143]);
-        const minPad = Math.floor(padMapping(trdTrackletData.binY)) - 2;
-        const maxPad = minPad + 4;
-        const padIndices = d3.range(minPad, maxPad + 1);
+        let padIndices;
 
-        const pads = digitsData.pads.filter(p => p.row == trdTrackletData.binZ && padIndices.includes(p.col));
+        if (location.binY != null) {
+            const padMapping = d3.scaleLinear().domain([layerDim.minBinY, layerDim.maxBinY]).range([0, 143]);
+            const minPad = Math.floor(padMapping(location.binY)) - 2;
+            const maxPad = minPad + 4;
+            padIndices = d3.range(minPad, maxPad + 1);
+        }
+        else {
+            const minPad = Math.max(location.col - 3, 0);
+            const maxPad = Math.min(location.col + 3, 143);
+            padIndices = d3.range(minPad, maxPad + 1);
+        }
+
+        const pads = digitsData.pads.filter(p => p.row == location.row && padIndices.includes(p.col));
 
         const tbinSum = d3.range(30);
         for (const index in tbinSum)
             tbinSum[index] = 0;
 
         for (const pad of pads) {
-            for (let i = 0; i < 30; i++)
+            for (let i = 0; i < pad.tbins.length; i++)
                 tbinSum[i] += pad.tbins[i];
         }
 
@@ -238,10 +273,10 @@ class PadSubView {
         this.content = this.padContainer.append("g");
     }
 
-    draw(trdTrackletData, digitsData, colourScale) {
+    draw(location, digitsData, colourScale) {
         this.content.selectAll("rect.tbin").remove();
 
-        if (trdTrackletData == null) {
+        if (location == null) {
             this.colourAxisGroup.style("display", "none");
             return;
         }
@@ -249,15 +284,27 @@ class PadSubView {
             this.colourAxisGroup.style("display", "inherit");
         }
 
-        const layerDim = this.dimensions.filter(d => d.stack == trdTrackletData.stack && d.layer == trdTrackletData.layer)[0];
+        const layerDim = this.dimensions.filter(d => d.stack == location.stack && d.layer == location.layer)[0];
 
-        const padMapping = d3.scaleLinear().domain([layerDim.minBinY, layerDim.maxBinY]).range([0, 143]);
-        const minPad = Math.floor(padMapping(trdTrackletData.binY)) - 2;
-        const maxPad = minPad + 5;
+        let padIndices;
 
-        const padIndices = d3.range(minPad, maxPad + 1);
+        if (location.binY != null) {
+            const padMapping = d3.scaleLinear().domain([layerDim.minBinY, layerDim.maxBinY]).range([0, 143]);
+            const minPad = Math.floor(padMapping(location.binY)) - 2;
+            const maxPad = minPad + 4;
+            padIndices = d3.range(minPad, maxPad + 1);
 
-        const pads = digitsData.pads.filter(p => p.row == trdTrackletData.binZ && padIndices.includes(p.col))
+            this.xscale.domain(d3.range(maxPad, minPad - 1, -1));
+        }
+        else {
+            const minPad = Math.max(location.col - 3, 0);
+            const maxPad = Math.min(location.col + 3, 143);
+            padIndices = d3.range(minPad, maxPad + 1);
+
+            this.xscale.domain(d3.range(maxPad, minPad - 1, -1));
+        }
+
+        const pads = digitsData.pads.filter(p => p.row == location.row && padIndices.includes(p.col))
             .map(p => p.tbins.map((t, i) => ({
                 pad: p.col,
                 tbin: i,
@@ -265,8 +312,6 @@ class PadSubView {
             })))
             .reduce(ajoin, [])
             .filter(p => p.val > 0);
-
-        this.xscale.domain(d3.range(maxPad, minPad - 1, -1));
 
         this.xaxis.call(d3.axisBottom(this.xscale));
 
