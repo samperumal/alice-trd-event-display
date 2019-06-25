@@ -7,37 +7,43 @@
 			"layer": 0,
 			"det": 462,
 			"pads": [
-			]
+			],
+			"maxtsum": 0
 		},
 		{
 			"layer": 1,
 			"det": 463,
 			"pads": [
-			]
+			],
+			"maxtsum": 0
 		},
 		{
 			"layer": 2,
 			"det": 464,
 			"pads": [
-			]
+			],
+			"maxtsum": 0
 		},
 		{
 			"layer": 3,
 			"det": 465,
 			"pads": [
-			]
+			],
+			"maxtsum": 0
 		},
 		{
 			"layer": 4,
 			"det": 466,
 			"pads": [
-			]
+			],
+			"maxtsum": 0
 		},
 		{
 			"layer": 5,
 			"det": 467,
 			"pads": [
-			]
+			],
+			"maxtsum": 0
 		}
 	]
 }
