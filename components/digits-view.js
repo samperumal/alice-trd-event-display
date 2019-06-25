@@ -95,8 +95,8 @@ class DigitsViewComponent extends ComponentBase {
                     const row = d3.select(nodes[i]).select("rect.row-highlight").style("visibility", "hidden");
 
                     const col = d3.select(nodes[i]).select("rect.col-highlight").style("visibility", "hidden");
-                });
-                //.on("mouseenter", this.drawPadRows.bind(this));
+                })
+                .on("mouseenter", this.drawPadRows.bind(this));
 
             newLayers
                 .append("rect")
