@@ -8,8 +8,8 @@ class TrackInformationComponent {
             "ID: ": "id",
             "pT: ": "pt",
             "PID: ": "pid",
-            "Stack": "stack",
-            "Sector": "sector"
+            "Stack:": "stack",
+            "Sector:": "sector"
         });
     }
 
