@@ -131,7 +131,10 @@ class DigitsViewComponent extends ComponentBase {
                 })
                 .on("click", (d, i, nodes) => {
                     if (this.padClick != null)
-                        this.padClick(d);
+                        this.padClick({
+                            data: nodes[i].parentNode.__data__,
+                            pos: d
+                        });
                 });
 
             const colourMap = new Map();

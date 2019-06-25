@@ -46,5 +46,12 @@ class ComponentCoordinator {
             component.draw(drawData);
         }
     }
+
+    padSelect(data) {
+        for (const component of this.components) {
+            if (component.updatePad != null) 
+                component.updatePad(data);
+        }
+    }
 }
 

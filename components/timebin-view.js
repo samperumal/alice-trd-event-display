@@ -113,6 +113,10 @@ class TimebinViewComponent extends ComponentBase {
             console.error(err);
         }
     }
+
+    updatePad(data) {
+        console.log(data);
+    }
 }
 
 class TbsumSubView {

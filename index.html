@@ -268,7 +268,8 @@
             stackInput: "#stack-input",
             layerInput: "#layer-input",
             buttons: ["#load-digits"],
-            dataLoadUrl: "data/"
+            dataLoadUrl: "data/",
+            padClick: coordinator.padSelect.bind(coordinator)
         });
 
         coordinator.addComponent(digitsView);
