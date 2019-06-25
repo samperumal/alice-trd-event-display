@@ -1,14 +1,19 @@
-rect.pad-sum {
+.digits-view rect.pad-sum {
     stroke: none;
     fill: none;
 }
 
-rect.pad-background {
+.digits-view rect.pad-background {
     stroke: black;
     fill: white;
 }
 
-path.pad-row {
+.digits-view path.pad-row {
     fill: none;
     stroke: black;
+}
+
+.digits-view .row-highlight, .digits-view .col-highlight {
+    stroke: slateblue;
+    fill: none;
 }

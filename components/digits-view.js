@@ -7,7 +7,10 @@ class DigitsViewComponent extends ComponentBase {
         this.eventInput = d3.select(config.eventInput).node();
         this.sectorInput = d3.select(config.sectorInput).node();
         this.stackInput = d3.select(config.stackInput).node();
-        //this.layerInput = d3.select(config.layerInput);
+
+        if (config != null && config.padClick != null)
+            this.padClick = config.padClick;
+
         this.buttons = [];
 
         for (const input of config.buttons) {
@@ -15,6 +18,8 @@ class DigitsViewComponent extends ComponentBase {
         }
 
         this.dataLoadUrl = config.dataLoadUrl;
+
+        this.container.attr("class", "digits-view");
 
         const yband = this.yband = d3.scaleBand().domain(d3.range(16))
             .range([0, this.componentHeight - 70])
@@ -38,6 +43,11 @@ class DigitsViewComponent extends ComponentBase {
             .text(d => d)
             .attr("transform", d => `translate(-20, ${(5 - d) * padh * 19 + 9 * padh})`);
 
+        this.selectGroup = this.sumGroup.append("g").attr("class", "selection-rects");
+
+        this.rowSelect = this.selectGroup.append("rect").attr("class", "row-select");
+        this.colSelect = this.selectGroup.append("rect").attr("class", "col-select");
+
         this.graphGroup.append("g").attr("class", "row-numbers")
             .selectAll("text")
             .data(d3.range(16))
@@ -49,22 +59,20 @@ class DigitsViewComponent extends ComponentBase {
 
     draw(eventData) {
         if (eventData != null && eventData.trdTrack != null && eventData.trdTrack.trdTracklets != null && eventData.trdTrack.trdTracklets.length > 0) {
-            this.eventInput.value = eventData.event.evno;
+            if (eventData.type == "select") {
+                const tracklet = eventData.trdTrack.trdTracklets[0];
 
-            const tracklet = eventData.trdTrack.trdTracklets[0];
-            this.sectorInput.value = tracklet.sector;
-            this.stackInput.value = tracklet.stack;
-            //this.layerInput.attr("value", tracklet.layer);
+                this.eventInput.value = eventData.event.evno;
+                this.sectorInput.value = tracklet.sector;
+                this.stackInput.value = tracklet.stack;
 
-            if (eventData.type == "select")
                 this.drawDigits();
+            }
         }
         else {
             this.eventInput.value = 0;
-
             this.sectorInput.value = 0;
             this.stackInput.value = 0;
-            //this.layerInput.attr("value", 0);
         }
     }
 
@@ -72,25 +80,30 @@ class DigitsViewComponent extends ComponentBase {
         const eventNo = this.eventInput.value;
         const sector = this.sectorInput.value;
         const stack = this.stackInput.value;
-        //const layer = this.layerInput.attr("value");
 
         try {
-            console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}`);
+            console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}: ${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
             const data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
             console.log(data);
 
             const allLayers = this.sumGroup.selectAll("g.layer")
                 .data(data.layers, d => d.det);
 
-            allLayers.enter().append("g")
+            const newLayers = allLayers.enter().append("g")
                 .attr("class", "layer")
-                .on("mouseenter", this.drawPadRows.bind(this))
+                .on("mouseleave", (d, i, nodes) => {
+                    const row = d3.select(nodes[i]).select("rect.row-highlight").style("visibility", "hidden");
+
+                    const col = d3.select(nodes[i]).select("rect.col-highlight").style("visibility", "hidden");
+                });
+                //.on("mouseenter", this.drawPadRows.bind(this));
+
+            newLayers
                 .append("rect")
                 .attr("class", "pad-background")
                 .attr("x", -2)
                 .attr("y", -2)
-                .attr("width", padw * 144 + 4)
-                .attr("height", padh * 16 + 4);
+                .attr("width", padw * 144 + 4).attr("height", padh * 16 + 4);
 
             allLayers.exit().remove();
 
@@ -102,26 +115,35 @@ class DigitsViewComponent extends ComponentBase {
 
             allPads.exit().remove();
 
-            function fillColour(d) {
-                const gray = Math.min(256 - 256 * d.tsum / 512, 240);
-
-                return `rgb(${gray}, ${gray}, ${gray})`;
-            }
-
             allPads.enter()
                 .append("rect")
                 .attr("class", "pad-sum")
                 .attr("x", d => d.col * padw + 1)
                 .attr("y", d => d.row * padh + 1)
                 .attr("width", padw - 1)
-                .attr("height", padh - 1);
+                .attr("height", padh - 1)
+                .on("mouseenter", (d, i, nodes) => {
+                    const row = d3.select(nodes[i].parentNode).select("rect.row-highlight").style("visibility", "visible");
+                    row.attr("y", d.row * padh - 1);
+
+                    const col = d3.select(nodes[i].parentNode).select("rect.col-highlight").style("visibility", "visible");
+                    col.attr("x", d.col * padw - 1);
+                })
+                .on("click", (d, i, nodes) => {
+                    if (this.padClick != null)
+                        this.padClick(d);
+                });
+
+            const colourMap = new Map();
+            for (const layer of data.layers) {
+                colourMap.set(layer.layer, d3.scaleSequential(d3.interpolateGreys).domain([0, layer.maxtsum]));
+            }
 
             this.sumGroup.selectAll("rect.pad-sum")
-                .style("fill", fillColour)
-                ;
+                .style("fill", d => colourMap.get(d.layer)(d.tsum));
 
-
-
+            newLayers.append("rect").attr("class", "row-highlight").style("visibility", "hidden").attr("x", -1).attr("width", padw * 144 + 2).attr("y", -1).attr("height", padh + 2);
+            newLayers.append("rect").attr("class", "col-highlight").style("visibility", "hidden").attr("x", -1).attr("width", padw + 2).attr("y", -1).attr("height", padh * 16 + 2);
         }
         catch (err) {
             console.error(err);
@@ -169,7 +191,5 @@ class DigitsViewComponent extends ComponentBase {
 
         this.graphGroup.selectAll("path.pad-row")
             .attr("d", d => d.line(d.pads));
-
-        console.log(rows);
     }
 }
