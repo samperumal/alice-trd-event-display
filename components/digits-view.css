@@ -1,5 +1,5 @@
 .digits-view rect.pad-sum {
-    stroke: none;
+    stroke: #aaa;
     fill: none;
 }
 
@@ -16,4 +16,9 @@
 .digits-view .row-highlight, .digits-view .col-highlight {
     stroke: slateblue;
     fill: none;
+}
+
+.digits-view .layer-labels text {
+    text-anchor: middle;
+    dominant-baseline: central;
 }
