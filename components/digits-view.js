@@ -34,6 +34,8 @@ class DigitsViewComponent extends ComponentBase {
             .range([axisMargins.left, contentWidth])
             .paddingInner(0);
 
+        //const colScale = fisheye.scale(d3.scaleLinear()).domain(colBand.domain()).range(colBand.range());
+
         const rowBand = this.rowBand = d3.scaleBand().domain(d3.range(-1, 17).reverse())
             .range([axisMargins.top, layerBand.bandwidth() - axisMargins.top - axisMargins.bottom]);
 
@@ -57,7 +59,7 @@ class DigitsViewComponent extends ComponentBase {
             .call(d3.axisBottom(colBand).tickValues(d3.range(0, 145, 4)));
 
         padColAxis.append("text").text("Pad Column Index").attr("class", "axis-label").style("fill", "currentColor")
-            .attr("transform", `translate(${(colBand.range()[0] + colBand.range()[1]) / 2}, 30)`)
+            .attr("transform", `translate(${(colBand.range()[0] + colBand.range()[1]) / 2}, 30)`);
 
         // Axes for pad row number
         layerAxes.append("g").attr("class", "padrow-axis").attr("transform", `translate(${colBand.range()[0]}, ${0})`)
@@ -69,8 +71,30 @@ class DigitsViewComponent extends ComponentBase {
         rightPadRowAxis.append("text").text("Pad Row").attr("class", "pad-row-axis-label").attr("textLength", 70)
             .attr("transform", `translate(${30}, ${(rowBand.range()[0] + rowBand.range()[1]) / 2})`);
 
+        let distortion = 100;
+        function fisheye(_, a) {
+            let x = colBand(_),
+                left = x < a,
+                range = d3.extent(colBand.range()),
+                min = range[0],
+                max = range[1],
+                m = left ? a - min : max - a;
+            if (m === 0) m = max - min;
+            return (left ? -1 : 1) * m * (distortion + 1) / (distortion + (m / Math.abs(x - a))) + a;
+        }
+
         // Create groups for each layer
-        this.padLayers = this.sumGroup.append("g").attr("class", "pad-layers").attr("transform", `translate(${layerLabelWidth}, 0)`)
+        this.padLayers = this.sumGroup.append("g")
+            .attr("class", "pad-layers").attr("transform", `translate(${layerLabelWidth}, 0)`)
+            // .on("mousemove", function () {
+            //     const mouse = d3.mouse(this);
+            //     colBand.distortion(2.5).focus(mouse[0]);
+            //     //yScale.distortion(2.5).focus(mouse[1]);
+
+            //     //dot.call(position);
+            //     //svg.select(".x.axis").call(xAxis);
+            //     padColAxis.call(d3.axisBottom(colScale).tickValues(d3.range(0, 145, 4)));
+            // })
             .selectAll("g.pad-layer").data(layerBand.domain())
             .enter().append("g").attr("class", "pad-layer").attr("transform", d => `translate(0, ${layerBand(d)})`);
 
