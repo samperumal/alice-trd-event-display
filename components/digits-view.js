@@ -52,8 +52,12 @@ class DigitsViewComponent extends ComponentBase {
             .attr("data-layer", d => d).attr("transform", d => `translate(0, ${layerBand(d)})`);
 
         // Axis for pad col number
-        layerAxes.append("g").attr("class", "padcol-axis").attr("transform", `translate(0, ${rowBand.range()[1]})`)
+        const padColAxis = layerAxes.append("g").attr("class", "padcol-axis")
+            .attr("transform", `translate(0, ${rowBand.range()[1]})`)
             .call(d3.axisBottom(colBand).tickValues(d3.range(0, 145, 4)));
+
+        padColAxis.append("text").text("Pad Column Index").style("fill", "currentColor")
+            .attr("transform", `translate(${(colBand.range()[0] + colBand.range()[1]) / 2}, 30)`)
 
         // Axes for pad row number
         layerAxes.append("g").attr("class", "padrow-axis").attr("transform", `translate(${colBand.range()[0]}, ${0})`)
@@ -121,7 +125,6 @@ class DigitsViewComponent extends ComponentBase {
         try {
             console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}: ${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
             const data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
-            console.log(data);
 
             for (const layer of data.layers) {
                 const colourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, layer.maxtsum]);
@@ -129,49 +132,7 @@ class DigitsViewComponent extends ComponentBase {
                     const key = this.key(layer.layer, pad.row, pad.col);
                     this.padMap.get(key).style("fill", colourScale(pad.tsum));
                 }
-
             }
-
-            return;
-
-            const allLayers = this.sumGroup.selectAll("g.layer")
-                .data(data.layers, d => d.det);
-
-            const newLayers = allLayers.enter().append("g")
-                .attr("class", "layer");
-
-            newLayers
-                .append("rect")
-                .attr("class", "pad-background")
-                .attr("x", -2)
-                .attr("y", -2)
-                .attr("width", padw * 144 + 4).attr("height", padh * 16 + 4);
-
-            allLayers.exit().remove();
-
-            const allPads = this.sumGroup
-                .selectAll("g.layer")
-                .attr("transform", d => `translate(0, ${(5 - d.layer) * padh * 19})`)
-                .selectAll("rect.pad-sum")
-                .data(d => d.pads, d => d.row * 144 + d.col);
-
-            allPads.exit().remove();
-
-            allPads.enter()
-                .append("rect")
-                .attr("class", "pad-sum")
-                .attr("x", d => d.col * padw + 1)
-                .attr("y", d => d.row * padh + 1)
-                .attr("width", padw - 1)
-                .attr("height", padh - 1);
-
-            const colourMap = new Map();
-            for (const layer of data.layers) {
-                colourMap.set(layer.layer, d3.scaleSequential(d3.interpolateGreys).domain([0, layer.maxtsum]));
-            }
-
-            this.sumGroup.selectAll("rect.pad-sum")
-                .style("fill", d => colourMap.get(d.layer)(d.tsum));
         }
         catch (err) {
             console.error(err);

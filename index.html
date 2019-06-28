@@ -209,7 +209,7 @@
                     <div class="component">
                         <p>Digits detail view</p>
                         <p>
-                            <span><label for="event-input">Event: </label><input type="number" value="55"
+                            <span><label for="event-input">Event: </label><input type="number" value="11"
                                     id="event-input" min="0" /></span>
                             <span><label for="sector-input">Sector: </label><input type="number" value="0"
                                     id="sector-input" min="0" /></span>
@@ -277,7 +277,7 @@
                 console.log("selecting");
                 $("#dataTree").jstree("select_node", tree.treeData[1].children[13]);
                 // let count = 0;
-                // digitsView.drawDigits().then(() => {
+                digitsView.drawDigits().then(() => {
                 //     // d3.selectAll("rect.pad-sum").filter(d => {
                 //     //     if (count < 1 && d.row == 3 && d.col == 84 && d.tsum > 0) {
                 //     //         count += 1;
@@ -287,7 +287,7 @@
                 //     //     else return false;
                 //     // })
                 //     //     .dispatch("click");
-                // });
+                });
             }, 500);
         }
 
