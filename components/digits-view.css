@@ -1,5 +1,5 @@
 .digits-view rect.pad-sum {
-    stroke: #aaa;
+    stroke: white;
     fill: none;
 }
 
@@ -21,4 +21,8 @@
 .digits-view .layer-labels text {
     text-anchor: middle;
     dominant-baseline: central;
+}
+
+.digits-view .layer-axes {
+    color: #888;
 }

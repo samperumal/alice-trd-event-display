@@ -26,7 +26,7 @@ class DigitsViewComponent extends ComponentBase {
         const contentWidth = this.displayWidth - layerLabelWidth - axisMargins.left - axisMargins.right;
         const contentHeight = this.displayHeight - axisMargins.top - axisMargins.bottom;
 
-        const layerBand = this.layerBand = d3.scaleBand().domain(d3.range(1).reverse())
+        const layerBand = this.layerBand = d3.scaleBand().domain(d3.range(6).reverse())
             .range([axisMargins.top, contentHeight])
             .paddingInner(0.2);
 
@@ -63,31 +63,35 @@ class DigitsViewComponent extends ComponentBase {
             .call(d3.axisRight(rowBand).tickValues(d3.range(0, 16, 3)));
 
         this.padLayers = this.sumGroup.append("g").attr("class", "pad-layers").attr("transform", `translate(${layerLabelWidth}, 0)`)
-            .selectAll("g.pad-layer").data([0])//layerBand.domain())
+            .selectAll("g.pad-layer").data(layerBand.domain())
             .enter().append("g").attr("class", "pad-layer").attr("transform", d => `translate(0, ${layerBand(d)})`);
 
-        const testData = d3.range(16).map(r => d3.range(40).map(c => ({ r: r, c: c }))).reduce(ajoin);
-        console.log(testData);
+        const testData = d3.range(16).map(r => d3.range(144).map(c => ({ r: r, c: c }))).reduce(ajoin);
 
         function rotate(d) {
-            return `rotate(${2 *(2 * (d.r % 2) - 1)} ${colBand(d.c) + colBand.bandwidth() / 2} ${rowBand(d.r) + rowBand.bandwidth() / 2})`;
+            return `rotate(${2 * (2 * (d.r % 2) - 1)} ${colBand(d.c) + colBand.bandwidth() / 2} ${rowBand(d.r) + rowBand.bandwidth() / 2})`;
         }
 
         // Create and rotate individual pads
-        this.padLayers.selectAll("rect.pad-sum").data(testData).enter()
+        this.padLayers.selectAll("rect.pad-sum").data(l => d3.range(16).map(r => d3.range(144).map(c => ({ l: l, r: r, c: c }))).reduce(ajoin))
+            .enter()
             .append("rect").attr("class", "pad-sum")
             .attr("transform", d => `${rotate(d)}translate(${colBand(d.c)}, ${rowBand(d.r)})`)
             .attr("width", colBand.bandwidth())
             .attr("height", rowBand.bandwidth());
 
-        
-        this.padLayers.append("rect").attr("class", "pad-sum")
-            .attr("width", colBand.bandwidth()).attr("height", Math.abs(rowBand(0) - rowBand(15) + rowBand.bandwidth()))
-            .attr("transform", `rotate(2 ${colBand(4) + colBand.bandwidth() / 2} ${(rowBand.range()[0] + rowBand.range()[1]) / 2})translate(${colBand(4)}, ${rowBand(15)})`).style("stroke", "red");
+        const padMap = this.padMap = new Map();
+        const key = this.key;
 
-        this.padLayers.append("rect").attr("class", "pad-sum")
-            .attr("width", colBand.bandwidth()).attr("height", Math.abs(rowBand(0) - rowBand(15) + rowBand.bandwidth()))
-            .attr("transform", `translate(${colBand(4)}, ${rowBand(15)})`).style("stroke", "orange");
+        this.padLayers.selectAll("rect.pad-sum").each((d, i, nodes) => {
+            padMap.set(key(d.l, d.r, d.c), d3.select(nodes[i]));
+        })
+    }
+
+    key(layer, row, col) {
+        //console.log(layer, col, row);
+        return `${layer}_${col}_${row}`;
+        return layer * 10e7 + col * 10e5 + row;
     }
 
     draw(eventData) {
@@ -118,6 +122,17 @@ class DigitsViewComponent extends ComponentBase {
             console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}: ${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
             const data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
             console.log(data);
+
+            for (const layer of data.layers) {
+                const colourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, layer.maxtsum]);
+                for (const pad of layer.pads) {
+                    const key = this.key(layer.layer, pad.row, pad.col);
+                    this.padMap.get(key).style("fill", colourScale(pad.tsum));
+                }
+
+            }
+
+            return;
 
             const allLayers = this.sumGroup.selectAll("g.layer")
                 .data(data.layers, d => d.det);
