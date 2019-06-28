@@ -23,6 +23,15 @@
     dominant-baseline: central;
 }
 
+.digits-view .pad-row-axis-label {
+    fill: currentcolor;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    text-anchor: middle;
+    dominant-baseline: central;
+    font-stretch: extra-condensed;
+}
+
 .digits-view .layer-axes {
     color: #888;
 }

@@ -22,7 +22,7 @@ class DigitsViewComponent extends ComponentBase {
         this.container.attr("class", "digits-view");
 
         const layerLabelWidth = 50;
-        const axisMargins = { top: 5, bottom: 10, left: 20, right: 10 };
+        const axisMargins = { top: 5, bottom: 10, left: 20, right: 20 };
         const contentWidth = this.displayWidth - layerLabelWidth - axisMargins.left - axisMargins.right;
         const contentHeight = this.displayHeight - axisMargins.top - axisMargins.bottom;
 
@@ -56,34 +56,48 @@ class DigitsViewComponent extends ComponentBase {
             .attr("transform", `translate(0, ${rowBand.range()[1]})`)
             .call(d3.axisBottom(colBand).tickValues(d3.range(0, 145, 4)));
 
-        padColAxis.append("text").text("Pad Column Index").style("fill", "currentColor")
+        padColAxis.append("text").text("Pad Column Index").attr("class", "axis-label").style("fill", "currentColor")
             .attr("transform", `translate(${(colBand.range()[0] + colBand.range()[1]) / 2}, 30)`)
 
         // Axes for pad row number
         layerAxes.append("g").attr("class", "padrow-axis").attr("transform", `translate(${colBand.range()[0]}, ${0})`)
             .call(d3.axisLeft(rowBand).tickValues(d3.range(0, 16, 3)));
 
-        layerAxes.append("g").attr("class", "padrow-axis").attr("transform", `translate(${colBand.range()[1]}, ${0})`)
+        const rightPadRowAxis = layerAxes.append("g").attr("class", "padrow-axis").attr("transform", `translate(${colBand.range()[1]}, ${0})`)
             .call(d3.axisRight(rowBand).tickValues(d3.range(0, 16, 3)));
 
+        rightPadRowAxis.append("text").text("Pad Row").attr("class", "pad-row-axis-label").attr("textLength", 70)
+            .attr("transform", `translate(${30}, ${(rowBand.range()[0] + rowBand.range()[1]) / 2})`);
+
+        // Create groups for each layer
         this.padLayers = this.sumGroup.append("g").attr("class", "pad-layers").attr("transform", `translate(${layerLabelWidth}, 0)`)
             .selectAll("g.pad-layer").data(layerBand.domain())
             .enter().append("g").attr("class", "pad-layer").attr("transform", d => `translate(0, ${layerBand(d)})`);
 
-        const testData = d3.range(16).map(r => d3.range(144).map(c => ({ r: r, c: c }))).reduce(ajoin);
-
         function rotate(d) {
-            return `rotate(${2 * (2 * (d.r % 2) - 1)} ${colBand(d.c) + colBand.bandwidth() / 2} ${rowBand(d.r) + rowBand.bandwidth() / 2})`;
+            const angle = 2 * (2 * (d.r % 2) - 1); // 2 degrees, alternating by row
+            const cx = colBand(d.c) + colBand.bandwidth() / 2; // x centre of rotation
+            const cy = rowBand(d.r) + rowBand.bandwidth() / 2; // y centre of rotation
+            return `rotate(${angle} ${cx} ${cy})`;
+        }
+
+        // Create data for pads in a layer
+        function layerPads(l) {
+            return d3.range(16)
+                .map(r => d3.range(144).map(c => ({ l: l, r: r, c: c })))
+                .reduce(ajoin)
         }
 
         // Create and rotate individual pads
-        this.padLayers.selectAll("rect.pad-sum").data(l => d3.range(16).map(r => d3.range(144).map(c => ({ l: l, r: r, c: c }))).reduce(ajoin))
+        this.padLayers.selectAll("rect.pad-sum")
+            .data(layerPads)
             .enter()
             .append("rect").attr("class", "pad-sum")
             .attr("transform", d => `${rotate(d)}translate(${colBand(d.c)}, ${rowBand(d.r)})`)
             .attr("width", colBand.bandwidth())
             .attr("height", rowBand.bandwidth());
 
+        // Map of all pads across all layers
         const padMap = this.padMap = new Map();
         const key = this.key;
 
