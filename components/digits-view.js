@@ -95,15 +95,21 @@ class DigitsViewComponent extends ComponentBase {
 
         if (bin < 30) {
             this.ctx.clearRect(0, 0, this.width, this.height);
-            this.ctx.strokeStyle = "white";
+            this.ctx.strokeStyle = "#777";
 
             const binColourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, 256]);
 
-            console.log(`Painting bin ${bin}`);
+            for (const row of d3.range(16)) {
+                this.ctx.strokeRect(3 + row * 8 * padw + padw, 5, padw * 7 + 3, padh * 144 + padh)
+            }
+
+            this.ctx.strokeStyle = "#eee";
+
+            //console.log(`Painting bin ${bin}`);
             for (const layer of this.data.layers.reverse()) {
                 const colourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, layer.maxtsum]);
                 for (const pad of layer.pads) {
-                    const x = 5 + (pad.row * 8 + pad.layer) * padw;
+                    const x = 5 + padw + (pad.row * 8 + pad.layer) * padw;
                     const y = 5 + (pad.col) * padh;
 
                     if (pad.tbins[bin] > 0) {
@@ -112,9 +118,13 @@ class DigitsViewComponent extends ComponentBase {
                         this.ctx.strokeRect(x, y, padw, padh);
                     }
 
-                    this.ctx.fillStyle = colourScale(pad.tsum);
-                    this.ctx.fillRect(x + 140 * padw, y, padw, padh);
-                    this.ctx.strokeRect(x + 140 * padw, y, padw, padh);
+                    const cumsum = d3.sum(pad.tbins.slice(0, bin));
+
+                    if (cumsum > 0) {
+                        this.ctx.fillStyle = colourScale(cumsum);
+                        this.ctx.fillRect(x + 140 * padw, y, padw, padh);
+                        this.ctx.strokeRect(x + 140 * padw, y, padw, padh);
+                    }
                 }
             }
 
