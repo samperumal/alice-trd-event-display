@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="d3.min.js"></script>
-    <script src="jquery.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="jstree.min.js"></script>
 
     <script src="components/trd-dimensions.js"></script>
@@ -29,6 +31,8 @@
     <link href='./components/digits-view.css' rel='stylesheet' />
     <link href='./components/timebin-view.css' rel='stylesheet' />
 
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
     <style>
         *,
         *:before,
@@ -43,6 +47,11 @@
             font-size: 14px;
             line-height: 1.428571429;
             /* background-color: #6d6d6d; */
+        }
+
+        .ui-draggable,
+        .ui-droppable {
+            background-position: top;
         }
 
         svg {
@@ -146,7 +155,7 @@
 
 <body>
     <div class="row">
-        <div class="column" style="display: none;">
+        <div class="column">
             <div style="margin: 1em;">
                 <p style="font-size: medium; ">Available events</p>
                 <div id="tree-container">
@@ -172,9 +181,9 @@
                 </div>
             </div>
         </div>
-        <div class="column main-content">
+        <div class="column main-content" style="overflow: hidden;">
             <div class="row">
-                <!-- <div class="column">
+                <div class="column">
                     <div class="component">
                         <p>Sector view - XY plane</p>
                         <svg id="sector-view" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
@@ -197,30 +206,42 @@
                         <svg id="supermodule-view-zoom" style="width: 300px; height: 300px;"
                             preserveAspectRatio="xMidYMid meet"></svg>
                     </div>
-                </div> -->
-                <!-- <div class="column">
+                </div>
+                <div class="column">
                     <div class="component time-bin-view">
                         <p>Time-bin view</p>
                         <svg id="timebin-view-zoom" style="width: 500px; height: 1600px;"
                             preserveAspectRatio="xMidYMid meet"></svg>
                     </div>
-                </div> -->
-                <div class="column">
-                    <div class="component">
-                        <p>Digits detail view</p>
-                        <p>
-                            <span><label for="event-input">Event: </label><input type="number" value="11"
-                                    id="event-input" min="0" /></span>
-                            <span><label for="sector-input">Sector: </label><input type="number" value="0"
-                                    id="sector-input" min="0" /></span>
-                            <span><label for="stack-input">Stack: </label><input type="number" value="0"
-                                    id="stack-input" min="0" /></span>
-                            <span><input type="button" value="Load" id="load-digits" /></span>
-                        </p>
-                        <svg id="digits-view" style="width: 1400px; height: 650px;"
-                            preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <div class="component">
+                <p>Digits detail view</p>
+                <p>
+                    <span><label for="event-input">Event: </label><input type="number" value="11" id="event-input"
+                            min="0" /></span>
+                    <span><label for="sector-input">Sector: </label><input type="number" value="0" id="sector-input"
+                            min="0" /></span>
+                    <span><label for="stack-input">Stack: </label><input type="number" value="0" id="stack-input"
+                            min="0" /></span>
+                    <span><input type="button" value="Load" id="load-digits" /></span>
+                </p>
+                <div style="text-align: center;">
+                    <div style="display: inline-block; margin: 1em 2em; width: 50%; text-align: center;">
+                        <div>
+                            <label for="amount">Timebin: </label>
+                            <input type="text" id="timebin-display" readonly
+                                style="border:0; color:#f6931f; font-weight:bold; width: 2em;">
+                        </div>
+                        <div id="timebin-slider" style="margin: 0 0;">
+                        </div>
                     </div>
                 </div>
+                <canvas id="digits-view" width="1480" height="650" style="background: inherit;"></canvas>
             </div>
         </div>
     </div>
@@ -250,34 +271,51 @@
 
         const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
 
-        // coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
-        // coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-22 -129 44 44", { r: 0.75, rotate: true }));
-        // coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
-        // coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view-zoom", 300, 300, null, { zoom: true }));
-        // coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
-        //     dataLoadUrl: "data/"
-        // }));
+        coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
+        coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-22 -129 44 44", { r: 0.75, rotate: true }));
+        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
+        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view-zoom", 300, 300, null, { zoom: true }));
+        coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
+            dataLoadUrl: "data/"
+        }));
 
         coordinator.addComponent(new TrackInformationComponent("#track-information"));
 
-        const digitsView = new DigitsViewComponent("#digits-view", 1400, 650, null, {
+        const timebinDisplay = $("timebin-display");
+        $("#timebin-slider").slider({
+            value: 0,
+            min: 0,
+            max: 29,
+            step: 1,
+            change: function (event, ui) {
+                $("#timebin-display").val(ui.value);
+            }
+        });
+
+        const digitsView = new DigitsViewComponent("#digits-view", 1480, 650, null, {
             eventInput: "#event-input",
             sectorInput: "#sector-input",
             stackInput: "#stack-input",
             layerInput: "#layer-input",
             buttons: ["#load-digits"],
             dataLoadUrl: "data/",
-            padClick: coordinator.padSelect.bind(coordinator)
+            padClick: coordinator.padSelect.bind(coordinator),
+            timeBinChange: (timebin) => { $("#timebin-slider").slider("option", "value", timebin); }
+        });
+
+        $("#timebin-slider").on("slide", function (event, ui) {
+            digitsView.drawPads(ui.value);
+            $("#timebin-display").val(ui.value);
         });
 
         coordinator.addComponent(digitsView);
 
-        if (true) {
+        if (false) {
             setTimeout(function () {
                 console.log("selecting");
                 $("#dataTree").jstree("select_node", tree.treeData[1].children[13]);
                 // let count = 0;
-                digitsView.drawDigits().then(() => {
+                //digitsView.drawDigits().then(() => {
                 //     // d3.selectAll("rect.pad-sum").filter(d => {
                 //     //     if (count < 1 && d.row == 3 && d.col == 84 && d.tsum > 0) {
                 //     //         count += 1;
@@ -287,7 +325,7 @@
                 //     //     else return false;
                 //     // })
                 //     //     .dispatch("click");
-                });
+                //});
             }, 500);
         }
 

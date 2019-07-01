@@ -15,6 +15,15 @@ function marginDef(left, right, top, bottom) {
 
 class ComponentBase {
     constructor(id, width, height, margin, viewBox) {
+        let container = d3.select(id);
+
+        if (container.node().tagName.toLowerCase() == "canvas") {
+            container = document.getElementById(id.replace("#", ""));
+            this.ctx = container.getContext("2d");
+            height = container.height;
+            width  = container.width;
+        }
+
         this.height = height;
         this.width = width;
 
@@ -34,11 +43,9 @@ class ComponentBase {
             .domain([-400, 400])
             .range([-this.displayHeight / 2, this.displayHeight / 2]);
 
-        let container = d3.select(id);
-
         this.svg = null;
         
-        if (container.node().tagName == "svg") {
+        if (container.node != null && container.node().tagName.toLowerCase() == "svg") {
             this.svg = container;
             if (viewBox == null)
                 container.attr("viewBox", (-this.componentWidth / 2) + " " + (-this.componentHeight / 2) + " " + (this.componentWidth) + " " + (this.componentHeight));

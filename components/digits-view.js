@@ -7,9 +7,15 @@ class DigitsViewComponent extends ComponentBase {
         this.eventInput = d3.select(config.eventInput).node();
         this.sectorInput = d3.select(config.sectorInput).node();
         this.stackInput = d3.select(config.stackInput).node();
+        this.canvas = document.getElementById(id.replace("#", ""));
 
-        if (config != null && config.padClick != null)
-            this.padClick = config.padClick;
+        if (config != null) {
+            if (config.padClick != null)
+                this.padClick = config.padClick;
+
+            if (config.timeBinChange != null)
+                this.timeBinChange = config.timeBinChange;
+        }
 
         this.buttons = [];
 
@@ -19,7 +25,7 @@ class DigitsViewComponent extends ComponentBase {
 
         this.dataLoadUrl = config.dataLoadUrl;
 
-        this.container.attr("class", "digits-view");
+        this.container.setAttribute("class", "digits-view");
 
         const layerLabelWidth = 50;
         const axisMargins = { top: 5, bottom: 10, left: 20, right: 20 };
@@ -34,45 +40,8 @@ class DigitsViewComponent extends ComponentBase {
             .range([axisMargins.left, contentWidth])
             .paddingInner(0);
 
-        const rowBand = this.rowBand = d3.scaleBand().domain(d3.range(-1, 17).reverse())
+        const rowBand = this.rowBand = d3.scaleBand().domain(d3.range(0, 16).reverse())
             .range([axisMargins.top, layerBand.bandwidth() - axisMargins.top - axisMargins.bottom]);
-
-        // Container for the layer/row/col digits data
-        this.sumGroup = this.container.append("g").attr("class", "sum-group");
-
-        // Create layer labels
-        this.sumGroup.append("g").attr("class", "layer-labels").attr("transform", `translate(${layerLabelWidth / 2}, 0)`)
-            .selectAll("text").data(layerBand.domain())
-            .enter().append("text").text(d => `Layer ${d}`).attr("y", d => layerBand(d) + layerBand.bandwidth() / 2);
-
-        // Create layer axes
-        const layerAxes = this.sumGroup.append("g").attr("class", "layer-axes").attr("transform", `translate(${layerLabelWidth}, 0)`)
-            .selectAll("text").data(layerBand.domain())
-            .enter().append("g").attr("class", "layer-axis")
-            .attr("data-layer", d => d).attr("transform", d => `translate(0, ${layerBand(d)})`);
-
-        // Axis for pad col number
-        const padColAxis = layerAxes.append("g").attr("class", "padcol-axis")
-            .attr("transform", `translate(0, ${rowBand.range()[1]})`)
-            .call(d3.axisBottom(colBand).tickValues(d3.range(0, 145, 4)));
-
-        padColAxis.append("text").text("Pad Column Index").attr("class", "axis-label").style("fill", "currentColor")
-            .attr("transform", `translate(${(colBand.range()[0] + colBand.range()[1]) / 2}, 30)`)
-
-        // Axes for pad row number
-        layerAxes.append("g").attr("class", "padrow-axis").attr("transform", `translate(${colBand.range()[0]}, ${0})`)
-            .call(d3.axisLeft(rowBand).tickValues(d3.range(0, 16, 3)));
-
-        const rightPadRowAxis = layerAxes.append("g").attr("class", "padrow-axis").attr("transform", `translate(${colBand.range()[1]}, ${0})`)
-            .call(d3.axisRight(rowBand).tickValues(d3.range(0, 16, 3)));
-
-        rightPadRowAxis.append("text").text("Pad Row").attr("class", "pad-row-axis-label").attr("textLength", 70)
-            .attr("transform", `translate(${30}, ${(rowBand.range()[0] + rowBand.range()[1]) / 2})`);
-
-        // Create groups for each layer
-        this.padLayers = this.sumGroup.append("g").attr("class", "pad-layers").attr("transform", `translate(${layerLabelWidth}, 0)`)
-            .selectAll("g.pad-layer").data(layerBand.domain())
-            .enter().append("g").attr("class", "pad-layer").attr("transform", d => `translate(0, ${layerBand(d)})`);
 
         function rotate(d) {
             const angle = 2 * (2 * (d.r % 2) - 1); // 2 degrees, alternating by row
@@ -81,35 +50,31 @@ class DigitsViewComponent extends ComponentBase {
             return `rotate(${angle} ${cx} ${cy})`;
         }
 
-        // Create data for pads in a layer
-        function layerPads(l) {
-            return d3.range(16)
-                .map(r => d3.range(144).map(c => ({ l: l, r: r, c: c })))
-                .reduce(ajoin)
+        const canvas = this.canvas, context = this.ctx;
+
+        const devicePixelRatio = window.devicePixelRatio || 1,
+            backingStoreRatio = context.webkitBackingStorePixelRatio ||
+                context.mozBackingStorePixelRatio ||
+                context.msBackingStorePixelRatio ||
+                context.oBackingStorePixelRatio ||
+                context.backingStorePixelRatio || 1,
+
+            ratio = devicePixelRatio / backingStoreRatio;
+
+        console.log(backingStoreRatio);
+
+        if (devicePixelRatio !== backingStoreRatio) {
+            const oldWidth = canvas.width;
+            const oldHeight = canvas.height;
+
+            canvas.width = oldWidth * ratio;
+            canvas.height = oldHeight * ratio;
+
+            canvas.style.width = oldWidth + 'px';
+            canvas.style.height = oldHeight + 'px';
+
+            context.scale(ratio, ratio);
         }
-
-        // Create and rotate individual pads
-        this.padLayers.selectAll("rect.pad-sum")
-            .data(layerPads)
-            .enter()
-            .append("rect").attr("class", "pad-sum")
-            .attr("transform", d => `${rotate(d)}translate(${colBand(d.c)}, ${rowBand(d.r)})`)
-            .attr("width", colBand.bandwidth())
-            .attr("height", rowBand.bandwidth());
-
-        // Map of all pads across all layers
-        const padMap = this.padMap = new Map();
-        const key = this.key;
-
-        this.padLayers.selectAll("rect.pad-sum").each((d, i, nodes) => {
-            padMap.set(key(d.l, d.r, d.c), d3.select(nodes[i]));
-        })
-    }
-
-    key(layer, row, col) {
-        //console.log(layer, col, row);
-        return `${layer}_${col}_${row}`;
-        return layer * 10e7 + col * 10e5 + row;
     }
 
     draw(eventData) {
@@ -138,18 +103,136 @@ class DigitsViewComponent extends ComponentBase {
 
         try {
             console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}: ${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
-            const data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
+            const data = this.data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
 
             for (const layer of data.layers) {
-                const colourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, layer.maxtsum]);
                 for (const pad of layer.pads) {
-                    const key = this.key(layer.layer, pad.row, pad.col);
-                    this.padMap.get(key).style("fill", colourScale(pad.tsum));
+                    let csum = 0;
+                    pad.csum = [];
+
+                    for (let i = 0; i < 30; i++) {
+                        csum += pad.tbins[i];
+                        pad.csum.push(csum);
+                    }
                 }
             }
+
+            this.timeStart = new Date();
+            this.animatePads();
         }
         catch (err) {
             console.error(err);
+        }
+    }
+
+    animatePads() {
+        const bin = Math.min(Math.floor((new Date() - this.timeStart) / 1000 / 0.5), 29);
+
+        this.timeBinChange(bin);
+
+        this.drawPads(bin);
+
+        if (bin < 29) {
+            window.requestAnimationFrame(this.animatePads.bind(this));
+        }
+    }
+
+    drawPads(bin) {
+        //this.fixDpi();
+
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        this.ctx.strokeStyle = "#bbb";
+        this.ctx.lineWidth = 0.6;
+
+        const binColourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, 256]);
+
+        const padw = 5, padh = 3, ml = 5, mt = 50, rs = 4, mb = 5;
+        const pane1End = ml + (padw + 6 * padw + padw) * 16 + rs * 15 + ml, paneXOffset = pane1End + 10 * padw;
+
+        // Stroke Pad Row outline
+
+        for (const row of d3.range(16)) {
+            this.ctx.strokeRect(ml + (padw + 6 * padw + padw + rs) * row, mt, padw * 8, padh * 146);
+            this.ctx.strokeRect(paneXOffset + ml + (padw + 6 * padw + padw + rs) * row, mt, padw * 8, padh * 146);
+        }
+
+        // Stroke axes text
+        this.ctx.fillStyle = "black";
+        this.ctx.textAlign = "center";
+        this.ctx.textBaseline = "middle";
+        this.ctx.font = '11px sans-serif';
+        this.ctx.fillText("Pad Cols", pane1End + 5 * padw, mt + 73.5 * padh);
+        this.ctx.fillText(0, pane1End + 5 * padw, mt + padh + padh * 1.5);
+        this.ctx.fillText(143, pane1End + 5 * padw, mt + padh + padh * 144);
+        this.ctx.textBaseline = "bottom";
+        this.ctx.fillText("Pad Rows", pane1End / 2, mt - padh * 4);
+        this.ctx.fillText("Pad Rows", pane1End / 2 + paneXOffset, mt - padh * 4);
+        for (const row of d3.range(16)) {
+            for (const paneOffset of [0, paneXOffset]) {
+                this.ctx.fillText(row, ml + (padw + 6 * padw + padw + rs) * row + padw + 3 * padw + paneOffset, mt);
+                this.ctx.fillText(0, ml + (padw + 6 * padw + padw + rs) * row + padw + paneOffset, mt + padh * 146 + 4 * padh);
+                this.ctx.fillText(5, ml + (padw + 6 * padw + padw + rs) * row + padw * 7 + paneOffset, mt + padh * 146 + 4 * padh);
+
+                this.ctx.fillText("Layers", ml + (padw + 6 * padw + padw + rs) * row + padw * 4 + paneOffset, mt + padh * 146 + 8 * padh);
+            }
+        }
+
+        this.ctx.font = 'small-caps bold 13px sans-serif';
+        this.ctx.fillText("Pad ADC - single time-bin", pane1End / 2, mt - padh * 9);
+        this.ctx.fillText("Pad ADC - cumulative time-bin sum", pane1End / 2 + paneXOffset, mt - padh * 9);
+
+        // Stroke contents colour scale
+        this.ctx.font = 'small-caps 13px sans-serif';
+        this.ctx.fillText("ADC single bin", pane1End / 2, mt + padh * 146 + 30 * padh);
+        this.ctx.fillText("ADC cumulative sum", pane1End / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
+
+        this.ctx.fillText("0", pane1End / 2 - padw * 50 / 2, mt + padh * 146 + 30 * padh);
+        this.ctx.fillText("255", pane1End / 2 + padw * 50 / 2, mt + padh * 146 + 30 * padh);
+        this.ctx.fillText("0", pane1End / 2 - padw * 50 / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
+        this.ctx.fillText("2048", pane1End / 2 + padw * 50 / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
+
+        const makeLinearGradient = function (colScheme, x1, x2) {
+            const stops = 10;
+            const colScale = d3.scaleSequential(colScheme).domain([0, stops]);
+            const lingrad = this.ctx.createLinearGradient(x1, 0, x2, 0);
+            for (let i = 0; i <= stops; i += 1) {
+                lingrad.addColorStop(i / stops, colScale(i));
+            }
+
+            return lingrad;
+        }.bind(this);
+
+        this.ctx.fillStyle = makeLinearGradient(d3.interpolateBuPu, pane1End / 2 - padw * 50 / 2, pane1End / 2 + padw * 50 / 2);
+        this.ctx.fillRect(pane1End / 2 - padw * 50 / 2, mt + padh * 146 + 13 * padh, padw * 50, padh * 10);
+
+        this.ctx.fillStyle = makeLinearGradient(d3.interpolateYlGnBu, pane1End / 2 - padw * 50 / 2 + paneXOffset, pane1End / 2 + padw * 50 / 2 + paneXOffset);
+        this.ctx.fillRect(pane1End / 2 - padw * 50 / 2 + paneXOffset, mt + padh * 146 + 13 * padh, padw * 50, padh * 10);
+
+        // Stroke pad contents
+        this.ctx.strokeStyle = "white";
+        this.ctx.lineWidth = 1;
+        //return;
+
+        for (const layer of this.data.layers.reverse()) {
+            const colourScale = d3.scaleSequential(d3.interpolateYlGnBu).domain([0, 2048]);
+            for (const pad of layer.pads) {
+                const x = ml + (padw + 6 * padw + padw + rs) * pad.row + padw + pad.layer * padw;
+                const y = mt + padh + (pad.col * padh);
+
+                if (pad.tbins[bin] > 0) {
+                    this.ctx.fillStyle = binColourScale(pad.tbins[bin]);
+                    this.ctx.fillRect(x, y, padw, padh);
+                    this.ctx.strokeRect(x, y, padw, padh);
+                }
+
+                const cumsum = pad.csum[bin];
+
+                if (cumsum > 0) {
+                    this.ctx.fillStyle = colourScale(cumsum);
+                    this.ctx.fillRect(x + paneXOffset, y, padw, padh);
+                    this.ctx.strokeRect(x + paneXOffset, y, padw, padh);
+                }
+            }
         }
     }
 }
