@@ -54,14 +54,14 @@ class DigitsViewComponent extends ComponentBase {
 
         const devicePixelRatio = window.devicePixelRatio || 1,
             backingStoreRatio = context.webkitBackingStorePixelRatio ||
-            context.mozBackingStorePixelRatio ||
-            context.msBackingStorePixelRatio ||
-            context.oBackingStorePixelRatio ||
-            context.backingStorePixelRatio || 1,
+                context.mozBackingStorePixelRatio ||
+                context.msBackingStorePixelRatio ||
+                context.oBackingStorePixelRatio ||
+                context.backingStorePixelRatio || 1,
 
             ratio = devicePixelRatio / backingStoreRatio;
 
-            console.log(backingStoreRatio);
+        console.log(backingStoreRatio);
 
         if (devicePixelRatio !== backingStoreRatio) {
             const oldWidth = canvas.width;
@@ -132,7 +132,7 @@ class DigitsViewComponent extends ComponentBase {
 
         this.drawPads(bin);
 
-        if (bin < 5) {
+        if (bin < 29) {
             window.requestAnimationFrame(this.animatePads.bind(this));
         }
     }
@@ -149,11 +149,14 @@ class DigitsViewComponent extends ComponentBase {
         const padw = 5, padh = 3, ml = 5, mt = 50, rs = 4, mb = 5;
         const pane1End = ml + (padw + 6 * padw + padw) * 16 + rs * 15 + ml, paneXOffset = pane1End + 10 * padw;
 
+        // Stroke Pad Row outline
+
         for (const row of d3.range(16)) {
             this.ctx.strokeRect(ml + (padw + 6 * padw + padw + rs) * row, mt, padw * 8, padh * 146);
             this.ctx.strokeRect(paneXOffset + ml + (padw + 6 * padw + padw + rs) * row, mt, padw * 8, padh * 146);
         }
 
+        // Stroke axes text
         this.ctx.fillStyle = "black";
         this.ctx.textAlign = "center";
         this.ctx.textBaseline = "middle";
@@ -166,11 +169,11 @@ class DigitsViewComponent extends ComponentBase {
         this.ctx.fillText("Pad Rows", pane1End / 2 + paneXOffset, mt - padh * 4);
         for (const row of d3.range(16)) {
             for (const paneOffset of [0, paneXOffset]) {
-            this.ctx.fillText(row, ml + (padw + 6 * padw + padw + rs) * row + padw + 3 * padw + paneOffset, mt);
-            this.ctx.fillText(0, ml + (padw + 6 * padw + padw + rs) * row + padw + paneOffset, mt + padh * 146 + 4 * padh);
-            this.ctx.fillText(5, ml + (padw + 6 * padw + padw + rs) * row + padw * 7 + paneOffset, mt + padh * 146 + 4 * padh);
+                this.ctx.fillText(row, ml + (padw + 6 * padw + padw + rs) * row + padw + 3 * padw + paneOffset, mt);
+                this.ctx.fillText(0, ml + (padw + 6 * padw + padw + rs) * row + padw + paneOffset, mt + padh * 146 + 4 * padh);
+                this.ctx.fillText(5, ml + (padw + 6 * padw + padw + rs) * row + padw * 7 + paneOffset, mt + padh * 146 + 4 * padh);
 
-            this.ctx.fillText("Layers", ml + (padw + 6 * padw + padw + rs) * row + padw * 4 + paneOffset, mt + padh * 146 + 8 * padh);
+                this.ctx.fillText("Layers", ml + (padw + 6 * padw + padw + rs) * row + padw * 4 + paneOffset, mt + padh * 146 + 8 * padh);
             }
         }
 
@@ -178,12 +181,40 @@ class DigitsViewComponent extends ComponentBase {
         this.ctx.fillText("Pad ADC - single time-bin", pane1End / 2, mt - padh * 9);
         this.ctx.fillText("Pad ADC - cumulative time-bin sum", pane1End / 2 + paneXOffset, mt - padh * 9);
 
+        // Stroke contents colour scale
+        this.ctx.font = 'small-caps 13px sans-serif';
+        this.ctx.fillText("ADC single bin", pane1End / 2, mt + padh * 146 + 30 * padh);
+        this.ctx.fillText("ADC cumulative sum", pane1End / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
+
+        this.ctx.fillText("0", pane1End / 2 - padw * 50 / 2, mt + padh * 146 + 30 * padh);
+        this.ctx.fillText("255", pane1End / 2 + padw * 50 / 2, mt + padh * 146 + 30 * padh);
+        this.ctx.fillText("0", pane1End / 2 - padw * 50 / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
+        this.ctx.fillText("2048", pane1End / 2 + padw * 50 / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
+
+        const makeLinearGradient = function (colScheme, x1, x2) {
+            const stops = 10;
+            const colScale = d3.scaleSequential(colScheme).domain([0, stops]);
+            const lingrad = this.ctx.createLinearGradient(x1, 0, x2, 0);
+            for (let i = 0; i <= stops; i += 1) {
+                lingrad.addColorStop(i / stops, colScale(i));
+            }
+
+            return lingrad;
+        }.bind(this);
+
+        this.ctx.fillStyle = makeLinearGradient(d3.interpolateBuPu, pane1End / 2 - padw * 50 / 2, pane1End / 2 + padw * 50 / 2);
+        this.ctx.fillRect(pane1End / 2 - padw * 50 / 2, mt + padh * 146 + 13 * padh, padw * 50, padh * 10);
+
+        this.ctx.fillStyle = makeLinearGradient(d3.interpolateYlGnBu, pane1End / 2 - padw * 50 / 2 + paneXOffset, pane1End / 2 + padw * 50 / 2 + paneXOffset);
+        this.ctx.fillRect(pane1End / 2 - padw * 50 / 2 + paneXOffset, mt + padh * 146 + 13 * padh, padw * 50, padh * 10);
+
+        // Stroke pad contents
         this.ctx.strokeStyle = "white";
         this.ctx.lineWidth = 1;
-        return;
+        //return;
 
         for (const layer of this.data.layers.reverse()) {
-            const colourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, layer.maxtsum]);
+            const colourScale = d3.scaleSequential(d3.interpolateYlGnBu).domain([0, 2048]);
             for (const pad of layer.pads) {
                 const x = ml + (padw + 6 * padw + padw + rs) * pad.row + padw + pad.layer * padw;
                 const y = mt + padh + (pad.col * padh);
