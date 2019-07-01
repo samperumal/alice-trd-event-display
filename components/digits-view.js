@@ -7,6 +7,7 @@ class DigitsViewComponent extends ComponentBase {
         this.eventInput = d3.select(config.eventInput).node();
         this.sectorInput = d3.select(config.sectorInput).node();
         this.stackInput = d3.select(config.stackInput).node();
+        this.canvas = document.getElementById(id.replace("#", ""));
 
         if (config != null) {
             if (config.padClick != null)
@@ -49,7 +50,31 @@ class DigitsViewComponent extends ComponentBase {
             return `rotate(${angle} ${cx} ${cy})`;
         }
 
-        this.ctx.imageSmoothingEnabled = false;
+        const canvas = this.canvas, context = this.ctx;
+
+        const devicePixelRatio = window.devicePixelRatio || 1,
+            backingStoreRatio = context.webkitBackingStorePixelRatio ||
+            context.mozBackingStorePixelRatio ||
+            context.msBackingStorePixelRatio ||
+            context.oBackingStorePixelRatio ||
+            context.backingStorePixelRatio || 1,
+
+            ratio = devicePixelRatio / backingStoreRatio;
+
+            console.log(backingStoreRatio);
+
+        if (devicePixelRatio !== backingStoreRatio) {
+            const oldWidth = canvas.width;
+            const oldHeight = canvas.height;
+
+            canvas.width = oldWidth * ratio;
+            canvas.height = oldHeight * ratio;
+
+            canvas.style.width = oldWidth + 'px';
+            canvas.style.height = oldHeight + 'px';
+
+            context.scale(ratio, ratio);
+        }
     }
 
     draw(eventData) {
@@ -101,39 +126,67 @@ class DigitsViewComponent extends ComponentBase {
     }
 
     animatePads() {
-        const bin = Math.min(Math.floor((new Date() - this.timeStart) / 1000 / 0.15), 29);
+        const bin = Math.min(Math.floor((new Date() - this.timeStart) / 1000 / 0.5), 29);
 
         this.timeBinChange(bin);
 
         this.drawPads(bin);
 
-        if (bin < 29) {
+        if (bin < 5) {
             window.requestAnimationFrame(this.animatePads.bind(this));
         }
     }
 
     drawPads(bin) {
+        //this.fixDpi();
+
         this.ctx.clearRect(0, 0, this.width, this.height);
         this.ctx.strokeStyle = "#bbb";
-        this.ctx.lineWidth = 0.5;
+        this.ctx.lineWidth = 0.6;
 
         const binColourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, 256]);
 
-        const padw = 5, padh = 3, mh = 5, mv = 5, rs = 4, paneOffset = 150 * padw;
+        const padw = 5, padh = 3, ml = 5, mt = 50, rs = 4, mb = 5;
+        const pane1End = ml + (padw + 6 * padw + padw) * 16 + rs * 15 + ml, paneXOffset = pane1End + 10 * padw;
 
         for (const row of d3.range(16)) {
-            this.ctx.strokeRect(mh + (padw + 6 * padw + padw + rs) * row, mv + padh, padw * 8, padh * 146);
-            this.ctx.strokeRect(paneOffset + mh + (padw + 6 * padw + padw + rs) * row, mv + padh, padw * 8, padh * 146);
+            this.ctx.strokeRect(ml + (padw + 6 * padw + padw + rs) * row, mt, padw * 8, padh * 146);
+            this.ctx.strokeRect(paneXOffset + ml + (padw + 6 * padw + padw + rs) * row, mt, padw * 8, padh * 146);
         }
+
+        this.ctx.fillStyle = "black";
+        this.ctx.textAlign = "center";
+        this.ctx.textBaseline = "middle";
+        this.ctx.font = '11px sans-serif';
+        this.ctx.fillText("Pad Cols", pane1End + 5 * padw, mt + 73.5 * padh);
+        this.ctx.fillText(0, pane1End + 5 * padw, mt + padh + padh * 1.5);
+        this.ctx.fillText(143, pane1End + 5 * padw, mt + padh + padh * 144);
+        this.ctx.textBaseline = "bottom";
+        this.ctx.fillText("Pad Rows", pane1End / 2, mt - padh * 4);
+        this.ctx.fillText("Pad Rows", pane1End / 2 + paneXOffset, mt - padh * 4);
+        for (const row of d3.range(16)) {
+            for (const paneOffset of [0, paneXOffset]) {
+            this.ctx.fillText(row, ml + (padw + 6 * padw + padw + rs) * row + padw + 3 * padw + paneOffset, mt);
+            this.ctx.fillText(0, ml + (padw + 6 * padw + padw + rs) * row + padw + paneOffset, mt + padh * 146 + 4 * padh);
+            this.ctx.fillText(5, ml + (padw + 6 * padw + padw + rs) * row + padw * 7 + paneOffset, mt + padh * 146 + 4 * padh);
+
+            this.ctx.fillText("Layers", ml + (padw + 6 * padw + padw + rs) * row + padw * 4 + paneOffset, mt + padh * 146 + 8 * padh);
+            }
+        }
+
+        this.ctx.font = 'small-caps bold 13px sans-serif';
+        this.ctx.fillText("Pad ADC - single time-bin", pane1End / 2, mt - padh * 9);
+        this.ctx.fillText("Pad ADC - cumulative time-bin sum", pane1End / 2 + paneXOffset, mt - padh * 9);
 
         this.ctx.strokeStyle = "white";
         this.ctx.lineWidth = 1;
+        return;
 
         for (const layer of this.data.layers.reverse()) {
             const colourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, layer.maxtsum]);
             for (const pad of layer.pads) {
-                const x = mh + (padw + 6 * padw + padw + rs) * pad.row + padw + pad.layer * padw;
-                const y = mv + padh + (pad.col * padh);
+                const x = ml + (padw + 6 * padw + padw + rs) * pad.row + padw + pad.layer * padw;
+                const y = mt + padh + (pad.col * padh);
 
                 if (pad.tbins[bin] > 0) {
                     this.ctx.fillStyle = binColourScale(pad.tbins[bin]);
@@ -145,8 +198,8 @@ class DigitsViewComponent extends ComponentBase {
 
                 if (cumsum > 0) {
                     this.ctx.fillStyle = colourScale(cumsum);
-                    this.ctx.fillRect(x + paneOffset, y, padw, padh);
-                    this.ctx.strokeRect(x + paneOffset, y, padw, padh);
+                    this.ctx.fillRect(x + paneXOffset, y, padw, padh);
+                    this.ctx.strokeRect(x + paneXOffset, y, padw, padh);
                 }
             }
         }
