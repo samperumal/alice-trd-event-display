@@ -85,6 +85,18 @@ class DigitsViewComponent extends ComponentBase {
             console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}: ${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
             const data = this.data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
 
+            for (const layer of data.layers) {
+                for (const pad of layer.pads) {
+                    let csum = 0;
+                    pad.csum = [];
+
+                    for (let i = 0; i < 30; i++) {
+                        csum += pad.tbins[i];
+                        pad.csum.push(csum);
+                    }
+                }
+            }
+
             this.timeStart = new Date();
             this.animatePads();
         }
@@ -132,7 +144,7 @@ class DigitsViewComponent extends ComponentBase {
                     this.ctx.strokeRect(x, y, padw, padh);
                 }
 
-                const cumsum = d3.sum(pad.tbins.slice(0, bin));
+                const cumsum = pad.csum[bin];
 
                 if (cumsum > 0) {
                     this.ctx.fillStyle = colourScale(cumsum);
