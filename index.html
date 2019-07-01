@@ -150,6 +150,12 @@
             stroke-dasharray: 1;
             stroke-width: 1px;
         }
+
+        input[type=number] {
+            width: 4em;
+            text-align: center;
+            margin-right: 1em;
+        }
     </style>
 </head>
 
@@ -226,8 +232,8 @@
                             min="0" /></span>
                     <span><label for="sector-input">Sector: </label><input type="number" value="0" id="sector-input"
                             min="0" /></span>
-                    <span><label for="stack-input">Stack: </label><input type="number" value="0" id="stack-input"
-                            min="0" /></span>
+                    <span><label for="stack-input">Stack: </label><input type="number" value="0" id="stack-input" min="0" /></span>
+                    <span><label for="max-csum-input">Max Cum. Sum: </label><input type="number" value="5000" id="max-csum-input" min="0" style="width: 6em;" /></span>
                     <span><input type="button" value="Load" id="load-digits" /></span>
                 </p>
                 <div style="text-align: center;">
@@ -241,7 +247,7 @@
                         </div>
                     </div>
                 </div>
-                <canvas id="digits-view" width="1480" height="650" style="background: inherit;"></canvas>
+                <canvas id="digits-view" width="1480" height="580" style="background: inherit;"></canvas>
             </div>
         </div>
     </div>
@@ -296,7 +302,7 @@
             eventInput: "#event-input",
             sectorInput: "#sector-input",
             stackInput: "#stack-input",
-            layerInput: "#layer-input",
+            maxCsumInput: "#max-csum-input",
             buttons: ["#load-digits"],
             dataLoadUrl: "data/",
             padClick: coordinator.padSelect.bind(coordinator),
@@ -313,7 +319,7 @@
         if (false) {
             setTimeout(function () {
                 console.log("selecting");
-                $("#dataTree").jstree("select_node", tree.treeData[1].children[13]);
+                $("#dataTree").jstree("select_node", tree.treeData[1].children[1]);
                 // let count = 0;
                 //digitsView.drawDigits().then(() => {
                 //     // d3.selectAll("rect.pad-sum").filter(d => {

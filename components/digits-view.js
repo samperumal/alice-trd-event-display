@@ -7,6 +7,7 @@ class DigitsViewComponent extends ComponentBase {
         this.eventInput = d3.select(config.eventInput).node();
         this.sectorInput = d3.select(config.sectorInput).node();
         this.stackInput = d3.select(config.stackInput).node();
+        this.maxCsumInput = d3.select(config.maxCsumInput).node();
         this.canvas = document.getElementById(id.replace("#", ""));
 
         if (config != null) {
@@ -100,6 +101,7 @@ class DigitsViewComponent extends ComponentBase {
         const eventNo = this.eventInput.value;
         const sector = this.sectorInput.value;
         const stack = this.stackInput.value;
+        this.maxCsum = this.maxCsumInput.value;
 
         try {
             console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}: ${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
@@ -126,7 +128,7 @@ class DigitsViewComponent extends ComponentBase {
     }
 
     animatePads() {
-        const bin = Math.min(Math.floor((new Date() - this.timeStart) / 1000 / 0.5), 29);
+        const bin = Math.min(Math.floor((new Date() - this.timeStart) / 1000 / 0.25), 29);
 
         this.timeBinChange(bin);
 
@@ -138,13 +140,12 @@ class DigitsViewComponent extends ComponentBase {
     }
 
     drawPads(bin) {
-        //this.fixDpi();
-
         this.ctx.clearRect(0, 0, this.width, this.height);
         this.ctx.strokeStyle = "#bbb";
         this.ctx.lineWidth = 0.6;
 
         const binColourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, 256]);
+        const maxCsum = this.maxCsum;
 
         const padw = 5, padh = 3, ml = 5, mt = 50, rs = 4, mb = 5;
         const pane1End = ml + (padw + 6 * padw + padw) * 16 + rs * 15 + ml, paneXOffset = pane1End + 10 * padw;
@@ -189,7 +190,7 @@ class DigitsViewComponent extends ComponentBase {
         this.ctx.fillText("0", pane1End / 2 - padw * 50 / 2, mt + padh * 146 + 30 * padh);
         this.ctx.fillText("255", pane1End / 2 + padw * 50 / 2, mt + padh * 146 + 30 * padh);
         this.ctx.fillText("0", pane1End / 2 - padw * 50 / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
-        this.ctx.fillText("2048", pane1End / 2 + padw * 50 / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
+        this.ctx.fillText(maxCsum, pane1End / 2 + padw * 50 / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
 
         const makeLinearGradient = function (colScheme, x1, x2) {
             const stops = 10;
@@ -211,10 +212,9 @@ class DigitsViewComponent extends ComponentBase {
         // Stroke pad contents
         this.ctx.strokeStyle = "white";
         this.ctx.lineWidth = 1;
-        //return;
 
         for (const layer of this.data.layers.reverse()) {
-            const colourScale = d3.scaleSequential(d3.interpolateYlGnBu).domain([0, 2048]);
+            const colourScale = d3.scaleSequential(d3.interpolateYlGnBu).domain([0, maxCsum]);
             for (const pad of layer.pads) {
                 const x = ml + (padw + 6 * padw + padw + rs) * pad.row + padw + pad.layer * padw;
                 const y = mt + padh + (pad.col * padh);
