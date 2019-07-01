@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="d3.min.js"></script>
-    <script src="jquery.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="jstree.min.js"></script>
 
     <script src="components/trd-dimensions.js"></script>
@@ -29,6 +31,8 @@
     <link href='./components/digits-view.css' rel='stylesheet' />
     <link href='./components/timebin-view.css' rel='stylesheet' />
 
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
     <style>
         *,
         *:before,
@@ -43,6 +47,11 @@
             font-size: 14px;
             line-height: 1.428571429;
             /* background-color: #6d6d6d; */
+        }
+
+        .ui-draggable,
+        .ui-droppable {
+            background-position: top;
         }
 
         svg {
@@ -217,6 +226,15 @@
                                     id="stack-input" min="0" /></span>
                             <span><input type="button" value="Load" id="load-digits" /></span>
                         </p>
+                        <div style="margin: 1em 2em; width: 50%; text-align: center;">
+                            <div>
+                                <label for="amount">Timebin: </label>
+                                <input type="text" id="timebin-display" readonly
+                                    style="border:0; color:#f6931f; font-weight:bold; width: 2em;">
+                            </div>
+                            <div id="timebin-slider" style="margin: 0 0;">
+                            </div>
+                        </div>
                         <canvas id="digits-view" width="1400" height="650" style="background: inherit;"></canvas>
                     </div>
                 </div>
@@ -259,6 +277,17 @@
 
         coordinator.addComponent(new TrackInformationComponent("#track-information"));
 
+        const timebinDisplay = $("timebin-display");
+        $("#timebin-slider").slider({
+            value: 0,
+            min: 0,
+            max: 29,
+            step: 1,
+            change: function (event, ui) {
+                $("#timebin-display").val(ui.value);
+            }
+        });
+
         const digitsView = new DigitsViewComponent("#digits-view", 1400, 650, null, {
             eventInput: "#event-input",
             sectorInput: "#sector-input",
@@ -266,7 +295,13 @@
             layerInput: "#layer-input",
             buttons: ["#load-digits"],
             dataLoadUrl: "data/",
-            padClick: coordinator.padSelect.bind(coordinator)
+            padClick: coordinator.padSelect.bind(coordinator),
+            timeBinChange: (timebin) => { $("#timebin-slider").slider("option", "value", timebin); }
+        });
+
+        $("#timebin-slider").on("slide", function (event, ui) {
+            digitsView.drawPads(ui.value);
+            $("#timebin-display").val(ui.value);
         });
 
         coordinator.addComponent(digitsView);

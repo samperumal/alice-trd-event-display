@@ -8,8 +8,13 @@ class DigitsViewComponent extends ComponentBase {
         this.sectorInput = d3.select(config.sectorInput).node();
         this.stackInput = d3.select(config.stackInput).node();
 
-        if (config != null && config.padClick != null)
-            this.padClick = config.padClick;
+        if (config != null) {
+            if (config.padClick != null)
+                this.padClick = config.padClick;
+
+            if (config.timeBinChange != null)
+                this.timeBinChange = config.timeBinChange;
+        }
 
         this.buttons = [];
 
@@ -81,54 +86,60 @@ class DigitsViewComponent extends ComponentBase {
             const data = this.data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
 
             this.timeStart = new Date();
-            this.drawPads(0);
+            this.animatePads();
         }
         catch (err) {
             console.error(err);
         }
     }
 
-    drawPads() {
+    animatePads() {
+        const bin = Math.min(Math.floor((new Date() - this.timeStart) / 1000 / 0.15), 29);
+
+        this.timeBinChange(bin);
+
+        this.drawPads(bin);
+
+        if (bin < 29) {
+            window.requestAnimationFrame(this.animatePads.bind(this));
+        }
+    }
+
+    drawPads(bin) {
+        this.ctx.clearRect(0, 0, this.width, this.height);
+        this.ctx.strokeStyle = "#777";
+
+        const binColourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, 256]);
+
         const padw = 5, padh = 4;
 
-        const bin = Math.floor((new Date() - this.timeStart) / 1000 / 0.15);
+        for (const row of d3.range(16)) {
+            this.ctx.strokeRect(3 + row * 8 * padw + padw, 5, padw * 7 + 3, padh * 144 + padh)
+        }
 
-        if (bin < 30) {
-            this.ctx.clearRect(0, 0, this.width, this.height);
-            this.ctx.strokeStyle = "#777";
+        this.ctx.strokeStyle = "#eee";
+        this.ctx.strokeWidth = 0.25;
 
-            const binColourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, 256]);
+        for (const layer of this.data.layers.reverse()) {
+            const colourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, layer.maxtsum]);
+            for (const pad of layer.pads) {
+                const x = 5 + padw + (pad.row * 8 + pad.layer) * padw;
+                const y = 5 + (pad.col) * padh;
 
-            for (const row of d3.range(16)) {
-                this.ctx.strokeRect(3 + row * 8 * padw + padw, 5, padw * 7 + 3, padh * 144 + padh)
-            }
+                if (pad.tbins[bin] > 0) {
+                    this.ctx.fillStyle = binColourScale(pad.tbins[bin]);
+                    this.ctx.fillRect(x, y, padw, padh);
+                    this.ctx.strokeRect(x, y, padw, padh);
+                }
 
-            this.ctx.strokeStyle = "#eee";
+                const cumsum = d3.sum(pad.tbins.slice(0, bin));
 
-            //console.log(`Painting bin ${bin}`);
-            for (const layer of this.data.layers.reverse()) {
-                const colourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, layer.maxtsum]);
-                for (const pad of layer.pads) {
-                    const x = 5 + padw + (pad.row * 8 + pad.layer) * padw;
-                    const y = 5 + (pad.col) * padh;
-
-                    if (pad.tbins[bin] > 0) {
-                        this.ctx.fillStyle = binColourScale(pad.tbins[bin]);
-                        this.ctx.fillRect(x, y, padw, padh);
-                        this.ctx.strokeRect(x, y, padw, padh);
-                    }
-
-                    const cumsum = d3.sum(pad.tbins.slice(0, bin));
-
-                    if (cumsum > 0) {
-                        this.ctx.fillStyle = colourScale(cumsum);
-                        this.ctx.fillRect(x + 140 * padw, y, padw, padh);
-                        this.ctx.strokeRect(x + 140 * padw, y, padw, padh);
-                    }
+                if (cumsum > 0) {
+                    this.ctx.fillStyle = colourScale(cumsum);
+                    this.ctx.fillRect(x + 140 * padw, y, padw, padh);
+                    this.ctx.strokeRect(x + 140 * padw, y, padw, padh);
                 }
             }
-
-            window.requestAnimationFrame(this.drawPads.bind(this));
         }
     }
 }
