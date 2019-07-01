@@ -19,7 +19,7 @@ class DigitsViewComponent extends ComponentBase {
 
         this.dataLoadUrl = config.dataLoadUrl;
 
-        this.container.attr("class", "digits-view");
+        this.container.setAttribute("class", "digits-view");
 
         const layerLabelWidth = 50;
         const axisMargins = { top: 5, bottom: 10, left: 20, right: 20 };
@@ -34,69 +34,8 @@ class DigitsViewComponent extends ComponentBase {
             .range([axisMargins.left, contentWidth])
             .paddingInner(0);
 
-        //const colScale = fisheye.scale(d3.scaleLinear()).domain(colBand.domain()).range(colBand.range());
-
-        const rowBand = this.rowBand = d3.scaleBand().domain(d3.range(-1, 17).reverse())
+        const rowBand = this.rowBand = d3.scaleBand().domain(d3.range(0, 16).reverse())
             .range([axisMargins.top, layerBand.bandwidth() - axisMargins.top - axisMargins.bottom]);
-
-        // Container for the layer/row/col digits data
-        this.sumGroup = this.container.append("g").attr("class", "sum-group");
-
-        // Create layer labels
-        this.sumGroup.append("g").attr("class", "layer-labels").attr("transform", `translate(${layerLabelWidth / 2}, 0)`)
-            .selectAll("text").data(layerBand.domain())
-            .enter().append("text").text(d => `Layer ${d}`).attr("y", d => layerBand(d) + layerBand.bandwidth() / 2);
-
-        // Create layer axes
-        const layerAxes = this.sumGroup.append("g").attr("class", "layer-axes").attr("transform", `translate(${layerLabelWidth}, 0)`)
-            .selectAll("text").data(layerBand.domain())
-            .enter().append("g").attr("class", "layer-axis")
-            .attr("data-layer", d => d).attr("transform", d => `translate(0, ${layerBand(d)})`);
-
-        // Axis for pad col number
-        const padColAxis = layerAxes.append("g").attr("class", "padcol-axis")
-            .attr("transform", `translate(0, ${rowBand.range()[1]})`)
-            .call(d3.axisBottom(colBand).tickValues(d3.range(0, 145, 4)));
-
-        padColAxis.append("text").text("Pad Column Index").attr("class", "axis-label").style("fill", "currentColor")
-            .attr("transform", `translate(${(colBand.range()[0] + colBand.range()[1]) / 2}, 30)`);
-
-        // Axes for pad row number
-        layerAxes.append("g").attr("class", "padrow-axis").attr("transform", `translate(${colBand.range()[0]}, ${0})`)
-            .call(d3.axisLeft(rowBand).tickValues(d3.range(0, 16, 3)));
-
-        const rightPadRowAxis = layerAxes.append("g").attr("class", "padrow-axis").attr("transform", `translate(${colBand.range()[1]}, ${0})`)
-            .call(d3.axisRight(rowBand).tickValues(d3.range(0, 16, 3)));
-
-        rightPadRowAxis.append("text").text("Pad Row").attr("class", "pad-row-axis-label").attr("textLength", 70)
-            .attr("transform", `translate(${30}, ${(rowBand.range()[0] + rowBand.range()[1]) / 2})`);
-
-        let distortion = 100;
-        function fisheye(_, a) {
-            let x = colBand(_),
-                left = x < a,
-                range = d3.extent(colBand.range()),
-                min = range[0],
-                max = range[1],
-                m = left ? a - min : max - a;
-            if (m === 0) m = max - min;
-            return (left ? -1 : 1) * m * (distortion + 1) / (distortion + (m / Math.abs(x - a))) + a;
-        }
-
-        // Create groups for each layer
-        this.padLayers = this.sumGroup.append("g")
-            .attr("class", "pad-layers").attr("transform", `translate(${layerLabelWidth}, 0)`)
-            // .on("mousemove", function () {
-            //     const mouse = d3.mouse(this);
-            //     colBand.distortion(2.5).focus(mouse[0]);
-            //     //yScale.distortion(2.5).focus(mouse[1]);
-
-            //     //dot.call(position);
-            //     //svg.select(".x.axis").call(xAxis);
-            //     padColAxis.call(d3.axisBottom(colScale).tickValues(d3.range(0, 145, 4)));
-            // })
-            .selectAll("g.pad-layer").data(layerBand.domain())
-            .enter().append("g").attr("class", "pad-layer").attr("transform", d => `translate(0, ${layerBand(d)})`);
 
         function rotate(d) {
             const angle = 2 * (2 * (d.r % 2) - 1); // 2 degrees, alternating by row
@@ -111,29 +50,6 @@ class DigitsViewComponent extends ComponentBase {
                 .map(r => d3.range(144).map(c => ({ l: l, r: r, c: c })))
                 .reduce(ajoin)
         }
-
-        // Create and rotate individual pads
-        this.padLayers.selectAll("rect.pad-sum")
-            .data(layerPads)
-            .enter()
-            .append("rect").attr("class", "pad-sum")
-            .attr("transform", d => `${rotate(d)}translate(${colBand(d.c)}, ${rowBand(d.r)})`)
-            .attr("width", colBand.bandwidth())
-            .attr("height", rowBand.bandwidth());
-
-        // Map of all pads across all layers
-        const padMap = this.padMap = new Map();
-        const key = this.key;
-
-        this.padLayers.selectAll("rect.pad-sum").each((d, i, nodes) => {
-            padMap.set(key(d.l, d.r, d.c), d3.select(nodes[i]));
-        })
-    }
-
-    key(layer, row, col) {
-        //console.log(layer, col, row);
-        return `${layer}_${col}_${row}`;
-        return layer * 10e7 + col * 10e5 + row;
     }
 
     draw(eventData) {
@@ -145,7 +61,7 @@ class DigitsViewComponent extends ComponentBase {
                 this.sectorInput.value = tracklet.sector;
                 this.stackInput.value = tracklet.stack;
 
-                //this.drawDigits();
+                this.drawDigits();
             }
         }
         else {
@@ -164,11 +80,16 @@ class DigitsViewComponent extends ComponentBase {
             console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}: ${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
             const data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
 
+            this.ctx.clearRect(0, 0, this.width, this.height);
+            this.ctx.strokeStyle = "white";
+
             for (const layer of data.layers) {
-                const colourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, layer.maxtsum]);
+                const colourScale = d3.scaleSequential(d3.interpolateOrRd).domain([0, layer.maxtsum]);
                 for (const pad of layer.pads) {
-                    const key = this.key(layer.layer, pad.row, pad.col);
-                    this.padMap.get(key).style("fill", colourScale(pad.tsum));
+
+                    this.ctx.fillStyle = colourScale(pad.tsum);
+                    this.ctx.fillRect(this.colBand(pad.col), this.layerBand(pad.layer) + this.rowBand(pad.row), this.colBand.bandwidth(), this.rowBand.bandwidth());
+                    this.ctx.strokeRect(this.colBand(pad.col), this.layerBand(pad.layer) + this.rowBand(pad.row), this.colBand.bandwidth(), this.rowBand.bandwidth());
                 }
             }
         }

@@ -217,8 +217,7 @@
                                     id="stack-input" min="0" /></span>
                             <span><input type="button" value="Load" id="load-digits" /></span>
                         </p>
-                        <svg id="digits-view" style="width: 1400px; height: 650px;"
-                            preserveAspectRatio="xMidYMid meet"></svg>
+                        <canvas id="digits-view" width="1400" height="650"></canvas>
                     </div>
                 </div>
             </div>
@@ -277,7 +276,7 @@
                 console.log("selecting");
                 $("#dataTree").jstree("select_node", tree.treeData[1].children[13]);
                 // let count = 0;
-                digitsView.drawDigits().then(() => {
+                //digitsView.drawDigits().then(() => {
                 //     // d3.selectAll("rect.pad-sum").filter(d => {
                 //     //     if (count < 1 && d.row == 3 && d.col == 84 && d.tsum > 0) {
                 //     //         count += 1;
@@ -287,7 +286,7 @@
                 //     //     else return false;
                 //     // })
                 //     //     .dispatch("click");
-                });
+                //});
             }, 500);
         }
 
