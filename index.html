@@ -155,7 +155,7 @@
 
 <body>
     <div class="row">
-        <div class="column" style="display: none;">
+        <div class="column">
             <div style="margin: 1em;">
                 <p style="font-size: medium; ">Available events</p>
                 <div id="tree-container">
@@ -181,9 +181,9 @@
                 </div>
             </div>
         </div>
-        <div class="column main-content">
+        <div class="column main-content" style="overflow: hidden;">
             <div class="row">
-                <!-- <div class="column">
+                <div class="column">
                     <div class="component">
                         <p>Sector view - XY plane</p>
                         <svg id="sector-view" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
@@ -206,40 +206,42 @@
                         <svg id="supermodule-view-zoom" style="width: 300px; height: 300px;"
                             preserveAspectRatio="xMidYMid meet"></svg>
                     </div>
-                </div> -->
-                <!-- <div class="column">
+                </div>
+                <div class="column">
                     <div class="component time-bin-view">
                         <p>Time-bin view</p>
                         <svg id="timebin-view-zoom" style="width: 500px; height: 1600px;"
                             preserveAspectRatio="xMidYMid meet"></svg>
                     </div>
-                </div> -->
-                <div class="column">
-                    <div class="component">
-                        <p>Digits detail view</p>
-                        <p>
-                            <span><label for="event-input">Event: </label><input type="number" value="11"
-                                    id="event-input" min="0" /></span>
-                            <span><label for="sector-input">Sector: </label><input type="number" value="0"
-                                    id="sector-input" min="0" /></span>
-                            <span><label for="stack-input">Stack: </label><input type="number" value="0"
-                                    id="stack-input" min="0" /></span>
-                            <span><input type="button" value="Load" id="load-digits" /></span>
-                        </p>
-                        <div style="text-align: center;">
-                            <div style="display: inline-block; margin: 1em 2em; width: 50%; text-align: center;">
-                                <div>
-                                    <label for="amount">Timebin: </label>
-                                    <input type="text" id="timebin-display" readonly
-                                        style="border:0; color:#f6931f; font-weight:bold; width: 2em;">
-                                </div>
-                                <div id="timebin-slider" style="margin: 0 0;">
-                                </div>
-                            </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="column">
+            <div class="component">
+                <p>Digits detail view</p>
+                <p>
+                    <span><label for="event-input">Event: </label><input type="number" value="11" id="event-input"
+                            min="0" /></span>
+                    <span><label for="sector-input">Sector: </label><input type="number" value="0" id="sector-input"
+                            min="0" /></span>
+                    <span><label for="stack-input">Stack: </label><input type="number" value="0" id="stack-input"
+                            min="0" /></span>
+                    <span><input type="button" value="Load" id="load-digits" /></span>
+                </p>
+                <div style="text-align: center;">
+                    <div style="display: inline-block; margin: 1em 2em; width: 50%; text-align: center;">
+                        <div>
+                            <label for="amount">Timebin: </label>
+                            <input type="text" id="timebin-display" readonly
+                                style="border:0; color:#f6931f; font-weight:bold; width: 2em;">
                         </div>
-                        <canvas id="digits-view" width="1480" height="650" style="background: inherit;"></canvas>
+                        <div id="timebin-slider" style="margin: 0 0;">
+                        </div>
                     </div>
                 </div>
+                <canvas id="digits-view" width="1480" height="650" style="background: inherit;"></canvas>
             </div>
         </div>
     </div>
@@ -269,13 +271,13 @@
 
         const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
 
-        // coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
-        // coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-22 -129 44 44", { r: 0.75, rotate: true }));
-        // coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
-        // coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view-zoom", 300, 300, null, { zoom: true }));
-        // coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
-        //     dataLoadUrl: "data/"
-        // }));
+        coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
+        coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-22 -129 44 44", { r: 0.75, rotate: true }));
+        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
+        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view-zoom", 300, 300, null, { zoom: true }));
+        coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
+            dataLoadUrl: "data/"
+        }));
 
         coordinator.addComponent(new TrackInformationComponent("#track-information"));
 
@@ -308,7 +310,7 @@
 
         coordinator.addComponent(digitsView);
 
-        if (true) {
+        if (false) {
             setTimeout(function () {
                 console.log("selecting");
                 $("#dataTree").jstree("select_node", tree.treeData[1].children[13]);

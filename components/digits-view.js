@@ -86,7 +86,7 @@ class DigitsViewComponent extends ComponentBase {
                 this.sectorInput.value = tracklet.sector;
                 this.stackInput.value = tracklet.stack;
 
-                this.drawDigits();
+                //this.drawDigits();
             }
         }
         else {
