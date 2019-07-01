@@ -78,23 +78,47 @@ class DigitsViewComponent extends ComponentBase {
 
         try {
             console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}: ${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
-            const data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
+            const data = this.data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
 
-            this.ctx.clearRect(0, 0, this.width, this.height);
-            this.ctx.strokeStyle = "white";
-
-            for (const layer of data.layers) {
-                const colourScale = d3.scaleSequential(d3.interpolateOrRd).domain([0, layer.maxtsum]);
-                for (const pad of layer.pads) {
-
-                    this.ctx.fillStyle = colourScale(pad.tsum);
-                    this.ctx.fillRect(this.colBand(pad.col), this.layerBand(pad.layer) + this.rowBand(pad.row), this.colBand.bandwidth(), this.rowBand.bandwidth());
-                    this.ctx.strokeRect(this.colBand(pad.col), this.layerBand(pad.layer) + this.rowBand(pad.row), this.colBand.bandwidth(), this.rowBand.bandwidth());
-                }
-            }
+            this.timeStart = new Date();
+            this.drawPads(0);
         }
         catch (err) {
             console.error(err);
+        }
+    }
+
+    drawPads() {
+        const padw = 5, padh = 4;
+
+        const bin = Math.floor((new Date() - this.timeStart) / 1000 / 0.15);
+
+        if (bin < 30) {
+            this.ctx.clearRect(0, 0, this.width, this.height);
+            this.ctx.strokeStyle = "white";
+
+            const binColourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, 256]);
+
+            console.log(`Painting bin ${bin}`);
+            for (const layer of this.data.layers.reverse()) {
+                const colourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, layer.maxtsum]);
+                for (const pad of layer.pads) {
+                    const x = 5 + (pad.row * 8 + pad.layer) * padw;
+                    const y = 5 + (pad.col) * padh;
+
+                    if (pad.tbins[bin] > 0) {
+                        this.ctx.fillStyle = binColourScale(pad.tbins[bin]);
+                        this.ctx.fillRect(x, y, padw, padh);
+                        this.ctx.strokeRect(x, y, padw, padh);
+                    }
+
+                    this.ctx.fillStyle = colourScale(pad.tsum);
+                    this.ctx.fillRect(x + 140 * padw, y, padw, padh);
+                    this.ctx.strokeRect(x + 140 * padw, y, padw, padh);
+                }
+            }
+
+            window.requestAnimationFrame(this.drawPads.bind(this));
         }
     }
 }
