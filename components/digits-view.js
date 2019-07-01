@@ -49,12 +49,7 @@ class DigitsViewComponent extends ComponentBase {
             return `rotate(${angle} ${cx} ${cy})`;
         }
 
-        // Create data for pads in a layer
-        function layerPads(l) {
-            return d3.range(16)
-                .map(r => d3.range(144).map(c => ({ l: l, r: r, c: c })))
-                .reduce(ajoin)
-        }
+        this.ctx.imageSmoothingEnabled = false;
     }
 
     draw(eventData) {
@@ -119,24 +114,26 @@ class DigitsViewComponent extends ComponentBase {
 
     drawPads(bin) {
         this.ctx.clearRect(0, 0, this.width, this.height);
-        this.ctx.strokeStyle = "#777";
+        this.ctx.strokeStyle = "#bbb";
+        this.ctx.lineWidth = 0.5;
 
         const binColourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, 256]);
 
-        const padw = 5, padh = 4;
+        const padw = 5, padh = 3, mh = 5, mv = 5, rs = 4, paneOffset = 150 * padw;
 
         for (const row of d3.range(16)) {
-            this.ctx.strokeRect(3 + row * 8 * padw + padw, 5, padw * 7 + 3, padh * 144 + padh)
+            this.ctx.strokeRect(mh + (padw + 6 * padw + padw + rs) * row, mv + padh, padw * 8, padh * 146);
+            this.ctx.strokeRect(paneOffset + mh + (padw + 6 * padw + padw + rs) * row, mv + padh, padw * 8, padh * 146);
         }
 
-        this.ctx.strokeStyle = "#eee";
-        this.ctx.strokeWidth = 0.25;
+        this.ctx.strokeStyle = "white";
+        this.ctx.lineWidth = 1;
 
         for (const layer of this.data.layers.reverse()) {
             const colourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, layer.maxtsum]);
             for (const pad of layer.pads) {
-                const x = 5 + padw + (pad.row * 8 + pad.layer) * padw;
-                const y = 5 + (pad.col) * padh;
+                const x = mh + (padw + 6 * padw + padw + rs) * pad.row + padw + pad.layer * padw;
+                const y = mv + padh + (pad.col * padh);
 
                 if (pad.tbins[bin] > 0) {
                     this.ctx.fillStyle = binColourScale(pad.tbins[bin]);
@@ -148,8 +145,8 @@ class DigitsViewComponent extends ComponentBase {
 
                 if (cumsum > 0) {
                     this.ctx.fillStyle = colourScale(cumsum);
-                    this.ctx.fillRect(x + 140 * padw, y, padw, padh);
-                    this.ctx.strokeRect(x + 140 * padw, y, padw, padh);
+                    this.ctx.fillRect(x + paneOffset, y, padw, padh);
+                    this.ctx.strokeRect(x + paneOffset, y, padw, padh);
                 }
             }
         }
