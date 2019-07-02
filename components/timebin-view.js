@@ -26,7 +26,7 @@ class TimebinViewComponent extends ComponentBase {
         this.padSubViews = [];
         this.layerLabels = [];
 
-        this.colourScale = d3.scaleSequential(d3.interpolateViridis).domain([0, 100]);
+        this.colourScale = d3.scaleSequential(d3.interpolateYlGnBu).domain([100, 0]);
 
         const midColour = this.colourScale(65);
 
@@ -43,7 +43,7 @@ class TimebinViewComponent extends ComponentBase {
         for (let i = 0; i <= 100; i += 10) {
             this.gradient.append('stop')
                 .attr('offset', `${i}%`)
-                .attr('stop-color', this.colourScale(i))
+                .attr('stop-color', this.colourScale(100 - i))
                 .attr('stop-opacity', 1);
         }
 
@@ -321,7 +321,7 @@ class PadSubView {
 
         colourScale.domain([0, maxVal]);
 
-        const zscale = d3.scaleLinear().domain(colourScale.domain()).range(this.yscale.range());
+        const zscale = d3.scaleLinear().domain(colourScale.domain().reverse()).range(this.yscale.range());
 
         this.colourAxisGroup.call(d3.axisLeft(zscale));
 
