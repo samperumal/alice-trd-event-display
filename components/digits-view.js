@@ -144,7 +144,7 @@ class DigitsViewComponent extends ComponentBase {
         this.ctx.strokeStyle = "#bbb";
         this.ctx.lineWidth = 0.6;
 
-        const binColourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, 256]);
+        const binColourScale = d3.scaleSequential(d3.interpolateGreys).domain([0, 256]);
         const maxCsum = this.maxCsum;
 
         const padw = 5, padh = 3, ml = 5, mt = 50, rs = 4, mb = 5;
@@ -203,10 +203,10 @@ class DigitsViewComponent extends ComponentBase {
             return lingrad;
         }.bind(this);
 
-        this.ctx.fillStyle = makeLinearGradient(d3.interpolateBuPu, pane1End / 2 - padw * 50 / 2, pane1End / 2 + padw * 50 / 2);
+        this.ctx.fillStyle = makeLinearGradient(d3.interpolateGreys, pane1End / 2 - padw * 50 / 2, pane1End / 2 + padw * 50 / 2);
         this.ctx.fillRect(pane1End / 2 - padw * 50 / 2, mt + padh * 146 + 13 * padh, padw * 50, padh * 10);
 
-        this.ctx.fillStyle = makeLinearGradient(d3.interpolateYlGnBu, pane1End / 2 - padw * 50 / 2 + paneXOffset, pane1End / 2 + padw * 50 / 2 + paneXOffset);
+        this.ctx.fillStyle = makeLinearGradient(d3.interpolateBuPu, pane1End / 2 - padw * 50 / 2 + paneXOffset, pane1End / 2 + padw * 50 / 2 + paneXOffset);
         this.ctx.fillRect(pane1End / 2 - padw * 50 / 2 + paneXOffset, mt + padh * 146 + 13 * padh, padw * 50, padh * 10);
 
         // Stroke pad contents
@@ -214,7 +214,7 @@ class DigitsViewComponent extends ComponentBase {
         this.ctx.lineWidth = 1;
 
         for (const layer of this.data.layers.reverse()) {
-            const colourScale = d3.scaleSequential(d3.interpolateYlGnBu).domain([0, maxCsum]);
+            const colourScale = d3.scaleSequential(d3.interpolateBuPu).domain([0, maxCsum]);
             for (const pad of layer.pads) {
                 const x = ml + (padw + 6 * padw + padw + rs) * pad.row + padw + pad.layer * padw;
                 const y = mt + padh + (pad.col * padh);
