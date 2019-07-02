@@ -26,7 +26,7 @@ class TimebinViewComponent extends ComponentBase {
         this.padSubViews = [];
         this.layerLabels = [];
 
-        this.colourScale = d3.scaleSequential(d3.interpolateBuPu).domain([100, 0]);
+        this.colourScale = d3.scaleSequential(d3.interpolateGreens).domain([100, 0]);
 
         const midColour = this.colourScale(65);
 

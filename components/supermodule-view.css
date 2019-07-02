@@ -9,15 +9,14 @@
 
 .supermodule-view-component .track path {
     fill: none;
-    stroke: lightskyblue;
+    stroke: #3392e3;
     stroke-dasharray: 5;
     stroke-width: 2px;
 }
 
 .supermodule-view-component .track.not-selected path {
-    stroke: rgb(234, 246, 255);
-    
-    stroke-width: 0.1;
+    stroke: #a9d7ff;
+    stroke-width: 0.3;
 }
 
 .supermodule-view-component rect.bin {

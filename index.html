@@ -123,14 +123,23 @@
         }
 
         #sector-view-zoom .sector-view-component path.track {
+            stroke-dasharray: 1;
+            stroke-width: 0.3px;
+        }
 
-            stroke-dasharray: 0.5;
-            stroke-width: 0.4px;
+        #sector-view-zoom .sector-view-component path.track.not-selected {
+            stroke-dasharray: 1;
+            stroke-width: 0.1px;
         }
 
         #supermodule-view-zoom .supermodule-view-component .track path {
+            stroke-dasharray: 2;
+            stroke-width: 0.8px;
+        }
+
+        #supermodule-view-zoom .supermodule-view-component .track.not-selected path {
             stroke-dasharray: 1;
-            stroke-width: 1px;
+            stroke-width: 0.3px;
         }
 
         input[type=number] {

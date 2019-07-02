@@ -5,9 +5,14 @@
 
 .sector-view-component path.track {
     fill: none;
-    stroke: lightskyblue;
+    stroke: #3392e3;
     stroke-dasharray: 5;
     stroke-width: 2px;
+}
+
+.sector-view-component path.track.not-selected {
+    stroke: #a9d7ff;
+    stroke-width: 0.3;
 }
 
 .sector-view-component .zoom {
@@ -23,10 +28,6 @@
     text-anchor: end;
     dominant-baseline: text-after-edge;
     font-size: 3px;
-}
-
-.sector-view-component path.track.not-selected {
-    stroke: rgb(234, 246, 255);
 }
 
 .sector-view-component .half-chamber-div {
