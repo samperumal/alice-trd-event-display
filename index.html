@@ -64,41 +64,23 @@
 
         div.navigation {
             width: 300px;
-            display: inline-block;
-            vertical-align: top;
         }
 
-        div.row {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            width: 100%;
-        }
+        div.row {}
 
-        div.column {
-            display: flex;
-            flex-direction: column;
-            flex-basis: 100%;
-            flex: 1;
-        }
+        div.column {}
 
-        div.column.main-content {
-            overflow-y: scroll;
-            max-height: 700px;
-            flex: 4;
-        }
+        div.column.main-content {}
 
         #tree-container {
-            height: 290px;
+            height: 300px;
             overflow: auto;
         }
 
         div.component-container {
-            display: block;
         }
 
         div.component {
-            display: inline-block;
             margin-right: 0.5em;
             margin-bottom: 1.5em;
         }
@@ -110,7 +92,7 @@
         }
 
         div.time-bin-view {
-            max-height: 670px;
+            max-height: 650px;
             overflow-y: scroll;
         }
 
@@ -160,98 +142,89 @@
 </head>
 
 <body>
-    <div class="row">
-        <div class="column">
-            <div style="margin: 1em;">
-                <p style="font-size: medium; ">Available events</p>
-                <div id="tree-container">
-                    <div id="dataTree">
-                    </div>
-                </div>
-            </div>
-            <div style="margin: 1em; display: none;">
-                <p style="font-size: medium; ">Older versions</p>
-                <a href="index.v1.html">Version 1</a>
-            </div>
-            <div style="display: none;">
-                <img src="alice-coord.png" style="width: 300px;" />
-            </div>
-            <div class="component" style="vertical-align: top;">
-                <p>Track Information</p>
-                <div style="width: 300px; height: 300px; padding: 1em; border: 1px solid black;">
-                    <table>
-                        <tbody id="track-information">
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div class="column main-content" style="overflow: hidden;">
-            <div class="row">
-                <div class="column">
-                    <div class="component">
-                        <p>Sector view - XY plane</p>
-                        <svg id="sector-view" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
-                    </div>
-                    <div class="component">
-                        <p>Sector detail view - XY plane</p>
-                        <svg id="sector-view-zoom" style="width: 300px; height: 300px;"
-                            preserveAspectRatio="xMidYMid meet"></svg>
-                    </div>
-
-                </div>
-                <div class="column">
-                    <div class="component">
-                        <p>Supermodule view - ZY plane</p>
-                        <svg id="supermodule-view" style="width: 300px; height: 300px;"
-                            preserveAspectRatio="xMidYMid"></svg>
-                    </div>
-                    <div class="component">
-                        <p>Supermodule detail view - ZY plane</p>
-                        <svg id="supermodule-view-zoom" style="width: 300px; height: 300px;"
-                            preserveAspectRatio="xMidYMid meet"></svg>
-                    </div>
-                </div>
-                <div class="column">
-                    <div class="component">
-                        <p>Time-bin view</p>
-                        <div class="time-bin-view">
-                            <svg id="timebin-view-zoom" style="width: 500px; height: 1600px;"
-                                preserveAspectRatio="xMidYMid meet"></svg>
+    <div style="display: flex; flex-direction: column; ">
+        <div style="display: flex; flex-direction: row; justify-content: flex-start; flex-wrap: no-wrap;">
+            <div>
+                <div class="component">
+                    <p >Available events</p>
+                    <div id="tree-container" style="border: 1px solid black;">
+                        <div id="dataTree">
                         </div>
+                    </div>
+                </div>
+                <div class="component" style="vertical-align: top; padding-top: 0.4em;">
+                    <p>Track Information</p>
+                    <div style="width: 300px; height: 300px; padding: 1em; border: 1px solid black;">
+                        <table>
+                            <tbody id="track-information">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="component">
+                    <p>Sector view - XY plane</p>
+                    <svg id="sector-view" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
+                </div>
+                <div class="component">
+                    <p>Sector detail view - XY plane</p>
+                    <svg id="sector-view-zoom" style="width: 300px; height: 300px;"
+                        preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+
+            </div>
+            <div>
+                <div class="component">
+                    <p>Supermodule view - ZY plane</p>
+                    <svg id="supermodule-view" style="width: 300px; height: 300px;"
+                        preserveAspectRatio="xMidYMid"></svg>
+                </div>
+                <div class="component">
+                    <p>Supermodule detail view - ZY plane</p>
+                    <svg id="supermodule-view-zoom" style="width: 300px; height: 300px;"
+                        preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+            </div>
+            <div>
+                <div class="component">
+                    <p>Time-bin view</p>
+                    <div class="time-bin-view" style="border: 1px solid black;">
+                        <svg id="timebin-view-zoom" style="width: 500px; height: 1600px; border: none;"
+                            preserveAspectRatio="xMidYMid meet"></svg>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="column">
-            <div class="component">
-                <p>Digits detail view</p>
-                <p>
-                    <span><label for="event-input">Event: </label><input type="number" value="11" id="event-input"
-                            min="0" /></span>
-                    <span><label for="sector-input">Sector: </label><input type="number" value="0" id="sector-input"
-                            min="0" /></span>
-                    <span><label for="stack-input">Stack: </label><input type="number" value="0" id="stack-input"
-                            min="0" /></span>
-                    <span><label for="max-csum-input">Max Cum. Sum: </label><input type="number" value="5000"
-                            id="max-csum-input" min="0" style="width: 6em;" /></span>
-                    <span><input type="button" value="Load" id="load-digits" /></span>
-                </p>
-                <div style="text-align: center;">
-                    <div style="display: inline-block; margin: 1em 2em; width: 50%; text-align: center;">
-                        <div>
-                            <label for="amount">Timebin: </label>
-                            <input type="text" id="timebin-display" readonly
-                                style="border:0; color:#f6931f; font-weight:bold; width: 2em;">
-                        </div>
-                        <div id="timebin-slider" style="margin: 0 0;">
+        <div style="display: flex; flex-direction: row;">
+            <div class="column">
+                <div class="component">
+                    <p>Digits detail view</p>
+                    <p>
+                        <span><label for="event-input">Event: </label><input type="number" value="11" id="event-input"
+                                min="0" /></span>
+                        <span><label for="sector-input">Sector: </label><input type="number" value="0" id="sector-input"
+                                min="0" /></span>
+                        <span><label for="stack-input">Stack: </label><input type="number" value="0" id="stack-input"
+                                min="0" /></span>
+                        <span><label for="max-csum-input">Max Cum. Sum: </label><input type="number" value="5000"
+                                id="max-csum-input" min="0" style="width: 6em;" /></span>
+                        <span><input type="button" value="Load" id="load-digits" /></span>
+                    </p>
+                    <div style="text-align: center;">
+                        <div style="display: inline-block; margin: 1em 2em; width: 50%; text-align: center;">
+                            <div>
+                                <label for="amount">Timebin: </label>
+                                <input type="text" id="timebin-display" readonly value="0"
+                                    style="border:0; color:#f6931f; font-weight:bold; width: 2em;">
+                            </div>
+                            <div id="timebin-slider" style="margin: 0 0;">
+                            </div>
                         </div>
                     </div>
+                    <canvas id="digits-view" width="1480" height="580" style="background: inherit;"></canvas>
                 </div>
-                <canvas id="digits-view" width="1480" height="580" style="background: inherit;"></canvas>
             </div>
         </div>
     </div>
