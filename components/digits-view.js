@@ -45,6 +45,9 @@ class DigitsViewComponent extends ComponentBase {
         const rowBand = this.rowBand = d3.scaleBand().domain(d3.range(0, 16).reverse())
             .range([axisMargins.top, layerBand.bandwidth() - axisMargins.top - axisMargins.bottom]);
 
+        this.binColourScale = d3.scaleSequential(d3.interpolateGreens).domain([0, 256]);
+        this.csumColourScale = d3.scaleSequential(d3.interpolateGreys)
+
         function rotate(d) {
             const angle = 2 * (2 * (d.r % 2) - 1); // 2 degrees, alternating by row
             const cx = colBand(d.c) + colBand.bandwidth() / 2; // x centre of rotation
@@ -138,6 +141,23 @@ class DigitsViewComponent extends ComponentBase {
         this.offscreenContext.fillText("0", pane1End / 2 - padw * 50 / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
         this.offscreenContext.fillText("255", pane1End / 2 + padw * 50 / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
         this.offscreenContext.fillText("0", pane1End / 2 - padw * 50 / 2, mt + padh * 146 + 30 * padh);
+
+        const makeLinearGradient = function (colScheme, x1, x2) {
+            const stops = 10;
+            const colScale = d3.scaleSequential(colScheme).domain([0, stops]);
+            const lingrad = this.offscreenContext.createLinearGradient(x1, 0, x2, 0);
+            for (let i = 0; i <= stops; i += 1) {
+                lingrad.addColorStop(i / stops, colScale(i));
+            }
+
+            return lingrad;
+        }.bind(this);
+
+        this.offscreenContext.fillStyle = makeLinearGradient(d3.interpolateGreens, pane1End / 2 - padw * 50 / 2 + paneXOffset, pane1End / 2 + padw * 50 / 2 + paneXOffset);
+        this.offscreenContext.fillRect(pane1End / 2 - padw * 50 / 2 + paneXOffset, mt + padh * 146 + 13 * padh, padw * 50, padh * 10);
+
+        this.offscreenContext.fillStyle = makeLinearGradient(d3.interpolateGreys, pane1End / 2 - padw * 50 / 2, pane1End / 2 + padw * 50 / 2);
+        this.offscreenContext.fillRect(pane1End / 2 - padw * 50 / 2, mt + padh * 146 + 13 * padh, padw * 50, padh * 10);
     }
 
     draw(eventData) {
@@ -196,7 +216,7 @@ class DigitsViewComponent extends ComponentBase {
 
         this.drawPads(bin);
 
-        if (bin < 3) {
+        if (bin < 29) {
             window.requestAnimationFrame(this.animatePads.bind(this));
         }
     }
@@ -206,8 +226,8 @@ class DigitsViewComponent extends ComponentBase {
 
         this.ctx.drawImage(this.offscreenCanvas, 0, 0, this.canvas.width * this.ratio, this.canvas.height * this.ratio, 0, 0, this.canvas.width, this.canvas.height);
 
-        const binColourScale = d3.scaleSequential(d3.interpolateGreens).domain([0, 256]);
         const maxCsum = this.maxCsum;
+        this.csumColourScale.domain([0, maxCsum]);
 
         // Stroke axes text
         this.ctx.fillStyle = "black";
@@ -216,35 +236,17 @@ class DigitsViewComponent extends ComponentBase {
         this.ctx.font = 'small-caps 13px sans-serif';
         this.ctx.fillText(maxCsum, pane1End / 2 + padw * 50 / 2, mt + padh * 146 + 30 * padh);
 
-        const makeLinearGradient = function (colScheme, x1, x2) {
-            const stops = 10;
-            const colScale = d3.scaleSequential(colScheme).domain([0, stops]);
-            const lingrad = this.ctx.createLinearGradient(x1, 0, x2, 0);
-            for (let i = 0; i <= stops; i += 1) {
-                lingrad.addColorStop(i / stops, colScale(i));
-            }
-
-            return lingrad;
-        }.bind(this);
-
-        this.ctx.fillStyle = makeLinearGradient(d3.interpolateGreens, pane1End / 2 - padw * 50 / 2 + paneXOffset, pane1End / 2 + padw * 50 / 2 + paneXOffset);
-        this.ctx.fillRect(pane1End / 2 - padw * 50 / 2 + paneXOffset, mt + padh * 146 + 13 * padh, padw * 50, padh * 10);
-
-        this.ctx.fillStyle = makeLinearGradient(d3.interpolateGreys, pane1End / 2 - padw * 50 / 2, pane1End / 2 + padw * 50 / 2);
-        this.ctx.fillRect(pane1End / 2 - padw * 50 / 2, mt + padh * 146 + 13 * padh, padw * 50, padh * 10);
-
         // Stroke pad contents
         this.ctx.strokeStyle = "white";
         this.ctx.lineWidth = 1;
 
         for (const layer of this.data.layers.reverse()) {
-            const colourScale = d3.scaleSequential(d3.interpolateGreys).domain([0, maxCsum]);
             for (const pad of layer.pads) {
                 const x = ml + (padw + 6 * padw + padw + rs) * pad.row + padw + pad.layer * padw;
                 const y = mt + padh + (pad.col * padh);
 
                 if (pad.tbins[bin] > 0) {
-                    this.ctx.fillStyle = binColourScale(pad.tbins[bin]);
+                    this.ctx.fillStyle = this.binColourScale(pad.tbins[bin]);
                     this.ctx.fillRect(x + paneXOffset, y, padw, padh);
                     this.ctx.strokeRect(x + paneXOffset, y, padw, padh);
                 }
@@ -252,7 +254,7 @@ class DigitsViewComponent extends ComponentBase {
                 const cumsum = pad.csum[bin];
 
                 if (cumsum > 0) {
-                    this.ctx.fillStyle = colourScale(cumsum);
+                    this.ctx.fillStyle = this.csumColourScale(cumsum);
                     this.ctx.fillRect(x, y, padw, padh);
                     this.ctx.strokeRect(x, y, padw, padh);
                 }
