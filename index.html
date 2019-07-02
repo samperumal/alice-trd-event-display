@@ -63,7 +63,7 @@
         }
 
         div.navigation {
-            width: 300px;
+            
         }
 
         div.row {}
@@ -152,8 +152,8 @@
 
 <body>
     <div style="display: flex; flex-direction: column; ">
-        <div style="display: flex; flex-direction: row; justify-content: flex-start; flex-wrap: no-wrap;">
-            <div>
+        <div style="display: flex; flex-direction: row; justify-content: flex-start; flex-wrap: wrap; width: 100%;">
+            <div id="navigation-col">
                 <div class="component">
                     <p >Available events</p>
                     <div id="tree-container" style="border: 1px solid black;">
@@ -172,7 +172,7 @@
                     </div>
                 </div>
             </div>
-            <div>
+            <div id="sector-col">
                 <div class="component">
                     <p>Sector view - XY plane</p>
                     <svg id="sector-view" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
@@ -184,7 +184,7 @@
                 </div>
 
             </div>
-            <div>
+            <div id="stack-col">
                 <div class="component">
                     <p>Supermodule view - ZY plane</p>
                     <svg id="supermodule-view" style="width: 300px; height: 300px;"
@@ -196,10 +196,10 @@
                         preserveAspectRatio="xMidYMid meet"></svg>
                 </div>
             </div>
-            <div>
+            <div id="time-bin-col" style="flex-grow: 1;">
                 <div class="component">
                     <p>Time-bin view</p>
-                    <div class="time-bin-view" style="border: 1px solid black;">
+                    <div class="time-bin-view" style="border: 1px solid black; text-align: center;">
                         <svg id="timebin-view-zoom" style="width: 500px; height: 1600px; border: none;"
                             preserveAspectRatio="xMidYMid meet"></svg>
                     </div>
