@@ -144,7 +144,7 @@ class DigitsViewComponent extends ComponentBase {
         this.ctx.strokeStyle = "#bbb";
         this.ctx.lineWidth = 0.6;
 
-        const binColourScale = d3.scaleSequential(d3.interpolateGreys).domain([0, 256]);
+        const binColourScale = d3.scaleSequential(d3.interpolateGreens).domain([0, 256]);
         const maxCsum = this.maxCsum;
 
         const padw = 5, padh = 3, ml = 5, mt = 50, rs = 4, mb = 5;
@@ -179,18 +179,18 @@ class DigitsViewComponent extends ComponentBase {
         }
 
         this.ctx.font = 'small-caps bold 13px sans-serif';
-        this.ctx.fillText("Pad ADC - single time-bin", pane1End / 2, mt - padh * 9);
-        this.ctx.fillText("Pad ADC - cumulative time-bin sum", pane1End / 2 + paneXOffset, mt - padh * 9);
+        this.ctx.fillText("Pad ADC - cumulative time-bin sum", pane1End / 2, mt - padh * 9);
+        this.ctx.fillText("Pad ADC - single time-bin", pane1End / 2 + paneXOffset, mt - padh * 9);
 
         // Stroke contents colour scale
         this.ctx.font = 'small-caps 13px sans-serif';
-        this.ctx.fillText("ADC single bin", pane1End / 2, mt + padh * 146 + 30 * padh);
-        this.ctx.fillText("ADC cumulative sum", pane1End / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
+        this.ctx.fillText("ADC cumulative sum", pane1End / 2, mt + padh * 146 + 30 * padh);
+        this.ctx.fillText("ADC single bin", pane1End / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
 
-        this.ctx.fillText("0", pane1End / 2 - padw * 50 / 2, mt + padh * 146 + 30 * padh);
-        this.ctx.fillText("255", pane1End / 2 + padw * 50 / 2, mt + padh * 146 + 30 * padh);
         this.ctx.fillText("0", pane1End / 2 - padw * 50 / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
-        this.ctx.fillText(maxCsum, pane1End / 2 + padw * 50 / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
+        this.ctx.fillText("255", pane1End / 2 + padw * 50 / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
+        this.ctx.fillText("0", pane1End / 2 - padw * 50 / 2, mt + padh * 146 + 30 * padh);
+        this.ctx.fillText(maxCsum, pane1End / 2 + padw * 50 / 2, mt + padh * 146 + 30 * padh);
 
         const makeLinearGradient = function (colScheme, x1, x2) {
             const stops = 10;
@@ -203,34 +203,34 @@ class DigitsViewComponent extends ComponentBase {
             return lingrad;
         }.bind(this);
 
-        this.ctx.fillStyle = makeLinearGradient(d3.interpolateGreys, pane1End / 2 - padw * 50 / 2, pane1End / 2 + padw * 50 / 2);
-        this.ctx.fillRect(pane1End / 2 - padw * 50 / 2, mt + padh * 146 + 13 * padh, padw * 50, padh * 10);
-
         this.ctx.fillStyle = makeLinearGradient(d3.interpolateGreens, pane1End / 2 - padw * 50 / 2 + paneXOffset, pane1End / 2 + padw * 50 / 2 + paneXOffset);
         this.ctx.fillRect(pane1End / 2 - padw * 50 / 2 + paneXOffset, mt + padh * 146 + 13 * padh, padw * 50, padh * 10);
+
+        this.ctx.fillStyle = makeLinearGradient(d3.interpolateGreys, pane1End / 2 - padw * 50 / 2, pane1End / 2 + padw * 50 / 2);
+        this.ctx.fillRect(pane1End / 2 - padw * 50 / 2, mt + padh * 146 + 13 * padh, padw * 50, padh * 10);
 
         // Stroke pad contents
         this.ctx.strokeStyle = "white";
         this.ctx.lineWidth = 1;
 
         for (const layer of this.data.layers.reverse()) {
-            const colourScale = d3.scaleSequential(d3.interpolateGreens).domain([0, maxCsum]);
+            const colourScale = d3.scaleSequential(d3.interpolateGreys).domain([0, maxCsum]);
             for (const pad of layer.pads) {
                 const x = ml + (padw + 6 * padw + padw + rs) * pad.row + padw + pad.layer * padw;
                 const y = mt + padh + (pad.col * padh);
 
                 if (pad.tbins[bin] > 0) {
                     this.ctx.fillStyle = binColourScale(pad.tbins[bin]);
-                    this.ctx.fillRect(x, y, padw, padh);
-                    this.ctx.strokeRect(x, y, padw, padh);
+                    this.ctx.fillRect(x + paneXOffset, y, padw, padh);
+                    this.ctx.strokeRect(x + paneXOffset, y, padw, padh);
                 }
 
                 const cumsum = pad.csum[bin];
 
                 if (cumsum > 0) {
                     this.ctx.fillStyle = colourScale(cumsum);
-                    this.ctx.fillRect(x + paneXOffset, y, padw, padh);
-                    this.ctx.strokeRect(x + paneXOffset, y, padw, padh);
+                    this.ctx.fillRect(x, y, padw, padh);
+                    this.ctx.strokeRect(x, y, padw, padh);
                 }
             }
         }
