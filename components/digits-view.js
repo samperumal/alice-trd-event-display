@@ -209,36 +209,27 @@ class DigitsViewComponent extends ComponentBase {
         }
     }
 
-    animatePads() {
+    async animatePads() {
         const bin = Math.min(Math.floor((new Date() - this.timeStart) / 1000 / 0.25), 29);
 
         this.timeBinChange(bin);
 
-        this.drawPads(bin);
+        await this.drawPads(bin);
 
         if (bin < 29) {
             window.requestAnimationFrame(this.animatePads.bind(this));
         }
     }
 
-    drawPads(bin) {
-        this.ctx.clearRect(0, 0, this.width, this.height);
-
-        this.ctx.drawImage(this.offscreenCanvas, 0, 0, this.canvas.width * this.ratio, this.canvas.height * this.ratio, 0, 0, this.canvas.width, this.canvas.height);
+    async drawPads(bin) {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         const maxCsum = this.maxCsum;
         this.csumColourScale.domain([0, maxCsum]);
 
-        // Stroke axes text
-        this.ctx.fillStyle = "black";
-        this.ctx.textAlign = "center";
-        this.ctx.textBaseline = "bottom";        
-        this.ctx.font = 'small-caps 13px sans-serif';
-        this.ctx.fillText(maxCsum, pane1End / 2 + padw * 50 / 2, mt + padh * 146 + 30 * padh);
-
         // Stroke pad contents
-        this.ctx.strokeStyle = "white";
-        this.ctx.lineWidth = 1;
+        this.offscreenContext.strokeStyle = "white";
+        this.offscreenContext.lineWidth = 1;
 
         for (const layer of this.data.layers.reverse()) {
             for (const pad of layer.pads) {
@@ -246,19 +237,28 @@ class DigitsViewComponent extends ComponentBase {
                 const y = mt + padh + (pad.col * padh);
 
                 if (pad.tbins[bin] > 0) {
-                    this.ctx.fillStyle = this.binColourScale(pad.tbins[bin]);
-                    this.ctx.fillRect(x + paneXOffset, y, padw, padh);
-                    this.ctx.strokeRect(x + paneXOffset, y, padw, padh);
+                    this.offscreenContext.fillStyle = this.binColourScale(pad.tbins[bin]);
+                    this.offscreenContext.fillRect(x + paneXOffset, y, padw, padh);
+                    this.offscreenContext.strokeRect(x + paneXOffset, y, padw, padh);
                 }
 
                 const cumsum = pad.csum[bin];
 
                 if (cumsum > 0) {
-                    this.ctx.fillStyle = this.csumColourScale(cumsum);
-                    this.ctx.fillRect(x, y, padw, padh);
-                    this.ctx.strokeRect(x, y, padw, padh);
+                    this.offscreenContext.fillStyle = this.csumColourScale(cumsum);
+                    this.offscreenContext.fillRect(x, y, padw, padh);
+                    this.offscreenContext.strokeRect(x, y, padw, padh);
                 }
             }
         }
+
+        this.ctx.drawImage(this.offscreenCanvas, 0, 0, this.canvas.width * this.ratio, this.canvas.height * this.ratio, 0, 0, this.canvas.width, this.canvas.height);
+
+        // Stroke axes text
+        this.ctx.fillStyle = "black";
+        this.ctx.textAlign = "center";
+        this.ctx.textBaseline = "bottom";        
+        this.ctx.font = 'small-caps 13px sans-serif';
+        this.ctx.fillText(maxCsum, pane1End / 2 + padw * 50 / 2, mt + padh * 146 + 30 * padh);       
     }
 }
