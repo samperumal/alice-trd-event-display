@@ -1,4 +1,5 @@
-const padw = 4, padh = 5;
+const padw = 5, padh = 3, ml = 5, mt = 50, rs = 4, mb = 5;
+const pane1End = ml + (padw + 6 * padw + padw) * 16 + rs * 15 + ml, paneXOffset = pane1End + 10 * padw;
 
 class DigitsViewComponent extends ComponentBase {
     constructor(id, width, height, viewBox, config) {
@@ -51,6 +52,7 @@ class DigitsViewComponent extends ComponentBase {
             return `rotate(${angle} ${cx} ${cy})`;
         }
 
+        // Fix to ensure crisp edges on high DPI displays
         const canvas = this.canvas, context = this.ctx;
 
         const devicePixelRatio = window.devicePixelRatio || 1,
@@ -58,24 +60,84 @@ class DigitsViewComponent extends ComponentBase {
                 context.mozBackingStorePixelRatio ||
                 context.msBackingStorePixelRatio ||
                 context.oBackingStorePixelRatio ||
-                context.backingStorePixelRatio || 1,
+                context.backingStorePixelRatio || 1;
 
-            ratio = devicePixelRatio / backingStoreRatio;
+        this.ratio = devicePixelRatio / backingStoreRatio;
 
-        console.log(backingStoreRatio);
+        this.offscreenCanvas = document.createElement("canvas"); // creates a new off-screen canvas element
+        this.offscreenContext = this.offscreenCanvas.getContext('2d'); //the drawing context of the off-screen canvas element
 
         if (devicePixelRatio !== backingStoreRatio) {
             const oldWidth = canvas.width;
             const oldHeight = canvas.height;
 
-            canvas.width = oldWidth * ratio;
-            canvas.height = oldHeight * ratio;
+            canvas.width = oldWidth * this.ratio;
+            canvas.height = oldHeight * this.ratio;
 
             canvas.style.width = oldWidth + 'px';
             canvas.style.height = oldHeight + 'px';
 
-            context.scale(ratio, ratio);
+            context.scale(this.ratio, this.ratio);
+
+            this.offscreenCanvas.width = canvas.width; // match the off-screen canvas dimensions with that of #mainCanvas
+            this.offscreenCanvas.height = canvas.height;
+            this.offscreenContext.scale(this.ratio, this.ratio);
         }
+        else {
+            this.offscreenCanvas.width = canvas.width; // match the off-screen canvas dimensions with that of #mainCanvas
+            this.offscreenCanvas.height = canvas.height;
+            
+        }
+
+        this.renderBackground();
+    }
+
+    renderBackground() {
+        this.offscreenContext.strokeStyle = "#bbb";
+        this.offscreenContext.lineWidth = 0.6;
+
+        // Stroke Pad Row outline
+        for (const row of d3.range(16)) {
+            this.offscreenContext.strokeRect(ml + (padw + 6 * padw + padw + rs) * row, mt, padw * 8, padh * 146);
+            this.offscreenContext.strokeRect(paneXOffset + ml + (padw + 6 * padw + padw + rs) * row, mt, padw * 8, padh * 146);
+        }
+
+        // Stroke axes text
+        this.offscreenContext.fillStyle = "black";
+        this.offscreenContext.textAlign = "center";
+        this.offscreenContext.textBaseline = "middle";
+        this.offscreenContext.font = '11px sans-serif';
+        this.offscreenContext.fillText("Pad Cols", pane1End + 5 * padw, mt + 73.5 * padh);
+        this.offscreenContext.fillText(0, pane1End + 5 * padw, mt + padh + padh * 1.5);
+        this.offscreenContext.fillText(143, pane1End + 5 * padw, mt + padh + padh * 144);
+        this.offscreenContext.textBaseline = "bottom";
+        this.offscreenContext.fillText("Pad Rows", pane1End / 2, mt - padh * 4);
+        this.offscreenContext.fillText("Pad Rows", pane1End / 2 + paneXOffset, mt - padh * 4);
+
+        // Stroke row and layer labels
+        for (const row of d3.range(16)) {
+            for (const paneOffset of [0, paneXOffset]) {
+                this.offscreenContext.fillText(row, ml + (padw + 6 * padw + padw + rs) * row + padw + 3 * padw + paneOffset, mt);
+                this.offscreenContext.fillText(0, ml + (padw + 6 * padw + padw + rs) * row + padw + paneOffset, mt + padh * 146 + 4 * padh);
+                this.offscreenContext.fillText(5, ml + (padw + 6 * padw + padw + rs) * row + padw * 7 + paneOffset, mt + padh * 146 + 4 * padh);
+
+                this.offscreenContext.fillText("Layers", ml + (padw + 6 * padw + padw + rs) * row + padw * 4 + paneOffset, mt + padh * 146 + 8 * padh);
+            }
+        }
+
+        // Stroke panel titles
+        this.offscreenContext.font = 'small-caps bold 13px sans-serif';
+        this.offscreenContext.fillText("Pad ADC - cumulative time-bin sum", pane1End / 2, mt - padh * 9);
+        this.offscreenContext.fillText("Pad ADC - single time-bin", pane1End / 2 + paneXOffset, mt - padh * 9);
+
+        // Stroke contents colour scale
+        this.offscreenContext.font = 'small-caps 13px sans-serif';
+        this.offscreenContext.fillText("ADC cumulative sum", pane1End / 2, mt + padh * 146 + 30 * padh);
+        this.offscreenContext.fillText("ADC single bin", pane1End / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
+
+        this.offscreenContext.fillText("0", pane1End / 2 - padw * 50 / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
+        this.offscreenContext.fillText("255", pane1End / 2 + padw * 50 / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
+        this.offscreenContext.fillText("0", pane1End / 2 - padw * 50 / 2, mt + padh * 146 + 30 * padh);
     }
 
     draw(eventData) {
@@ -134,62 +196,24 @@ class DigitsViewComponent extends ComponentBase {
 
         this.drawPads(bin);
 
-        if (bin < 29) {
+        if (bin < 3) {
             window.requestAnimationFrame(this.animatePads.bind(this));
         }
     }
 
     drawPads(bin) {
         this.ctx.clearRect(0, 0, this.width, this.height);
-        this.ctx.strokeStyle = "#bbb";
-        this.ctx.lineWidth = 0.6;
+
+        this.ctx.drawImage(this.offscreenCanvas, 0, 0, this.canvas.width * this.ratio, this.canvas.height * this.ratio, 0, 0, this.canvas.width, this.canvas.height);
 
         const binColourScale = d3.scaleSequential(d3.interpolateGreens).domain([0, 256]);
         const maxCsum = this.maxCsum;
 
-        const padw = 5, padh = 3, ml = 5, mt = 50, rs = 4, mb = 5;
-        const pane1End = ml + (padw + 6 * padw + padw) * 16 + rs * 15 + ml, paneXOffset = pane1End + 10 * padw;
-
-        // Stroke Pad Row outline
-
-        for (const row of d3.range(16)) {
-            this.ctx.strokeRect(ml + (padw + 6 * padw + padw + rs) * row, mt, padw * 8, padh * 146);
-            this.ctx.strokeRect(paneXOffset + ml + (padw + 6 * padw + padw + rs) * row, mt, padw * 8, padh * 146);
-        }
-
         // Stroke axes text
         this.ctx.fillStyle = "black";
         this.ctx.textAlign = "center";
-        this.ctx.textBaseline = "middle";
-        this.ctx.font = '11px sans-serif';
-        this.ctx.fillText("Pad Cols", pane1End + 5 * padw, mt + 73.5 * padh);
-        this.ctx.fillText(0, pane1End + 5 * padw, mt + padh + padh * 1.5);
-        this.ctx.fillText(143, pane1End + 5 * padw, mt + padh + padh * 144);
-        this.ctx.textBaseline = "bottom";
-        this.ctx.fillText("Pad Rows", pane1End / 2, mt - padh * 4);
-        this.ctx.fillText("Pad Rows", pane1End / 2 + paneXOffset, mt - padh * 4);
-        for (const row of d3.range(16)) {
-            for (const paneOffset of [0, paneXOffset]) {
-                this.ctx.fillText(row, ml + (padw + 6 * padw + padw + rs) * row + padw + 3 * padw + paneOffset, mt);
-                this.ctx.fillText(0, ml + (padw + 6 * padw + padw + rs) * row + padw + paneOffset, mt + padh * 146 + 4 * padh);
-                this.ctx.fillText(5, ml + (padw + 6 * padw + padw + rs) * row + padw * 7 + paneOffset, mt + padh * 146 + 4 * padh);
-
-                this.ctx.fillText("Layers", ml + (padw + 6 * padw + padw + rs) * row + padw * 4 + paneOffset, mt + padh * 146 + 8 * padh);
-            }
-        }
-
-        this.ctx.font = 'small-caps bold 13px sans-serif';
-        this.ctx.fillText("Pad ADC - cumulative time-bin sum", pane1End / 2, mt - padh * 9);
-        this.ctx.fillText("Pad ADC - single time-bin", pane1End / 2 + paneXOffset, mt - padh * 9);
-
-        // Stroke contents colour scale
+        this.ctx.textBaseline = "bottom";        
         this.ctx.font = 'small-caps 13px sans-serif';
-        this.ctx.fillText("ADC cumulative sum", pane1End / 2, mt + padh * 146 + 30 * padh);
-        this.ctx.fillText("ADC single bin", pane1End / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
-
-        this.ctx.fillText("0", pane1End / 2 - padw * 50 / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
-        this.ctx.fillText("255", pane1End / 2 + padw * 50 / 2 + paneXOffset, mt + padh * 146 + 30 * padh);
-        this.ctx.fillText("0", pane1End / 2 - padw * 50 / 2, mt + padh * 146 + 30 * padh);
         this.ctx.fillText(maxCsum, pane1End / 2 + padw * 50 / 2, mt + padh * 146 + 30 * padh);
 
         const makeLinearGradient = function (colScheme, x1, x2) {
