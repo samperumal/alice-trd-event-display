@@ -304,20 +304,8 @@
 
         if (false) {
             setTimeout(function () {
-                console.log("selecting");
                 $("#dataTree").jstree("select_node", tree.treeData[1].children[1]);
-                // let count = 0;
-                //digitsView.drawDigits().then(() => {
-                //     // d3.selectAll("rect.pad-sum").filter(d => {
-                //     //     if (count < 1 && d.row == 3 && d.col == 84 && d.tsum > 0) {
-                //     //         count += 1;
-                //     //         console.log(d);
-                //     //         return true;
-                //     //     }
-                //     //     else return false;
-                //     // })
-                //     //     .dispatch("click");
-                //});
+                digitsView.drawDigits();
             }, 500);
         }
 

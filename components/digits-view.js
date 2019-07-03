@@ -46,7 +46,9 @@ class DigitsViewComponent extends ComponentBase {
             .range([axisMargins.top, layerBand.bandwidth() - axisMargins.top - axisMargins.bottom]);
 
         this.binColourScale = d3.scaleSequential(d3.interpolateGreens).domain([0, 256]);
-        this.csumColourScale = d3.scaleSequential(d3.interpolateGreys)
+        this.binSelectedColourScale = d3.scaleSequential(d3.interpolateReds).domain(this.binColourScale.domain());
+        this.csumColourScale = d3.scaleSequential(d3.interpolateGreys);
+        this.csumSelectedColourScale = d3.scaleSequential(d3.interpolateOranges);
 
         function rotate(d) {
             const angle = 2 * (2 * (d.r % 2) - 1); // 2 degrees, alternating by row
@@ -89,7 +91,7 @@ class DigitsViewComponent extends ComponentBase {
         else {
             this.offscreenCanvas.width = canvas.width; // match the off-screen canvas dimensions with that of #mainCanvas
             this.offscreenCanvas.height = canvas.height;
-            
+
         }
 
         this.renderBackground();
@@ -168,6 +170,7 @@ class DigitsViewComponent extends ComponentBase {
                 this.eventInput.value = eventData.event.evno;
                 this.sectorInput.value = tracklet.sector;
                 this.stackInput.value = tracklet.stack;
+                this.selectedTrackInput = eventData.trdTrack;
 
                 //this.drawDigits();
             }
@@ -184,6 +187,7 @@ class DigitsViewComponent extends ComponentBase {
         const sector = this.sectorInput.value;
         const stack = this.stackInput.value;
         this.maxCsum = this.maxCsumInput.value;
+        this.selectedTrack = this.selectedTrackInput;
 
         try {
             console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}: ${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
@@ -219,17 +223,25 @@ class DigitsViewComponent extends ComponentBase {
         if (bin < 29) {
             window.requestAnimationFrame(this.animatePads.bind(this));
         }
+        else console.log(bin);
     }
 
     async drawPads(bin) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        const maxCsum = this.maxCsum;
-        this.csumColourScale.domain([0, maxCsum]);
+        this.ctx.drawImage(this.offscreenCanvas, 0, 0, this.canvas.width * this.ratio, this.canvas.height * this.ratio, 0, 0, this.canvas.width, this.canvas.height);
+
+        let rowLayerIds = [];
+        if (this.selectedTrack != null) {
+            rowLayerIds = this.selectedTrack.trdTracklets.map(d => d.layer + d.binZ * 10 + 1000);
+        }
+
+        this.csumColourScale.domain([0, this.maxCsum]);
+        this.csumSelectedColourScale.domain([0, this.maxCsum * 1.2]);
 
         // Stroke pad contents
-        this.offscreenContext.strokeStyle = "white";
-        this.offscreenContext.lineWidth = 1;
+        this.ctx.strokeStyle = "white";
+        this.ctx.lineWidth = 1;
 
         for (const layer of this.data.layers.reverse()) {
             for (const pad of layer.pads) {
@@ -237,28 +249,30 @@ class DigitsViewComponent extends ComponentBase {
                 const y = mt + padh + (pad.col * padh);
 
                 if (pad.tbins[bin] > 0) {
-                    this.offscreenContext.fillStyle = this.binColourScale(pad.tbins[bin]);
-                    this.offscreenContext.fillRect(x + paneXOffset, y, padw, padh);
-                    this.offscreenContext.strokeRect(x + paneXOffset, y, padw, padh);
+                    if (rowLayerIds.includes(pad.layer + pad.row * 10 + 1000))
+                        this.ctx.fillStyle = this.binSelectedColourScale(pad.tbins[bin]);
+                    else this.ctx.fillStyle = this.binColourScale(pad.tbins[bin]);
+                    this.ctx.fillRect(x + paneXOffset, y, padw, padh);
+                    this.ctx.strokeRect(x + paneXOffset, y, padw, padh);
                 }
 
                 const cumsum = pad.csum[bin];
 
                 if (cumsum > 0) {
-                    this.offscreenContext.fillStyle = this.csumColourScale(cumsum);
-                    this.offscreenContext.fillRect(x, y, padw, padh);
-                    this.offscreenContext.strokeRect(x, y, padw, padh);
+                    if (rowLayerIds.includes(pad.layer + pad.row * 10 + 1000))
+                        this.ctx.fillStyle = this.csumSelectedColourScale(cumsum);
+                    else this.ctx.fillStyle = this.csumColourScale(cumsum);
+                    this.ctx.fillRect(x+1, y+1, padw-1, padh-1);
+                    //this.ctx.strokeRect(x, y, padw, padh);
                 }
             }
         }
 
-        this.ctx.drawImage(this.offscreenCanvas, 0, 0, this.canvas.width * this.ratio, this.canvas.height * this.ratio, 0, 0, this.canvas.width, this.canvas.height);
-
         // Stroke axes text
         this.ctx.fillStyle = "black";
         this.ctx.textAlign = "center";
-        this.ctx.textBaseline = "bottom";        
+        this.ctx.textBaseline = "bottom";
         this.ctx.font = 'small-caps 13px sans-serif';
-        this.ctx.fillText(maxCsum, pane1End / 2 + padw * 50 / 2, mt + padh * 146 + 30 * padh);       
+        this.ctx.fillText(this.maxCsum, pane1End / 2 + padw * 50 / 2, mt + padh * 146 + 30 * padh);
     }
 }
