@@ -9,7 +9,9 @@ class TrackInformationComponent {
             "pT: ": "pt",
             "PID: ": "pid",
             "Stack:": "stack",
-            "Sector:": "sector"
+            "Sector:": "sector",
+            "Alpha:": "alpha",
+            "Lambda:" : "lambda"
         });
     }
 
