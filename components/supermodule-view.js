@@ -73,7 +73,9 @@ class SupermoduleViewComponent extends ComponentBase {
             .attr("y", d => yscale(d.maxR + 10));
 
         this.tracks = this.container.append("g")
-            .attr("class", "tracks");
+            .attr("class", "tracks")
+            .append("path")
+            .attr("class", "track");
 
         this.setViewBox(null, 750);
     }
@@ -87,19 +89,25 @@ class SupermoduleViewComponent extends ComponentBase {
 
         if (this.selectedEventId != eventData.event.id) {
             this.selectedEventId = eventData.event.id;
+            
+            
+            const allTracks = eventData.event.trdTracks.filter(d => d.track != null && d.track.path != null);
+            this.tracks.attr("d", allTracks.map(d => line(d.track.path)).join(" "));
+            return;
+
             let tracks = this.tracks
-                .selectAll("g.track")
+                .selectAll("path.track")
                 .data(eventData.event.trdTracks.filter(d => d.track != null && d.track.path != null), d => d.id);
 
             tracks.exit().remove();
 
             tracks.enter()
-                .append("g")
-                .attr("class", "track")
-                .attr("data-trackid", d => d.id)
+                // .append("g")
+                // .attr("class", "track")
+                // .attr("data-trackid", d => d.id)
                 .append("path")
                 .attr("class", "track")
-                .attr("d", d => line(d.track.path));
+                //.attr("d", d => line(d.track.path));
 
             let trackletPlanes = this.tracklets
                 .selectAll("rect.tracklet")
@@ -114,10 +122,11 @@ class SupermoduleViewComponent extends ComponentBase {
                 .attr("x", d => xscale(d.layerDim.minZ + d.binZ * d.layerDim.zsize))
                 .attr("y", d => yscale(d.layerDim.maxR))
                 .attr("width", d => xscale(d.layerDim.zsize))
-                .attr("height", d => Math.abs(yscale(d.layerDim.maxR) - yscale(d.layerDim.minR)));
+                //.attr("height", d => Math.abs(yscale(d.layerDim.maxR) - yscale(d.layerDim.minR)));
         }
+        return;
 
-        this.tracks.selectAll("g.track")
+        this.tracks.selectAll("path.track")
             .classed("not-selected", d => eventData.trdTrack != null && d.id != selectedTrack)
             .filter(d => d.id == selectedTrack)
             .raise();

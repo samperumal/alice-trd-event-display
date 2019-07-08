@@ -6,8 +6,8 @@
 .sector-view-component path.track {
     fill: none;
     stroke: #3392e3;
-    stroke-dasharray: 5;
-    stroke-width: 2px;
+    stroke-dasharray: 1;
+    stroke-width: 1px;
 }
 
 .sector-view-component path.track.not-selected {

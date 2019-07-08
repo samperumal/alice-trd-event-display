@@ -7,11 +7,11 @@
     stroke: #ffdddd;
 }
 
-.supermodule-view-component .track path {
+.supermodule-view-component path.track {
     fill: none;
     stroke: #3392e3;
-    stroke-dasharray: 5;
-    stroke-width: 2px;
+    stroke-dasharray: 1;
+    stroke-width: 1px;
 }
 
 .supermodule-view-component .track.not-selected path {
