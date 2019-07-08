@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="d3.min.js"></script>
+    <style>
+        svg {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <svg>
+
+    </svg>
+    <script>
+        const svg = d3.select("svg").attr("width", 500).attr("height", 500);
+        const g = svg.append("g").attr("transform", "translate(250, 250)");
+        const d = d3.range(-150, 200, 150);
+        const cols = d3.scaleOrdinal(d3.schemeCategory10).domain(d);
+        g.selectAll("rect").data(d).enter().append("rect").attr("x", d => d).attr("width", 150).attr("y", -200).attr("height", 400)
+            .style("fill", d => cols(d)).style("opacity", 0.5).attr("transform", d => `rotate(2 ${d + 75} 0)`);
+    </script>
+</body>
+</html>
