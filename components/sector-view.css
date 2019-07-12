@@ -10,9 +10,23 @@
     stroke-width: 1px;
 }
 
-.sector-view-component path.track.not-selected {
-    stroke: #a9d7ff;
-    stroke-width: 0.3;
+.sector-view-component path.track.fade {
+    stroke: #cfe9ff;
+}
+
+.sector-view-component path.track.selected {
+    stroke: #3392e3;
+    stroke-width: 2px;
+    stroke-dasharray: 2 1;
+}
+
+.sector-view-component path.tracklet {
+    stroke: red;
+    stroke-width: 1px;
+}
+
+.sector-view-component path.tracklet.fade {
+    stroke: #ffdddd;
 }
 
 .sector-view-component .zoom {

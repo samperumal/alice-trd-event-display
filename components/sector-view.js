@@ -51,14 +51,24 @@ class SectorViewComponent extends ComponentBase {
             .attr("class", "rotating");
 
         this.tracks = this.rotatingContainer.append("g")
-            .attr("class", "tracks")
+            .attr("class", "tracks");
+
+        this.allTracks = this.tracks
             .append("path")
             .attr("class", "track");
 
-        this.trackletPlanes = this.rotatingContainer.append("g")
-            .attr("class", "trackletPlanes");
+        this.selectedTrack = this.tracks
+            .append("path")
+            .attr("class", "selected track");
 
-        this.trackletPath = this.trackletPlanes.append("path").attr("class", "tracklet");
+        this.tracklets = this.rotatingContainer.append("g")
+            .attr("class", "tracklets");
+
+        this.allTracklets = this.tracklets
+            .append("path").attr("class", "tracklet");
+
+        this.selectedTracklet = this.tracklets
+            .append("path").attr("class", "selected track");
 
         this.sectors = this.rotatingContainer
             .append("g")
@@ -141,42 +151,8 @@ class SectorViewComponent extends ComponentBase {
         if (this.selectedEventId != eventData.event.id) {
             this.selectedEventId = eventData.event.id;
 
-            const allTracks = eventData.event.trdTracks.filter(d => d.track != null && d.track.path != null && d.type == "Trd Track");
-            this.tracks.attr("d", allTracks.map(d => line(d.track.path)).join(" "));
-
-            //const allTracklets = eventData.event.trdTracklets.map()
-            //return;
-            // let tracks = this.tracks
-            //     .selectAll("path.track")
-            //     .data(0, d => d.id);
-
-            // tracks.exit().remove();
-
-            // tracks.enter()
-            //     // .append("g")
-            //     // .attr("class", "track")
-            //     .append("path")
-            //     .attr("class", "track")
-            // // .attr("d", d => line(d.track.path));
-
-            let trackletPlanes = this.trackletPlanes
-                .selectAll("g.tracklet-plane")
-                .data(eventData.event.trdTracklets, d => d.id);
-
-            trackletPlanes.exit().remove();
-
-            trackletPlanes.enter()
-                .append("g")
-                .attr("class", "tracklet-plane")
-                .attr("data-trackletid", d => d.id)
-                .attr("transform", d => "rotate(" + (sectorToRotationAngle(d.sector)) + ")")
-                .append("line")
-                .attr("class", "tracklet-plane")
-                .attr("y1", d => yscale(-d.localY))
-                .attr("y2", d => yscale(-d.localY + (d.dyDx * Math.abs(d.layerDim.maxR - d.layerDim.minR))))
-                .attr("x1", d => xscale(d.layerDim.maxR))
-                .attr("x2", d => xscale(d.layerDim.minR))
-                ;
+            const allTrackData = eventData.event.trdTracks.filter(d => d.track != null && d.track.path != null && (true || d.type == "Trd Track"));
+            this.allTracks.attr("d", allTrackData.map(d => line(d.track.path)).join(" "));
 
             const trackletPathDef = eventData.event.trdTracklets
                 .map(d => {
@@ -185,39 +161,41 @@ class SectorViewComponent extends ComponentBase {
                     const y2 = yscale(-d.localY + (d.dyDx * Math.abs(d.layerDim.maxR - d.layerDim.minR)));
                     const x1 = xscale(d.layerDim.maxR);
                     const x2 = xscale(d.layerDim.minR);
-                    return `M ${rotate(x1, y1, rot).join(",")} L ${rotate(x2,y2, rot).join(",")}`;
+                    return `M ${rotate(x1, y1, rot).join(",")} L ${rotate(x2, y2, rot).join(",")}`;
                 })
                 .join(" ");
 
-            this.trackletPath.attr("d", trackletPathDef);
+            this.allTracklets.attr("d", trackletPathDef);
         }
 
-        return;
-
-        this.tracks.selectAll("path.track")
-            .classed("not-selected", d => eventData.trdTrack != null && d.id != selectedTrack);
+        // this.tracks.selectAll("path.track")
+        //     .classed("not-selected", d => eventData.trdTrack != null && d.id != selectedTrack);
 
         if (eventData.trdTrack != null && eventData.trdTrack.trdTracklets != null) {
-            const trackletIds = eventData.trdTrack.trdTracklets.map(d => d.id);
+            this.allTracks.classed("fade", true);
+            this.allTracklets.classed("fade", true);
+            // const trackletIds = eventData.trdTrack.trdTracklets.map(d => d.id);
 
-            this.trackletPlanes.selectAll(".tracklet-plane")
-                .classed("not-selected", d => !trackletIds.includes(d.id))
-                .classed("selected", d => trackletIds.includes(d.id));
+            // this.trackletPlanes.selectAll(".tracklet-plane")
+            //     .classed("not-selected", d => !trackletIds.includes(d.id))
+            //     .classed("selected", d => trackletIds.includes(d.id));
+
+            this.selectedTrack.attr("d", line(eventData.trdTrack.track.path));
 
             const sector = eventData.trdTrack.sector;
 
-            if (this.config.rotate) {
-                this.rotatingContainer
-                    .transition().duration(transitionDuration)
-                    .attr("transform", "rotate(" + ((sector - 4) * 20) + ")");
+            if (this.config.rotate && sector != null) {
+                // this.rotatingContainer
+                //     .transition().duration(transitionDuration)
+                //     .attr("transform", "rotate(" + ((sector - 4) * 20) + ")");
 
-                this.sectorNumbers
-                    .transition().duration(transitionDuration)
-                    .attr("transform", d => "rotate(" + (-sectorToRotationAngle(d) - ((sector - 4) * 20)) + ")");
+                // this.sectorNumbers
+                //     .transition().duration(transitionDuration)
+                //     .attr("transform", d => "rotate(" + (-sectorToRotationAngle(d) - ((sector - 4) * 20)) + ")");
 
-                this.layerNumbers
-                    .transition().duration(transitionDuration)
-                    .attr("transform", this.layerNumberPosition.bind(this, sector));
+                // this.layerNumbers
+                //     .transition().duration(transitionDuration)
+                //     .attr("transform", this.layerNumberPosition.bind(this, sector));
             }
             else {
                 this.zoomBox
@@ -228,18 +206,23 @@ class SectorViewComponent extends ComponentBase {
             this.detectors.classed("not-selected", d => d.sector != sector);
         }
         else {
+            this.allTracks.classed("fade", false);
+            this.allTracklets.classed("fade", false);
+
+            this.selectedTrack.attr("d", null);
+
             if (this.config.rotate) {
-                this.rotatingContainer
-                    .transition().duration(transitionDuration)
-                    .attr("transform", "rotate(0)");
+                // this.rotatingContainer
+                //     .transition().duration(transitionDuration)
+                //     .attr("transform", "rotate(0)");
 
-                this.sectorNumbers
-                    .transition().duration(transitionDuration)
-                    .attr("transform", d => "rotate(" + (-sectorToRotationAngle(d)) + ")");
+                // this.sectorNumbers
+                //     .transition().duration(transitionDuration)
+                //     .attr("transform", d => "rotate(" + (-sectorToRotationAngle(d)) + ")");
 
-                this.layerNumbers
-                    .transition().duration(transitionDuration)
-                    .attr("transform", this.layerNumberPosition.bind(this, 4));
+                // this.layerNumbers
+                //     .transition().duration(transitionDuration)
+                //     .attr("transform", this.layerNumberPosition.bind(this, 4));
             }
             else {
                 this.zoomBox
@@ -247,11 +230,11 @@ class SectorViewComponent extends ComponentBase {
                     .attr("transform", "rotate(" + (-4 * 20) + ")");
             }
 
-            this.trackletPlanes.selectAll(".tracklet-plane")
-                .classed("selected", false)
-                .classed("not-selected", false);
+            // this.trackletPlanes.selectAll(".tracklet-plane")
+            //     .classed("selected", false)
+            //     .classed("not-selected", false);
 
-            this.detectors.classed("not-selected", false);
+            // this.detectors.classed("not-selected", false);
         }
     }
 

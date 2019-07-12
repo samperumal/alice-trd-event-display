@@ -11,6 +11,7 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="jstree.min.js"></script>
 
+    <script src="common-functions.js"></script>
     <script src="components/trd-dimensions.js"></script>
     <script src="components/component-base.js"></script>
     <script src="components/sector-view.js"></script>
@@ -101,7 +102,7 @@
             font-size: 5px;
         }
 
-        #sector-view-zoom g.tracklet-plane {
+        #sector-view-zoom path.tracklet {
             stroke-width: 0.3;
         }
 
@@ -246,12 +247,12 @@
 
         data.forEach(ev => {
             ev.trdTracks = ev.trdTracks
-                .filter(t => t.track != null && t.track.path != null && t.track.path.length > 0)
+                .filter(t => t.track != null && t.track.path != null && t.track.path.length > 0);
 
                 // Performance filtering
-                .slice(0, 25);
+                //.slice(0, 25);
             const usedTracklets = ev.trdTracks.map(t => t.trdTracklets.map(tl => tl.id)).reduce(ajoin);
-            ev.trdTracklets = ev.trdTracklets.filter(tl => usedTracklets.includes(tl.id) || Math.random() < 0.1);
+            ev.trdTracklets = ev.trdTracklets;//.filter(tl => usedTracklets.includes(tl.id) || Math.random() < 0.1);
 
             ev.trdTracklets
                 .forEach(trklt => {

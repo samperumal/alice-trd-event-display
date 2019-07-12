@@ -20,11 +20,18 @@ class SupermoduleViewComponent extends ComponentBase {
         this.container
             .attr("class", "supermodule-view-component");
 
-        this.zoomBox = this.container.append("rect");
+        this.zoomBox = this.container.append("rect");        
+
+        this.tracks = this.container.append("g")
+            .attr("class", "tracks")
+            .append("path")
+            .attr("class", "track");
 
         this.tracklets = this.container.append("g")
-            .attr("class", "tracklets");
-
+            .attr("class", "tracklets")
+            .append("path")
+            .attr("class", "tracklet");
+            
         this.detectors = this.container
             .append("g")
             .attr("class", "detectors")
@@ -72,11 +79,6 @@ class SupermoduleViewComponent extends ComponentBase {
             .attr("x", d => xscale((d.minZ + d.maxZ) / 2))
             .attr("y", d => yscale(d.maxR + 10));
 
-        this.tracks = this.container.append("g")
-            .attr("class", "tracks")
-            .append("path")
-            .attr("class", "track");
-
         this.setViewBox(null, 750);
     }
 
@@ -89,7 +91,6 @@ class SupermoduleViewComponent extends ComponentBase {
 
         if (this.selectedEventId != eventData.event.id) {
             this.selectedEventId = eventData.event.id;
-            
             
             const allTracks = eventData.event.trdTracks.filter(d => d.track != null && d.track.path != null);
             this.tracks.attr("d", allTracks.map(d => line(d.track.path)).join(" "));

@@ -1,2 +1,4 @@
 ~*.xlsx
 data/old/
+openday/
+.vscode/
