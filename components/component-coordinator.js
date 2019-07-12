@@ -13,7 +13,7 @@ class ComponentCoordinator {
                 dataMap[track.id] = track;
             }
 
-            for (const tracklet of ev.tracklets) {
+            for (const tracklet of ev.trklts) {
                 dataMap[tracklet.id] = tracklet;
             }
         }
@@ -32,13 +32,13 @@ class ComponentCoordinator {
         if (ids[0] !== null)
             event = this.dataMap[ids[0]];
 
-        let trdTrack = null;
+        let track = null;
         if (ids[1] !== null)
-            trdTrack = this.dataMap[ids[0] + "_" + ids[1]];
+            track = this.dataMap[ids[0] + "_" + ids[1]];
 
         const drawData = {
-            event: event,
-            trdTrack: trdTrack,
+            event,
+            track,
             type: ev.type == "select_node" ? "select" : (ev.type == "hover_node" ? "hover" : "hover")
         };
 

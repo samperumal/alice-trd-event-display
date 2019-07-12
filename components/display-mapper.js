@@ -4,7 +4,7 @@ function* mapToDisplayDataFormat(data) {
     for (const ev of data) {
         const trackletMap = new Map();
 
-        const tracklets = ev.trdTracklets
+        const trklts = ev.trdTracklets
             .map(t => {
                 const layerDim = stackedLayerData.get(t.stack).get(t.layer);
 
@@ -19,7 +19,7 @@ function* mapToDisplayDataFormat(data) {
 
                 const tracklet = {
                     id: t.id,
-                    x1, y1, x2, y2,
+                    path: [{x: x1, y: -y1}, {x: x2, y: -y2}],
                     sec: t.sector,
                     stk: t.stack,
                     lyr: t.layer
@@ -38,14 +38,14 @@ function* mapToDisplayDataFormat(data) {
                 stk: t.stack,
                 path: t.track.path,
                 type: t.type,
-                tklts: t.trdTracklets.map(tl => trackletMap.get(tl.id))
+                trklts: t.trdTracklets.map(tl => trackletMap.get(tl.id))
             }));
 
         yield {
             id: ev.id,
             evno: ev.evno,
             tracks,
-            tracklets
+            trklts
         };
     }
 }

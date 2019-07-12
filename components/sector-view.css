@@ -29,6 +29,11 @@
     stroke: #ffdddd;
 }
 
+.sector-view-component path.tracklet.selected {
+    stroke: red;
+    stroke-width: 2px;
+}
+
 .sector-view-component .zoom {
     fill: transparent;
 }
