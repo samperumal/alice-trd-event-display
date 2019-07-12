@@ -15,7 +15,7 @@ class SupermoduleViewComponent extends ComponentBase {
         xscale.domain([-350, 350]);
         yscale.domain([400, 0]);
 
-        this.line = d3.line().x(d => xscale(-d.z)).y(d => yscale(Math.sqrt(d.y * d.y + d.x * d.x)));
+        this.line = d3.line().x(d => xscale(-d.z)).y(d => yscale(d.r));
 
         this.container
             .attr("class", "supermodule-view-component");
@@ -23,9 +23,15 @@ class SupermoduleViewComponent extends ComponentBase {
         this.zoomBox = this.container.append("rect");        
 
         this.tracks = this.container.append("g")
-            .attr("class", "tracks")
+            .attr("class", "tracks");
+
+        this.allTracks = this.tracks
             .append("path")
             .attr("class", "track");
+
+        this.selectedTrack = this.tracks
+            .append("path")
+            .attr("class", "selected track");        
 
         this.tracklets = this.container.append("g")
             .attr("class", "tracklets")
@@ -92,65 +98,49 @@ class SupermoduleViewComponent extends ComponentBase {
         if (this.selectedEventId != eventData.event.id) {
             this.selectedEventId = eventData.event.id;
             
-            const allTracks = eventData.event.trdTracks.filter(d => d.track != null && d.track.path != null);
-            this.tracks.attr("d", allTracks.map(d => line(d.track.path)).join(" "));
-            return;
+            this.allTracks.attr("d", eventData.event.tracks.map(d => line(d.path)).join(" "));
 
-            let tracks = this.tracks
-                .selectAll("path.track")
-                .data(eventData.event.trdTracks.filter(d => d.track != null && d.track.path != null), d => d.id);
+            // let trackletPlanes = this.tracklets
+            //     .selectAll("rect.tracklet")
+            //     .data(eventData.event.trdTracklets, d => d.id);
 
-            tracks.exit().remove();
+            // trackletPlanes.exit().remove();
 
-            tracks.enter()
-                // .append("g")
-                // .attr("class", "track")
-                // .attr("data-trackid", d => d.id)
-                .append("path")
-                .attr("class", "track")
-                //.attr("d", d => line(d.track.path));
-
-            let trackletPlanes = this.tracklets
-                .selectAll("rect.tracklet")
-                .data(eventData.event.trdTracklets, d => d.id);
-
-            trackletPlanes.exit().remove();
-
-            trackletPlanes.enter()
-                .append("rect")
-                .attr("class", "tracklet")
-                .attr("data-trackletid", d => d.id)
-                .attr("x", d => xscale(d.layerDim.minZ + d.binZ * d.layerDim.zsize))
-                .attr("y", d => yscale(d.layerDim.maxR))
-                .attr("width", d => xscale(d.layerDim.zsize))
-                //.attr("height", d => Math.abs(yscale(d.layerDim.maxR) - yscale(d.layerDim.minR)));
+            // trackletPlanes.enter()
+            //     .append("rect")
+            //     .attr("class", "tracklet")
+            //     .attr("data-trackletid", d => d.id)
+            //     .attr("x", d => xscale(d.layerDim.minZ + d.binZ * d.layerDim.zsize))
+            //     .attr("y", d => yscale(d.layerDim.maxR))
+            //     .attr("width", d => xscale(d.layerDim.zsize))
+            //     //.attr("height", d => Math.abs(yscale(d.layerDim.maxR) - yscale(d.layerDim.minR)));
         }
-        return;
-
-        this.tracks.selectAll("path.track")
-            .classed("not-selected", d => eventData.trdTrack != null && d.id != selectedTrack)
-            .filter(d => d.id == selectedTrack)
-            .raise();
 
         this.detectors
-            .classed("not-selected", d => eventData.trdTrack != null && d.stack != eventData.trdTrack.stack);
+            .classed("not-selected", d => eventData.track != null && d.stack != eventData.track.stk);
 
-        if (eventData.trdTrack != null && eventData.trdTrack.trdTracklets != null) {
-            const trackletIds = eventData.trdTrack.trdTracklets.map(d => d.id);
-            this.tracklets.selectAll("rect.tracklet")
-                .classed("not-selected", d => !trackletIds.includes(d.id))
-                .classed("selected", d => trackletIds.includes(d.id));
+        if (eventData.track != null) {
+            this.allTracks.classed("fade", true);
+            this.selectedTrack.attr("d", line(eventData.track.path));
+            
+            // const trackletIds = eventData.trdTrack.trdTracklets.map(d => d.id);
+            // this.tracklets.selectAll("rect.tracklet")
+            //     .classed("not-selected", d => !trackletIds.includes(d.id))
+            //     .classed("selected", d => trackletIds.includes(d.id));
 
-            this.tracklets.selectAll("rect.tracklet.selected").raise();
+            // this.tracklets.selectAll("rect.tracklet.selected").raise();
 
-            this.setViewBox(eventData.trdTrack.stack);
+            this.setViewBox(eventData.track.stk);
         }
         else {
+            this.allTracks.classed("fade", false);
+            this.selectedTrack.attr("d", null);
+            
             this.setViewBox();
 
-            this.tracklets.selectAll("rect.tracklet")
-                .classed("not-selected", d => false)
-                .classed("selected", d => false);
+            // this.tracklets.selectAll("rect.tracklet")
+            //     .classed("not-selected", d => false)
+            //     .classed("selected", d => false);
         }
     }
 

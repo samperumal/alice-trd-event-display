@@ -36,7 +36,14 @@ function* mapToDisplayDataFormat(data) {
                 id: t.id,
                 sec: t.sector,
                 stk: t.stack,
-                path: t.track.path,
+                path: t.track.path.map(d => {
+                    return {
+                        x: d.x,
+                        y: d.y,
+                        z: d.z,
+                        r: Math.sqrt(d.y * d.y + d.x * d.x)
+                    };
+                }),
                 type: t.type,
                 trklts: t.trdTracklets.map(tl => trackletMap.get(tl.id))
             }));
