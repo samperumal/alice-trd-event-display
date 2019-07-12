@@ -43,6 +43,7 @@ function* mapToDisplayDataFormat(data) {
 
         yield {
             id: ev.id,
+            evno: ev.evno,
             tracks,
             tracklets
         };

@@ -9,12 +9,12 @@ class ComponentCoordinator {
         const dataMap = {};
         for (const ev of data) {
             dataMap[ev.id] = ev;
-            for (const trdTrack of ev.trdTracks) {
-                dataMap[trdTrack.id] = trdTrack;
+            for (const track of ev.tracks) {
+                dataMap[track.id] = track;
             }
 
-            for (const trdTracklet of ev.trdTracklets) {
-                dataMap[trdTracklet.id] = trdTracklet;
+            for (const tracklet of ev.tracklets) {
+                dataMap[tracklet.id] = tracklet;
             }
         }
 
