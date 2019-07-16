@@ -34,3 +34,7 @@
 
     return [nx, ny];
  }
+
+ function closedRect(p0, p1, x, y) {
+   return `M ${x(p0)} ${y(p0)} L ${x(p1)} ${y(p0)} L ${x(p1)} ${y(p1)} L ${x(p0)} ${y(p1)} Z`;
+ }

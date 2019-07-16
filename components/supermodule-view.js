@@ -4,7 +4,9 @@ class SupermoduleViewComponent extends ComponentBase {
 
         const layerData = this.layerData = getDimensions();
 
-        const stackData = this.stackData = getDimensions().filter(d => d.layer == 5);
+        // const stackData = this.stackData = getDimensions().filter(d => d.layer == 5);
+
+        const padRowData = this.padRowData = getPadrowDimensions();
 
         this.config = config != null ? config : {};
         this.r = (this.config.r != null) ? this.config.r : 2;
@@ -22,8 +24,9 @@ class SupermoduleViewComponent extends ComponentBase {
 
         this.zoomBox = this.container.append("rect");        
 
-        this.tracks = this.container.append("g")
-            .attr("class", "tracks");
+        this.tracks = this.container;
+            // .append("g")
+            // .attr("class", "tracks");
 
         this.allTracks = this.tracks
             .append("path")
@@ -33,57 +36,59 @@ class SupermoduleViewComponent extends ComponentBase {
             .append("path")
             .attr("class", "selected track");        
 
-        this.tracklets = this.container.append("g")
-            .attr("class", "tracklets")
+        this.tracklets = this.container
+            // .append("g")
+            // .attr("class", "tracklets")
             .append("path")
             .attr("class", "tracklet");
-            
+
+        const detectorPath = padRowData
+            .filter(d => d.use)
+            .map(d => closedRect(d.p0, d.p1, p => xscale(p.z), p => yscale(p.y)))
+            .join(" ");
+
         this.detectors = this.container
-            .append("g")
-            .attr("class", "detectors")
-            .selectAll("g.detector")
-            .data(layerData)
-            .enter()
-            .append("g")
-            .attr("class", "detector");
-
-        this.detectors
-            .selectAll("rect.bin")
-            .data(d => d3.range(0, d.zegments).map(z => ({
-                detector: d,
-                bin: z,
-                x: xscale(d.minZ),
-                width: xscale((z + 1) * d.zsize),
-                y: yscale(d.maxR),
-                height: Math.abs(yscale(d.maxR) - yscale(d.minR))
-            })))
-            .enter()
-            .append("rect")
-            .attr("class", "bin")
-            .attr("x", d => d.x)
-            .attr("y", d => d.y)
-            .attr("width", d => d.width)
-            .attr("height", d => d.height);
-
-        this.detectors
-            .append("rect")
+            .append("path")
             .attr("class", "detector")
-            .attr("x", d => xscale(d.minZ))
-            .attr("width", d => xscale(d.maxZ) - xscale(d.minZ))
-            .attr("y", d => yscale(d.maxR))
-            .attr("height", d => yscale(d.minR) - yscale(d.maxR));
+            .attr("d", detectorPath);
+        //     .append("g")
+        //     .attr("class", "detectors")
+        //     .selectAll("g.detector")
+        //     .data(layerData)
+        //     .enter()
+        //     .append("g")
+        //     .attr("class", "detector");
 
-        this.stackTexts = this.container
-            .append("g")
-            .attr("class", "stack-texts")
-            .selectAll("text.stack-text")
-            .data(stackData)
-            .enter()
-            .append("text")
-            .attr("class", "stack-text")
-            .text(d => d.stack)
-            .attr("x", d => xscale((d.minZ + d.maxZ) / 2))
-            .attr("y", d => yscale(d.maxR + 10));
+        // this.detectors
+        //     .selectAll("rect.bin")
+        //     .data(d => )
+        //     .enter()
+        //     .append("rect")
+        //     .attr("class", "bin")
+        //     .attr("x", d => d.x)
+        //     .attr("y", d => d.y)
+        //     .attr("width", d => d.width)
+        //     .attr("height", d => d.height);
+
+        // this.detectors
+        //     .append("rect")
+        //     .attr("class", "detector")
+        //     .attr("x", d => xscale(d.minZ))
+        //     .attr("width", d => xscale(d.maxZ) - xscale(d.minZ))
+        //     .attr("y", d => yscale(d.maxR))
+        //     .attr("height", d => yscale(d.minR) - yscale(d.maxR));
+
+        // this.stackTexts = this.container
+        //     .append("g")
+        //     .attr("class", "stack-texts")
+        //     .selectAll("text.stack-text")
+        //     .data(stackData)
+        //     .enter()
+        //     .append("text")
+        //     .attr("class", "stack-text")
+        //     .text(d => d.stack)
+        //     .attr("x", d => xscale((d.minZ + d.maxZ) / 2))
+        //     .attr("y", d => yscale(d.maxR + 10));
 
         this.setViewBox(null, 750);
     }
@@ -116,8 +121,8 @@ class SupermoduleViewComponent extends ComponentBase {
             //     //.attr("height", d => Math.abs(yscale(d.layerDim.maxR) - yscale(d.layerDim.minR)));
         }
 
-        this.detectors
-            .classed("not-selected", d => eventData.track != null && d.stack != eventData.track.stk);
+        // this.detectors
+        //     .classed("not-selected", d => eventData.track != null && d.stack != eventData.track.stk);
 
         if (eventData.track != null) {
             this.allTracks.classed("fade", true);
