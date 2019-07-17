@@ -34,11 +34,11 @@
     fill: none; 
 }
 
-.supermodule-view-component rect.tracklet {
+.supermodule-view-component path.tracklet {
     fill: #f99997;
 }
 
-.supermodule-view-component rect.tracklet.selected {
+.supermodule-view-component path.tracklet.selected {
     fill: rgb(209, 39, 39); 
 }
 

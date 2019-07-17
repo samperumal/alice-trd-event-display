@@ -22,7 +22,8 @@ function* mapToDisplayDataFormat(data) {
                     path: [{x: x1, y: -y1}, {x: x2, y: -y2}],
                     sec: t.sector,
                     stk: t.stack,
-                    lyr: t.layer
+                    lyr: t.layer,
+                    row: t.binZ
                 };
 
                 trackletMap.set(t.id, tracklet);

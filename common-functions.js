@@ -15,6 +15,7 @@
  function DetectorToSector(detector) { return Math.floor(detector / nLAYERS / nSTACKS); } // convert linear stack index 0-89 to TRD sector 0-17
  function StackSectorToLinearStackIndex(stack, sector) { return sector * nSTACKS + stack; } // convert sector 0-17 and stack 0-5 to linear stack index 0-89
 
+ // Rotate x,y by angle about cx,cy
  function rotate(cx, cy, x, y, angle) {
     const radians = (Math.PI / 180) * angle;
     const cos = Math.cos(radians);
@@ -25,6 +26,7 @@
     return [nx, ny];
  }
 
+ // Rotate x,y by angle about the origin (0,0)
  function rotate(x, y, angle) {
     const radians = (Math.PI / 180) * angle;
     const cos = Math.cos(radians);
@@ -35,6 +37,12 @@
     return [nx, ny];
  }
 
+ // Create SVG path for a closed Rect, given opposite corners
  function closedRect(p0, p1, x, y) {
    return `M ${x(p0)} ${y(p0)} L ${x(p1)} ${y(p0)} L ${x(p1)} ${y(p1)} L ${x(p0)} ${y(p1)} Z`;
+ }
+
+ // Convert stack,layer,row to a unique rowid
+ function rid(stk, lyr, row) {
+   return (stk * 6 + lyr) * 16 + row;
  }
