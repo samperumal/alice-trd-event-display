@@ -1,5 +1,10 @@
 .supermodule-view-component path.detector {
     fill: none;
+    stroke: lightgray;
+}
+
+.supermodule-view-component path.module {
+    fill: none;
     stroke: darkgray;
 }
 
