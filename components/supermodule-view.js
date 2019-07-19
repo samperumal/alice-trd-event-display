@@ -3,8 +3,9 @@ class SupermoduleViewComponent extends ComponentBase {
         super(id, width, height, marginDef(5, 5, 5, 5), viewBox);
 
         const layerData = this.layerData = getDimensions();
-        const padRowDimensionData = this.padRowData = getPadrowDimensions();
-        const moduleDimensionData = getModuleDimensions();
+        const padRowDimensionData = this.padRowDimensionData = getPadrowDimensions();
+        const moduleDimensionData = this.moduleDimensionData = getModuleDimensions();
+        const stackDimensionData = this.stackDimensionData = getStackDimensions();
 
         this.config = config != null ? config : {};
         this.r = (this.config.r != null) ? this.config.r : 2;
@@ -80,7 +81,7 @@ class SupermoduleViewComponent extends ComponentBase {
             this.allTracks.classed("fade", true);
             this.selectedTrack.attr("d", line(eventData.track.path));
 
-            const padRowDimensionData = this.padRowData;
+            const padRowDimensionData = this.padRowDimensionData;
 
             this.selectedTracklets.attr("d", eventData.track.trklts
                 .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
@@ -88,7 +89,7 @@ class SupermoduleViewComponent extends ComponentBase {
                 .join(" ")
             );
 
-            this.setViewBox(eventData.track.stk);
+            this.setViewBox(this.stackDimensionData[eventData.track.stk]);
         }
         else {
             this.allTracks.classed("fade", false);
@@ -99,33 +100,27 @@ class SupermoduleViewComponent extends ComponentBase {
         }
     }
 
-    setViewBox(stack, transitionDuration) {
+    setViewBox(dim, transitionDuration) {
         let zoomBoxClass = "zoom-box ";
-        if (stack == null) {
-            stack = 2;
+        if (dim == null) {
             zoomBoxClass += "hidden";
+            this.zoomBox
+                .attr("class", zoomBoxClass);
         }
+        else {
 
-        if (transitionDuration == null)
-            transitionDuration = 750;
+            if (transitionDuration == null)
+                transitionDuration = 750;
 
-        const xscale = this.xscale, yscale = this.yscale;
+            const xscale = this.xscale, yscale = this.yscale;
 
-        const thisStack = this.layerData.filter(d => d.stack == stack);
-        const minZ = d3.min(thisStack, d => d.minZ), maxZ = d3.max(thisStack, d => d.maxZ);
-        const minR = d3.min(thisStack, d => d.minR) * 0.9;
-
-        if (this.config.zoom) {
-            this.svg
+            this.zoomBox
                 .transition().duration(transitionDuration)
-                .attr("viewBox", (xscale(minZ)) + " " + (yscale.range()[0]) + " " + (dist(minZ, maxZ, xscale)) + " " + (dist(yscale.domain()[0], minR, yscale)));
+                .attr("class", zoomBoxClass)
+                .attr("x", xscale(dim.bbZ[0]))
+                .attr("y", yscale(dim.bbR[0]))
+                .attr("width", dist(dim.bbZ[0], dim.bbZ[1], xscale))
+                .attr("height", dist(dim.bbR[0], dim.bbR[1], yscale));
         }
-        else this.zoomBox
-            .transition().duration(transitionDuration)
-            .attr("class", zoomBoxClass)
-            .attr("x", xscale(minZ))
-            .attr("y", yscale.range()[0])
-            .attr("width", (dist(minZ, maxZ, xscale)))
-            .attr("height", dist(yscale.domain()[0], minR, yscale));
     }
 }

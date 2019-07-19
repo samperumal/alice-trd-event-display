@@ -55,8 +55,6 @@ class SupermoduleZoomViewComponent extends ComponentBase {
         //     .text(d => d.stack)
         //     .attr("x", d => xscale((d.minZ + d.maxZ) / 2))
         //     .attr("y", d => yscale(d.maxR + 10));
-
-        //this.setViewBox(null, 750);
     }
 
     detectorPath(d) {
@@ -97,8 +95,6 @@ class SupermoduleZoomViewComponent extends ComponentBase {
                 .map(this.detectorPath.bind(this))
                 .join(" ")
             );
-
-            //this.setViewBox(eventData.track.stk);
         }
         else {
             //this.allTracks.classed("fade", false);
@@ -106,38 +102,6 @@ class SupermoduleZoomViewComponent extends ComponentBase {
             this.selectedTracklets.attr("d", null);
             this.detectors.attr("d", null);
             this.modules.attr("d", null);
-
-            //this.setViewBox();
         }
-    }
-
-    setViewBox(stack, transitionDuration) {
-        let zoomBoxClass = "zoom-box ";
-        if (stack == null) {
-            stack = 2;
-            zoomBoxClass += "hidden";
-        }
-
-        if (transitionDuration == null)
-            transitionDuration = 750;
-
-        const xscale = this.xscale, yscale = this.yscale;
-
-        const thisStack = this.layerData.filter(d => d.stack == stack);
-        const minZ = d3.min(thisStack, d => d.minZ), maxZ = d3.max(thisStack, d => d.maxZ);
-        const minR = d3.min(thisStack, d => d.minR) * 0.9;
-
-        if (this.config.zoom) {
-            this.svg
-                .transition().duration(transitionDuration)
-                .attr("viewBox", (xscale(minZ)) + " " + (yscale.range()[0]) + " " + (dist(minZ, maxZ, xscale)) + " " + (dist(yscale.domain()[0], minR, yscale)));
-        }
-        else this.zoomBox
-            .transition().duration(transitionDuration)
-            .attr("class", zoomBoxClass)
-            .attr("x", xscale(minZ))
-            .attr("y", yscale.range()[0])
-            .attr("width", (dist(minZ, maxZ, xscale)))
-            .attr("height", dist(yscale.domain()[0], minR, yscale));
     }
 }
