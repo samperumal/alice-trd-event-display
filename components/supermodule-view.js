@@ -70,7 +70,7 @@ class SupermoduleViewComponent extends ComponentBase {
     }
 
     detectorPath(d) {
-        return closedRect(d.p0, d.p1, p => this.xscale(p.z), p => this.yscale(p.y));
+        return closedRect(d.p0, d.p1, p => this.xscale(p.z), p => this.yscale(p.r));
     }
 
     draw(eventData) {
@@ -110,7 +110,7 @@ class SupermoduleViewComponent extends ComponentBase {
         else {
 
             if (transitionDuration == null)
-                transitionDuration = 750;
+                transitionDuration = 500;
 
             const xscale = this.xscale, yscale = this.yscale;
 

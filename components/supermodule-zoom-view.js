@@ -28,13 +28,13 @@ class SupermoduleZoomViewComponent extends ComponentBase {
             .append("path")
             .attr("class", "track");
 
-        this.selectedTrack = this.container
-            .append("path")
-            .attr("class", "selected track");
-
         this.selectedTracklets = this.container
             .append("path")
             .attr("class", "tracklet selected");
+
+        this.selectedTrack = this.container
+            .append("path")
+            .attr("class", "selected track");
 
         this.detectors = this.container
             .append("path")
@@ -58,7 +58,7 @@ class SupermoduleZoomViewComponent extends ComponentBase {
     }
 
     detectorPath(d) {
-        return closedRect(d.p0, d.p1, p => this.xscale(p.z), p => this.yscale(p.y));
+        return closedRect(d.p0, d.p1, p => this.xscale(p.z), p => this.yscale(p.r));
     }
 
     draw(eventData) {
