@@ -37,6 +37,9 @@ function* mapToDisplayDataFormat(data) {
                 id: t.id,
                 sec: t.sector,
                 stk: t.stack,
+                pt: t.pT,
+                alpha: t.alpha,
+                lambda: t.lambda,
                 path: t.track.path.map(d => {
                     return {
                         x: d.x,

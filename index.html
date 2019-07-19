@@ -7,8 +7,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="d3.min.js"></script>
 
-    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="jquery.min.js"></script>
+    <script src="jquery-ui.js"></script>
     <script src="jstree.min.js"></script>
 
     <script src="common-functions.js"></script>
@@ -36,7 +36,7 @@
     <link href='./components/digits-view.css' rel='stylesheet' />
     <link href='./components/timebin-view.css' rel='stylesheet' />
 
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="jquery-ui.css">
 
     <style>
         *,
@@ -257,9 +257,9 @@
         coordinator.addComponent(new SectorZoomViewComponent("#sector-zoom-view", 300, 300));
         coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
         coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 300, 300));
-        // // coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
-        // //     dataLoadUrl: "data/"
-        // // }));
+        coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
+            dataLoadUrl: "data/"
+        }));
 
         coordinator.addComponent(new TrackInformationComponent("#track-information"));
 

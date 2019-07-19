@@ -8,8 +8,8 @@ class TrackInformationComponent {
             "ID: ": "id",
             "pT: ": "pt",
             "PID: ": "pid",
-            "Stack:": "stack",
-            "Sector:": "sector",
+            "Stack:": "stk",
+            "Sector:": "sec",
             "Alpha:": "alpha",
             "Lambda:" : "lambda"
         });
@@ -24,9 +24,9 @@ class TrackInformationComponent {
     }
 
     draw(eventData) {
-        if (eventData.trdTrack != null && eventData.trdTrack.trdTracklets != null) {
+        if (eventData.track != null) {
             for (const el in this.elements) {
-                this.elements[el].text(eventData.trdTrack[el]);
+                this.elements[el].text(eventData.track[el]);
             }
         }
         else {
