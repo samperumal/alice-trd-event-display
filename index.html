@@ -17,6 +17,7 @@
     <script src="components/component-base.js"></script>
     <script src="components/sector-view.js"></script>
     <script src="components/supermodule-view.js"></script>
+    <script src="components/supermodule-zoom-view.js"></script>
     <script src="components/digits-view.js"></script>
     <script src="components/event-tree.js"></script>
     <script src="components/component-coordinator.js"></script>
@@ -252,12 +253,12 @@
         const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
 
         coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
-        coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-22 -129 44 44", { r: 0.75, rotate: true }));
+        // coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-22 -129 44 44", { r: 0.75, rotate: true }));
         coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
-        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view-zoom", 300, 300, null, { zoom: true }));
-        coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
-            dataLoadUrl: "data/"
-        }));
+        coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 300, 300));
+        // // coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
+        // //     dataLoadUrl: "data/"
+        // // }));
 
         coordinator.addComponent(new TrackInformationComponent("#track-information"));
 
