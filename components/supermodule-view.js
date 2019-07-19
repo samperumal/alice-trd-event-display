@@ -12,8 +12,8 @@ class SupermoduleViewComponent extends ComponentBase {
         this.selectedEventId = null;
 
         const xscale = this.xscale, yscale = this.yscale;
-        xscale.domain([-350, 350]);
-        yscale.domain([400, 0]);
+        xscale.domain([-370, 370]);
+        yscale.domain([600, -140]);
 
         this.line = d3.line().x(d => xscale(-d.z)).y(d => yscale(d.r));
 
