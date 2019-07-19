@@ -144,7 +144,7 @@ class SectorViewComponent extends ComponentBase {
         const layerData = this.layerData;
 
         const sectorToRotationAngle = this.sectorToRotationAngle;
-        const transitionDuration = 750;
+        const transitionDuration = 500;
 
         const selectedTrack = eventData.track != null ? eventData.track.id : null;
 

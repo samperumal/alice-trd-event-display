@@ -1,6 +1,11 @@
-.sector-view-component rect.detector {
+.sector-view-component path.detector, .sector-view-component rect.detector {
     fill: none;
     stroke: lightgray;
+}
+
+.sector-view-component path.module {
+    fill: none;
+    stroke: darkgray;
 }
 
 .sector-view-component path.track {
