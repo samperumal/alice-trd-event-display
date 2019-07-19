@@ -7979,8 +7979,6 @@ const dims = {
         "maxZ": -173.94,
         "minR": 294.5,
         "maxR": 369.5,
-        "minX": Infinity,
-        "maxX": -Infinity,
         "bbZ": [
             -372.66,
             -173.94
@@ -7995,8 +7993,6 @@ const dims = {
         "maxZ": -53.46,
         "minR": 294.5,
         "maxR": 369.5,
-        "minX": Infinity,
-        "maxX": -Infinity,
         "bbZ": [
             -210.9,
             -53.46000000000001
@@ -8011,8 +8007,6 @@ const dims = {
         "maxZ": 53.46,
         "minR": 294.5,
         "maxR": 369.5,
-        "minX": Infinity,
-        "maxX": -Infinity,
         "bbZ": [
             -53.46,
             53.46
@@ -8027,8 +8021,6 @@ const dims = {
         "maxZ": 210.9,
         "minR": 294.5,
         "maxR": 369.5,
-        "minX": Infinity,
-        "maxX": -Infinity,
         "bbZ": [
             53.46000000000001,
             210.9
@@ -8043,8 +8035,6 @@ const dims = {
         "maxZ": 372.66,
         "minR": 294.5,
         "maxR": 369.5,
-        "minX": Infinity,
-        "maxX": -Infinity,
         "bbZ": [
             173.94,
             372.66
@@ -8054,6 +8044,20 @@ const dims = {
             232.64
         ]
     }
+};
+
+	return dims;
+}
+function getSectorDimensions() {
+const dims = {
+    "bbX": [
+        -57.9,
+        57.9
+    ],
+    "bbY": [
+        389.9,
+        274.1
+    ]
 };
 
 	return dims;

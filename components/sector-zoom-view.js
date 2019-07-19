@@ -2,7 +2,6 @@ class SectorZoomViewComponent extends ComponentBase {
     constructor(id, width, height, viewBox, config) {
         super(id, width, height, marginDef(5, 5, 5, 5), viewBox);
 
-        const layerData = this.layerData = getDimensions();
         const padRowDimensionData = this.padRowDimensionData = getPadrowDimensions();
         const moduleDimensionData = this.moduleDimensionData = getModuleDimensions();
         const stackDimensionData = this.stackDimensionData = getStackDimensions();
@@ -12,14 +11,11 @@ class SectorZoomViewComponent extends ComponentBase {
 
         this.selectedEventId = null;
 
-        const minZ = d3.min(moduleDimensionData, d => d.p0.y), maxZ = d3.max(moduleDimensionData, d => d.p1.y);
-        this.minZ = minZ; this.maxZ = maxZ;
-
         const xscale = this.xscale, yscale = this.yscale;
-        xscale.domain([-450, 450]);
-        yscale.domain([-450, 450]);
+        xscale.domain(getSectorDimensions().bbX);
+        yscale.domain(getSectorDimensions().bbY);
 
-        this.line = d3.line().x(d => xscale(d.x)).y(d => yscale(-d.y));
+        this.line = d3.line().x(d => xscale(d.x)).y(d => yscale(d.y));
 
         this.container
             .attr("class", "sector-view-component");
@@ -67,28 +63,31 @@ class SectorZoomViewComponent extends ComponentBase {
     }
 
     detectorPath(d) {
-        return closedRect(d.p0, d.p1, p => this.xscale(p.x), p => this.yscale(-p.y));
+        return closedRect(d.p0, d.p1, p => this.xscale(p.x), p => this.yscale(p.y));
     }
 
     draw(eventData) {
+        function rotateToSector(path, sector) {
+            return path.map(d => {
+                const rot = rotate(d.x, d.y, -20 * (4 - sector));
+                return { x: rot[0], y: rot[1] };
+            });
+        }
+
         const line = this.line;
 
         if (eventData.track != null) {
-            const stack = this.stackDimensionData[eventData.track.stk];
+            this.selectedTrack.attr("d", line(rotateToSector(eventData.track.path, eventData.track.sec)));
 
-            // this.xscale.domain(stack.bbZ);
-            // this.yscale.domain(stack.bbR);
-            this.selectedTrack.attr("d", line(eventData.track.path))
-                .attr("transform", `rotate(${-20 * (4 - eventData.track.sec)})`);
+            this.selectedTracklet.attr("d", eventData.track.trklts.map(d => line(rotateToSector(d.path, eventData.track.sec))).join(" "));
 
-            this.selectedTracklet.attr("d", eventData.track.trklts.map(d => line(d.path)).join(" "))
-                .attr("transform", `rotate(${-20 * (4 - eventData.track.sec)})`);
+            this.modules.attr("display", "default");
         }
         else {
             this.selectedTrack.attr("d", null);
-            this.selectedTracklets.attr("d", null);
-            // this.detectors.attr("d", null);
-            // this.modules.attr("d", null);
+            this.selectedTracklet.attr("d", null);
+
+            this.modules.attr("display", "none");
         }
     }
 }

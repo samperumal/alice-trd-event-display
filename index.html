@@ -16,6 +16,7 @@
     <script src="components/padrow-dimensions.js"></script>
     <script src="components/component-base.js"></script>
     <script src="components/sector-view.js"></script>
+    <script src="components/sector-zoom-view.js"></script>
     <script src="components/supermodule-view.js"></script>
     <script src="components/supermodule-zoom-view.js"></script>
     <script src="components/digits-view.js"></script>
@@ -183,7 +184,7 @@
                 </div>
                 <div class="component">
                     <p>Sector detail view - XY plane</p>
-                    <svg id="sector-view-zoom" style="width: 300px; height: 300px;"
+                    <svg id="sector-zoom-view" style="width: 300px; height: 300px;"
                         preserveAspectRatio="xMidYMid meet"></svg>
                 </div>
 
@@ -196,7 +197,7 @@
                 </div>
                 <div class="component">
                     <p>Supermodule detail view - ZY plane</p>
-                    <svg id="supermodule-view-zoom" style="width: 300px; height: 300px;"
+                    <svg id="supermodule-zoom-view" style="width: 300px; height: 300px;"
                         preserveAspectRatio="xMidYMid meet"></svg>
                 </div>
             </div>
@@ -253,7 +254,7 @@
         const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
 
         coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
-        // coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-22 -129 44 44", { r: 0.75, rotate: true }));
+        coordinator.addComponent(new SectorZoomViewComponent("#sector-zoom-view", 300, 300));
         coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
         coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 300, 300));
         // // coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {

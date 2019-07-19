@@ -2,7 +2,6 @@ class SupermoduleZoomViewComponent extends ComponentBase {
     constructor(id, width, height, viewBox, config) {
         super(id, width, height, marginDef(5, 5, 5, 5), viewBox);
 
-        const layerData = this.layerData = getDimensions();
         const padRowDimensionData = this.padRowDimensionData = getPadrowDimensions();
         const moduleDimensionData = this.moduleDimensionData = getModuleDimensions();
         const stackDimensionData = this.stackDimensionData = getStackDimensions();
