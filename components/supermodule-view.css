@@ -42,3 +42,8 @@
 .supermodule-view-component rect.zoom-box.hidden {
     display: none;
 }
+
+.supermodule-view-component .stack-text {
+    text-anchor: middle;
+    dominant-baseline: central;
+}
