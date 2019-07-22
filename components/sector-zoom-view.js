@@ -50,17 +50,12 @@ class SectorZoomViewComponent extends ComponentBase {
             .append("path")
             .attr("class", "tracklet selected");
 
-        // this.stackTexts = this.container
-        //     .append("g")
-        //     .attr("class", "stack-texts")
-        //     .selectAll("text.stack-text")
-        //     .data(layerData.filter(d => d.layer == 5))
-        //     .enter()
-        //     .append("text")
-        //     .attr("class", "stack-text")
-        //     .text(d => d.stack)
-        //     .attr("x", d => xscale((d.minZ + d.maxZ) / 2))
-        //     .attr("y", d => yscale(d.maxR + 10));
+        this.stackText = this.container
+            .append("text")
+            .attr("class", "stack-text")
+            .attr("x", 0)
+            .attr("y", -this.displayHeight / 2 + this.margin.top * 3)
+            .text("No track selected");
     }
 
     draw(eventData) {
@@ -80,6 +75,8 @@ class SectorZoomViewComponent extends ComponentBase {
 
             this.modules.attr("display", "default");
             this.pads.attr("display", "default");
+
+            this.stackText.text(`Sector ${eventData.track.sec}`);
         }
         else {
             this.selectedTrack.attr("d", null);
@@ -87,6 +84,8 @@ class SectorZoomViewComponent extends ComponentBase {
 
             this.modules.attr("display", "none");
             this.pads.attr("display", "none");
+            
+            this.stackText.text("No track selected");
         }
     }
 }

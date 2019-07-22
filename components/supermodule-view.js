@@ -4,7 +4,7 @@ class SupermoduleViewComponent extends ComponentBase {
 
         const layerData = this.layerData = getDimensions();
         const padRowDimensionData = this.padRowDimensionData = getPadrowDimensions();
-        const moduleDimensionData = this.moduleDimensionData = getModuleDimensions();
+        const moduleDimensionData = geomStackZRPlaneModules();
         const stackDimensionData = this.stackDimensionData = getStackDimensions();
 
         this.config = config != null ? config : {};
@@ -36,17 +36,7 @@ class SupermoduleViewComponent extends ComponentBase {
             .append("path")
             .attr("class", "tracklet selected");
 
-        // const detectorPath = padRowDimensionData
-        //     .filter(d => d.use)
-        //     .map(this.detectorPath.bind(this))
-        //     .join(" ");
-
-        // this.detectors = this.container
-        //     .append("path")
-        //     .attr("class", "detector")
-        //     .attr("d", detectorPath);
-
-        const modulePath = geomStackZRPlaneModules()
+        const modulePath = moduleDimensionData
             .map(d => this.line2(d.d) + " Z ")
             .join(" ");
 
@@ -66,22 +56,23 @@ class SupermoduleViewComponent extends ComponentBase {
             .attr("d", padPath);        
 
         this.stackTexts = this.container
-            .append("g")
-            .attr("class", "stack-texts")
             .selectAll("text.stack-text")
-            .data(layerData.filter(d => d.layer == 5))
+            .data(moduleDimensionData.filter(d => d.lyr == 5))
             .enter()
             .append("text")
             .attr("class", "stack-text")
-            .text(d => d.stack)
-            .attr("x", d => xscale((d.minZ + d.maxZ) / 2))
-            .attr("y", d => yscale(d.maxR + 10));
+            .text(d => d.stk)
+            .attr("x", d => xscale((d.d[0].x + d.d[2].x) / 2))
+            .attr("y", d => yscale(d.d[2].y + 40));
+
+        this.container
+            .append("text")
+            .attr("class", "stack-text-title")
+            .attr("x", 0)
+            .attr("y", yscale(d3.max(moduleDimensionData, d => d.d[2].y) + 100))
+            .text("Stacks");
 
         this.setViewBox(null, 750);
-    }
-
-    detectorPath(d) {
-        return closedRect(d.p0, d.p1, p => this.xscale(p.z), p => this.yscale(p.r));
     }
 
     draw(eventData) {
@@ -92,11 +83,11 @@ class SupermoduleViewComponent extends ComponentBase {
             this.allTracks.classed("fade", true);
             this.selectedTrack.attr("d", line(eventData.track.path));
 
-            const padRowDimensionData = this.padRowDimensionData;
+            const padRowDimensionData = geomStackZRPlanePads();
 
             this.selectedTracklets.attr("d", eventData.track.trklts
                 .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
-                .map(this.detectorPath.bind(this))
+                .map(d => this.line2(d.d))
                 .join(" ")
             );
 

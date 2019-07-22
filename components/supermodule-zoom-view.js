@@ -97,13 +97,15 @@ class SupermoduleZoomViewComponent extends ComponentBase {
                 .join(" ")
             );
 
-            this.stackText.text(`Stack ${eventData.track.stk}`)
+            this.stackText.text(`Stack ${eventData.track.stk}`);
         }
         else {
             this.selectedTrack.attr("d", null);
             this.selectedTracklets.attr("d", null);
+            
             this.pads.attr("d", null);
             this.modules.attr("d", null);
+
             this.stackText.text("No track selected");
         }
     }
