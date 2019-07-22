@@ -68,22 +68,9 @@
             margin: 0 0 10px;
         }
 
-        div.navigation {
-            
-        }
-
-        div.row {}
-
-        div.column {}
-
-        div.column.main-content {}
-
         #tree-container {
             height: 300px;
             overflow: auto;
-        }
-
-        div.component-container {
         }
 
         div.component {
@@ -95,6 +82,17 @@
             text-align: center;
             font-weight: bold;
             margin-bottom: 0.25em;
+            color: darkslategray;
+        }
+
+        div.component p span.label-left {
+            float: left;
+            margin-left: 2em;
+        }
+
+        div.component p span.label-right {
+            float: right;
+            margin-right: 2em;
         }
 
         div.time-bin-view {
@@ -180,11 +178,11 @@
             </div>
             <div id="sector-col">
                 <div class="component">
-                    <p>Sector view - XY plane</p>
+                    <p><span class="label-left">Sector</span><span>Summary</span><span class="label-right">XY plane</span></p>
                     <svg id="sector-view" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
                 </div>
                 <div class="component">
-                    <p>Sector detail view - XY plane</p>
+                    <p><span class="label-left">Sector</span><span>Detail</span><span class="label-right">XY plane</span></p>
                     <svg id="sector-zoom-view" style="width: 300px; height: 300px;"
                         preserveAspectRatio="xMidYMid meet"></svg>
                 </div>
@@ -192,12 +190,12 @@
             </div>
             <div id="stack-col">
                 <div class="component">
-                    <p>Supermodule view - ZY plane</p>
+                    <p><span class="label-left">Supermodule</span><span>Summary</span><span class="label-right">ZR plane</span></p>
                     <svg id="supermodule-view" style="width: 300px; height: 300px;"
                         preserveAspectRatio="xMidYMid"></svg>
                 </div>
                 <div class="component">
-                    <p>Supermodule detail view - ZY plane</p>
+                    <p><span class="label-left">Supermodule</span><span>Detail</span><span class="label-right">ZR plane</span></p>
                     <svg id="supermodule-zoom-view" style="width: 300px; height: 300px;"
                         preserveAspectRatio="xMidYMid meet"></svg>
                 </div>
