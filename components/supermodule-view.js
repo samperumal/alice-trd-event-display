@@ -17,6 +17,7 @@ class SupermoduleViewComponent extends ComponentBase {
         yscale.domain([600, -140]);
 
         this.line = d3.line().x(d => xscale(-d.z)).y(d => yscale(d.r));
+        this.line2 = d3.line().x(d => xscale(d.x)).y(d => yscale(d.y));
 
         this.container
             .attr("class", "supermodule-view-component");
@@ -35,24 +36,34 @@ class SupermoduleViewComponent extends ComponentBase {
             .append("path")
             .attr("class", "tracklet selected");
 
-        const detectorPath = padRowDimensionData
-            .filter(d => d.use)
-            .map(this.detectorPath.bind(this))
-            .join(" ");
+        // const detectorPath = padRowDimensionData
+        //     .filter(d => d.use)
+        //     .map(this.detectorPath.bind(this))
+        //     .join(" ");
 
-        this.detectors = this.container
-            .append("path")
-            .attr("class", "detector")
-            .attr("d", detectorPath);
+        // this.detectors = this.container
+        //     .append("path")
+        //     .attr("class", "detector")
+        //     .attr("d", detectorPath);
 
-        const modulePath = moduleDimensionData
-            .map(this.detectorPath.bind(this))
+        const modulePath = geomStackZRPlaneModules()
+            .map(d => this.line2(d.d) + " Z ")
             .join(" ");
 
         this.modules = this.container
             .append("path")
             .attr("class", "module")
             .attr("d", modulePath);
+
+        const padPath = geomStackZRPlanePads()
+            .filter(d => d.d != null && d.d.length > 0)
+            .map(d => this.line2(d.d) + " Z ")
+            .join(" ");
+
+        this.pads = this.container
+            .append("path")
+            .attr("class", "pad")
+            .attr("d", padPath);        
 
         this.stackTexts = this.container
             .append("g")
