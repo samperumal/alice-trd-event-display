@@ -38,13 +38,13 @@ class SectorZoomViewComponent extends ComponentBase {
                 .map(d => this.line(d.d) + " Z ").join(" ")
             );
 
-        this.allTracks = this.container
-            .append("path")
-            .attr("class", "track");
-
         this.selectedTrack = this.container
             .append("path")
             .attr("class", "selected track");
+
+        this.otherTracklets = this.container
+            .append("path")
+            .attr("class", "tracklet other");
 
         this.selectedTracklet = this.container
             .append("path")
@@ -69,9 +69,15 @@ class SectorZoomViewComponent extends ComponentBase {
         const line = this.line;
 
         if (eventData.track != null) {
-            this.selectedTrack.attr("d", line(rotateToSector(eventData.track.path, eventData.track.sec)));
+            const track = eventData.track;
 
-            this.selectedTracklet.attr("d", eventData.track.trklts.map(d => line(rotateToSector(d.path, eventData.track.sec))).join(" "));
+            this.selectedTrack.attr("d", line(rotateToSector(eventData.track.path, track.sec)));
+
+            this.selectedTracklet.attr("d", track.trklts.map(d => line(rotateToSector(d.path, track.sec))).join(" "));
+
+            const otherTracklets = eventData.event.trklts.filter(t => t.stk == track.stk && t.sec == track.sec);
+
+            this.otherTracklets.attr("d", otherTracklets.map(d => line(rotateToSector(d.path, track.sec))).join(" "));
 
             this.modules.attr("display", "default");
             this.pads.attr("display", "default");
@@ -81,10 +87,11 @@ class SectorZoomViewComponent extends ComponentBase {
         else {
             this.selectedTrack.attr("d", null);
             this.selectedTracklet.attr("d", null);
+            this.otherTracklets.attr("d", null);
 
             this.modules.attr("display", "none");
             this.pads.attr("display", "none");
-            
+
             this.stackText.text("No track selected");
         }
     }

@@ -16,7 +16,7 @@
     stroke-width: 1px;
 }
 
-.sector-view-component path.track.fade {
+.sector-view-component path.track.other {
     stroke: #cfe9ff;
 }
 
@@ -31,8 +31,9 @@
     stroke-width: 1px;
 }
 
-.sector-view-component path.tracklet.fade {
+.sector-view-component path.tracklet.other {
     stroke: #ffdddd;
+    stroke-width: 2px;
 }
 
 .sector-view-component path.tracklet.selected {

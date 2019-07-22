@@ -26,11 +26,15 @@ class SupermoduleViewComponent extends ComponentBase {
 
         this.allTracks = this.container
             .append("path")
-            .attr("class", "track");
+            .attr("class", "other track");
 
         this.selectedTrack = this.container
             .append("path")
             .attr("class", "selected track");
+
+        this.otherTracklets = this.container
+            .append("path")
+            .attr("class", "tracklet");
 
         this.selectedTracklets = this.container
             .append("path")
@@ -53,7 +57,7 @@ class SupermoduleViewComponent extends ComponentBase {
         this.pads = this.container
             .append("path")
             .attr("class", "pad")
-            .attr("d", padPath);        
+            .attr("d", padPath);
 
         this.stackTexts = this.container
             .selectAll("text.stack-text")
@@ -78,12 +82,22 @@ class SupermoduleViewComponent extends ComponentBase {
     draw(eventData) {
         const line = this.line;
 
-        if (eventData.track != null) {
-            this.allTracks.attr("d", eventData.event.tracks.map(d => line(d.path)).join(" "));
-            this.allTracks.classed("fade", true);
-            this.selectedTrack.attr("d", line(eventData.track.path));
+        const padRowDimensionData = geomStackZRPlanePads();
 
-            const padRowDimensionData = geomStackZRPlanePads();
+        const track = eventData.track;
+
+        this.allTracks.attr("d", eventData.event.tracks.map(d => line(d.path)).join(" "));
+
+        this.otherTracklets.attr("d", eventData.event.trklts
+            .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
+            .map(d => this.line2(d.d))
+            .join(" ")
+        );
+
+        if (eventData.track != null) {
+            this.allTracks.classed("other", true);
+            this.otherTracklets.classed("other", true);
+            this.selectedTrack.attr("d", line(track.path));
 
             this.selectedTracklets.attr("d", eventData.track.trklts
                 .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
@@ -94,7 +108,8 @@ class SupermoduleViewComponent extends ComponentBase {
             this.setViewBox(this.stackDimensionData[eventData.track.stk]);
         }
         else {
-            this.allTracks.classed("fade", false);
+            this.allTracks.classed("other", false);
+            this.otherTracklets.classed("other", false);
             this.selectedTrack.attr("d", null);
             this.selectedTracklets.attr("d", null);
 

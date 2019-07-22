@@ -43,35 +43,27 @@ class SectorViewComponent extends ComponentBase {
             .attr("class", "zoom-box")
             .attr("d", d3.line()(zoomPath) + "Z");
 
+        this.container.classed("sector-view-component", true);
+
+        this.allTracks = this.container
+            .append("path")
+            .attr("class", "track");
+
+        this.selectedTrack = this.container
+            .append("path")
+            .attr("class", "selected track");
+
+        this.allTracklets = this.container
+            .append("path").attr("class", "tracklet");
+
+        this.selectedTracklet = this.container
+            .append("path").attr("class", "selected tracklet");
+
         this.container.append("path")
             .attr("class", "module")
             .attr("d", geomSectorXYPlane()
                 .map(d => this.line(d.d) + " Z ").join(" ")
             )
-
-        this.container.classed("sector-view-component", true);
-
-        this.tracks = this.container.append("g")
-            .attr("class", "tracks");
-
-        this.allTracks = this.tracks
-            .append("path")
-            .attr("class", "track");
-
-        this.selectedTrack = this.tracks
-            .append("path")
-            .attr("class", "selected track");
-
-        this.tracklets = this.container.append("g")
-            .attr("class", "tracklets");
-
-        this.allTracklets = this.tracklets
-            .append("path").attr("class", "tracklet");
-
-        this.selectedTracklet = this.tracklets
-            .append("path").attr("class", "selected tracklet");
-
-        const doRotate = this.config.rotate;
 
         this.sectorNumbers = this.container
             .append("g")
@@ -144,63 +136,27 @@ class SectorViewComponent extends ComponentBase {
         }
 
         if (eventData.track != null) {
-            this.allTracks.classed("fade", true);
-            this.allTracklets.classed("fade", true);
+            this.allTracks.classed("other", true);
+            this.allTracklets.classed("other", true);
 
             this.selectedTrack.attr("d", line(eventData.track.path));
             this.selectedTracklet.attr("d", eventData.track.trklts.map(d => line(d.path)).join(" "));
 
             const sector = eventData.track.sec;
 
-            if (this.config.rotate && sector != null) {
-                // this.rotatingContainer
-                //     .transition().duration(transitionDuration)
-                //     .attr("transform", "rotate(" + ((sector - 4) * 20) + ")");
-
-                // this.sectorNumbers
-                //     .transition().duration(transitionDuration)
-                //     .attr("transform", d => "rotate(" + (-sectorToRotationAngle(d) - ((sector - 4) * 20)) + ")");
-
-                // this.layerNumbers
-                //     .transition().duration(transitionDuration)
-                //     .attr("transform", this.layerNumberPosition.bind(this, sector));
-            }
-            else {
-                this.zoomBox
-                    .transition().duration(transitionDuration)
-                    .attr("transform", `rotate(${-sector * 20} ${xscale(0)} ${yscale(0)})`);
-            }
+            this.zoomBox
+                .transition().duration(transitionDuration)
+                .attr("transform", `rotate(${-sector * 20} ${xscale(0)} ${yscale(0)})`);
         }
         else {
-            this.allTracks.classed("fade", false);
-            this.allTracklets.classed("fade", false);
+            this.allTracks.classed("other", false);
+            this.allTracklets.classed("other", false);
 
             this.selectedTrack.attr("d", null);
 
-            if (this.config.rotate) {
-                // this.rotatingContainer
-                //     .transition().duration(transitionDuration)
-                //     .attr("transform", "rotate(0)");
-
-                // this.sectorNumbers
-                //     .transition().duration(transitionDuration)
-                //     .attr("transform", d => "rotate(" + (-sectorToRotationAngle(d)) + ")");
-
-                // this.layerNumbers
-                //     .transition().duration(transitionDuration)
-                //     .attr("transform", this.layerNumberPosition.bind(this, 4));
-            }
-            else {
-                this.zoomBox
-                    .transition().duration(transitionDuration)
-                    .attr("transform", "rotate(" + (-4 * 20) + ")");
-            }
-
-            // this.trackletPlanes.selectAll(".tracklet-plane")
-            //     .classed("selected", false)
-            //     .classed("not-selected", false);
-
-            // this.detectors.classed("not-selected", false);
+            this.zoomBox
+                .transition().duration(transitionDuration)
+                .attr("transform", "rotate(" + (-4 * 20) + ")");
         }
     }
 

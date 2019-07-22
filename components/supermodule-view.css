@@ -16,7 +16,7 @@
     stroke-width: 1px;
 }
 
-.supermodule-view-component path.track.fade {
+.supermodule-view-component path.track.other {
     stroke: #cfe9ff;
 }
 
@@ -26,11 +26,15 @@
     stroke-dasharray: 2 1;
 }
 
-.supermodule-view-component path.tracklet {
-    fill: #f99997;
+.supermodule-view-component path.tracklet.other {
+    stroke: lightgray;
+    stroke-width: 0.2px;
+    fill: #ffdddd;
 }
 
-.supermodule-view-component path.tracklet.selected {
+.supermodule-view-component path.tracklet.selected, .supermodule-view-component path.tracklet {
+    stroke: lightgray;
+    stroke-width: 0.2px;
     fill: rgb(209, 39, 39); 
 }
 

@@ -46,21 +46,21 @@ class SupermoduleZoomViewComponent extends ComponentBase {
 
         this.zoomBox = this.container.append("rect");
 
-        this.modules = this.container
-            .append("path")
-            .attr("class", "module");
-
         this.pads = this.container
             .append("path")
             .attr("class", "pad");
 
-        this.allTracks = this.container
+        this.otherTracklets = this.container
             .append("path")
-            .attr("class", "track");
+            .attr("class", "tracklet other");
 
         this.selectedTracklets = this.container
             .append("path")
             .attr("class", "tracklet selected");
+
+        this.modules = this.container
+            .append("path")
+            .attr("class", "module");
 
         this.selectedTrack = this.container
             .append("path")
@@ -78,20 +78,30 @@ class SupermoduleZoomViewComponent extends ComponentBase {
         const line = this.line;
 
         if (eventData.track != null) {
-            const stackbb = this.stackDimensionData[eventData.track.stk];
+            const track = eventData.track;
+
+            const stackbb = this.stackDimensionData[track.stk];
 
             this.xscale.domain(stackbb.bbZ);
             this.yscale.domain(stackbb.bbR);
 
-            this.pads.attr("d", this.stackPaths.get(eventData.track.stk).padPath);
+            this.pads.attr("d", this.stackPaths.get(track.stk).padPath);
 
-            this.modules.attr("d", this.stackPaths.get(eventData.track.stk).modulePath);
+            this.modules.attr("d", this.stackPaths.get(track.stk).modulePath);
 
-            this.selectedTrack.attr("d", line(eventData.track.path));
+            this.selectedTrack.attr("d", line(track.path));
 
             const padRowDimensionData = geomStackZRPlanePads();
 
-            this.selectedTracklets.attr("d", eventData.track.trklts
+            this.selectedTracklets.attr("d", track.trklts
+                .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
+                .map(d => this.line2(d.d) + " Z ")
+                .join(" ")
+            );
+
+            const otherTracklets = eventData.event.trklts.filter(t => t.stk == track.stk && t.sec == track.sec);
+
+            this.otherTracklets.attr("d", otherTracklets
                 .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
                 .map(d => this.line2(d.d) + " Z ")
                 .join(" ")
@@ -102,6 +112,7 @@ class SupermoduleZoomViewComponent extends ComponentBase {
         else {
             this.selectedTrack.attr("d", null);
             this.selectedTracklets.attr("d", null);
+            this.otherTracklets.attr("d", null);
 
             this.pads.attr("d", null);
             this.modules.attr("d", null);
