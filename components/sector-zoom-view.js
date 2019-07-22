@@ -25,6 +25,7 @@ class SectorZoomViewComponent extends ComponentBase {
         this.pads = this.container
             .append("path")
             .attr("class", "pad")
+            .attr("display", "none")
             .attr("d", geomZoomSectorXYPlanePads()
                 .map(d => this.line(d.d) + " Z ").join(" ")
             );
@@ -32,6 +33,7 @@ class SectorZoomViewComponent extends ComponentBase {
         this.modules = this.container
             .append("path")
             .attr("class", "module")
+            .attr("display", "none")
             .attr("d", geomZoomSectorXYPlaneModules()
                 .map(d => this.line(d.d) + " Z ").join(" ")
             );
@@ -77,12 +79,14 @@ class SectorZoomViewComponent extends ComponentBase {
             this.selectedTracklet.attr("d", eventData.track.trklts.map(d => line(rotateToSector(d.path, eventData.track.sec))).join(" "));
 
             this.modules.attr("display", "default");
+            this.pads.attr("display", "default");
         }
         else {
             this.selectedTrack.attr("d", null);
             this.selectedTracklet.attr("d", null);
 
             this.modules.attr("display", "none");
+            this.pads.attr("display", "none");
         }
     }
 }
