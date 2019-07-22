@@ -37,11 +37,11 @@ class ComponentBase {
 
         this.xscale = d3.scaleLinear()
             .domain([-400, 400])
-            .range([-this.displayWidth / 2, this.displayWidth / 2]);
+            .range([margin.left - this.componentWidth / 2, this.componentWidth / 2 - margin.right]);
 
         this.yscale = d3.scaleLinear()
             .domain([-400, 400])
-            .range([-this.displayHeight / 2, this.displayHeight / 2]);
+            .range([margin.top - this.componentHeight / 2, this.componentHeight / 2 - margin.bottom]);
 
         this.svg = null;
         
