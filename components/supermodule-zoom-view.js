@@ -68,7 +68,7 @@ class SupermoduleZoomViewComponent extends ComponentBase {
 
         this.stackText = this.container
             .append("text")
-            .attr("class", "stack-text")
+            .attr("class", "stack-number")
             .attr("x", 0)
             .attr("y", -this.displayHeight / 2 + this.margin.top * 3)
             .text("No track selected");
@@ -102,7 +102,7 @@ class SupermoduleZoomViewComponent extends ComponentBase {
         else {
             this.selectedTrack.attr("d", null);
             this.selectedTracklets.attr("d", null);
-            
+
             this.pads.attr("d", null);
             this.modules.attr("d", null);
 

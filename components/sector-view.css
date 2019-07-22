@@ -49,6 +49,12 @@
     dominant-baseline: central;
 }
 
+.sector-view-component text.sector-number-title {
+    text-anchor: start;
+    dominant-baseline: central;
+    font-weight: bold;
+}
+
 .sector-view-component text.layer-number {
     text-anchor: end;
     dominant-baseline: text-after-edge;
@@ -58,9 +64,4 @@
 .sector-view-component .zoom-box {
     fill: rgb(250, 250, 250);
     stroke: darkgray;
-}
-
-.sector-view-component .stack-text {
-    text-anchor: middle;
-    dominant-baseline: central;
 }

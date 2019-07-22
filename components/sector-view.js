@@ -1,6 +1,6 @@
 class SectorViewComponent extends ComponentBase {
     constructor(id, width, height, viewBox, config) {
-        super(id, width, height, marginDef(5, 5, 5, 5));
+        super(id, width, height, marginDef(15, 15, 25, 5));
 
         const sectorToRotationAngle = this.sectorToRotationAngle;
 
@@ -19,9 +19,9 @@ class SectorViewComponent extends ComponentBase {
 
         const xscale = this.xscale, yscale = this.yscale;
         xscale.domain([-450, 450]);
-        yscale.domain([-450, 450]);
+        yscale.domain([450, -450]);
 
-        this.line = d3.line().x(d => xscale(d.x)).y(d => yscale(-d.y));
+        this.line = d3.line().x(d => xscale(d.x)).y(d => yscale(d.y));
 
         this.container.append("rect")
             .attr("class", "zoom")
@@ -31,19 +31,17 @@ class SectorViewComponent extends ComponentBase {
 
         this.zoomBox = this.container
             .append("g")
-            .attr("class", "zoom-box-group")
-            .attr("transform", "rotate(-80)");
+            .attr("class", "zoom-box-group");
 
         const zoomPath = [
             [xscale(0), yscale(0)],
-            [xscale.range()[1], yscale(0)],
-            [xscale.range()[1] * Math.cos(20 / 180 * Math.PI), -xscale.range()[1] * Math.sin(20 / 180 * Math.PI)],
-            [xscale(0), yscale(0)]
+            [xscale(460), yscale(0)],
+            rotateC(xscale(0), yscale(0), xscale(460), yscale(0), 20)
         ];
 
         this.zoomBox.append("path")
             .attr("class", "zoom-box")
-            .attr("d", d3.line()(zoomPath));
+            .attr("d", d3.line()(zoomPath) + "Z");
 
         this.container.append("path")
             .attr("class", "module")
@@ -51,12 +49,9 @@ class SectorViewComponent extends ComponentBase {
                 .map(d => this.line(d.d) + " Z ").join(" ")
             )
 
-        this.rotatingContainer = this.container
-            .classed("sector-view-component", true)
-            .append("g")
-            .attr("class", "rotating");
+        this.container.classed("sector-view-component", true);
 
-        this.tracks = this.rotatingContainer.append("g")
+        this.tracks = this.container.append("g")
             .attr("class", "tracks");
 
         this.allTracks = this.tracks
@@ -67,7 +62,7 @@ class SectorViewComponent extends ComponentBase {
             .append("path")
             .attr("class", "selected track");
 
-        this.tracklets = this.rotatingContainer.append("g")
+        this.tracklets = this.container.append("g")
             .attr("class", "tracklets");
 
         this.allTracklets = this.tracklets
@@ -76,31 +71,47 @@ class SectorViewComponent extends ComponentBase {
         this.selectedTracklet = this.tracklets
             .append("path").attr("class", "selected tracklet");
 
-        this.sectors = this.rotatingContainer
-            .append("g")
-            .attr("class", "sectors")
-            .selectAll("g.sector")
-            .data(this.detectorData)
-            .enter()
-            .append("g")
-            .attr("class", "sector")
-            .attr("transform", d => "rotate(" + d.rot + ")");
+        const doRotate = this.config.rotate;
 
-        const rotate = this.config.rotate;
+        this.sectorNumbers = this.container
+            .append("g")
+            .attr("class", "sector-number");
 
-        this.sectorNumbers = this.rotatingContainer
-            .append("g")
-            .attr("class", "sector-number")
-            .selectAll("g")
-            .data(d3.range(18))
+        this.sectorNumbers
+            .selectAll("text")
+            .data(d3.range(18).map(d => {
+                const [x, y] = rotateC(xscale(0), yscale(0), xscale(420), yscale(0), 10 + 20 * d);
+
+                return {
+                    sector: d,
+                    x: x,
+                    y: y
+                }
+            }))
             .enter()
-            .append("g")
-            .attr("transform", d => "rotate(" + sectorToRotationAngle(d) + ")translate(" + (xscale(d3.max(layerData, d2 => d2.maxR) * (rotate ? 1.04 : 1.1))) + ", 0)")
             .append("text")
             .attr("class", "sector-number")
-            .text(d => d)
-            .attr("transform", d => "rotate(" + (-sectorToRotationAngle(d)) + ")")
-            ;
+            .attr("x", d => d.x)
+            .attr("y", d => d.y)
+            .text(d => d.sector);
+
+        this.defs = this.svg.append("defs");
+
+        const pc = [xscale(0), -this.componentHeight / 2 + this.margin.top / 2];
+        const pr = rotateC(xscale(0), -this.componentHeight / 4, pc[0], pc[1], -25);
+        const pl = rotateC(xscale(0), -this.componentHeight / 4, pc[0], pc[1], 24);
+
+        this.defs.append("path")
+            .attr("id", "sectors-text-path")
+            .attr("d", `M ${pl[0]},${pl[1]} S ${pc[0]},${pc[1]} ${pr[0]},${pr[1]}`);
+
+        this.sectorNumbers
+            .append("text")
+            .attr("class", "sector-number-title")
+            .append("textPath")
+            .attr("href", "#sectors-text-path")
+            .attr("method", "stretch")
+            .text("Sectors");
 
         if (viewBox != null)
             this.transitionViewBox(viewBox, 750);
@@ -157,7 +168,7 @@ class SectorViewComponent extends ComponentBase {
             else {
                 this.zoomBox
                     .transition().duration(transitionDuration)
-                    .attr("transform", "rotate(" + (-sector * 20) + ")");
+                    .attr("transform", `rotate(${-sector * 20} ${xscale(0)} ${yscale(0)})`);
             }
         }
         else {

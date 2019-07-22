@@ -43,11 +43,11 @@
     display: none;
 }
 
-.supermodule-view-component .stack-text, .supermodule-view-component .stack-text-title {
+.supermodule-view-component .stack-number, .supermodule-view-component .stack-number-title {
     text-anchor: middle;
     dominant-baseline: central;
 }
 
-.supermodule-view-component .stack-text-title {
+.supermodule-view-component .stack-number-title {
     font-weight: bold;
 }

@@ -52,7 +52,7 @@ class SectorZoomViewComponent extends ComponentBase {
 
         this.stackText = this.container
             .append("text")
-            .attr("class", "stack-text")
+            .attr("class", "sector-number")
             .attr("x", 0)
             .attr("y", -this.displayHeight / 2 + this.margin.top * 3)
             .text("No track selected");

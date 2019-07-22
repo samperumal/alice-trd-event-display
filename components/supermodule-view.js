@@ -60,14 +60,14 @@ class SupermoduleViewComponent extends ComponentBase {
             .data(moduleDimensionData.filter(d => d.lyr == 5))
             .enter()
             .append("text")
-            .attr("class", "stack-text")
+            .attr("class", "stack-number")
             .text(d => d.stk)
             .attr("x", d => xscale((d.d[0].x + d.d[2].x) / 2))
             .attr("y", d => yscale(d.d[2].y + 40));
 
         this.container
             .append("text")
-            .attr("class", "stack-text-title")
+            .attr("class", "stack-number-title")
             .attr("x", 0)
             .attr("y", yscale(d3.max(moduleDimensionData, d => d.d[2].y) + 100))
             .text("Stacks");
