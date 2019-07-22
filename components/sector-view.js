@@ -45,6 +45,12 @@ class SectorViewComponent extends ComponentBase {
             .attr("class", "zoom-box")
             .attr("d", d3.line()(zoomPath));
 
+        this.container.append("path")
+            .attr("class", "detector")
+            .attr("d", geomSectorXYPlane()
+                .map(d => this.line(d.d) + " Z ").join(" ")
+            )
+
         this.rotatingContainer = this.container
             .classed("sector-view-component", true)
             .append("g")
@@ -79,36 +85,6 @@ class SectorViewComponent extends ComponentBase {
             .append("g")
             .attr("class", "sector")
             .attr("transform", d => "rotate(" + d.rot + ")");
-
-        this.detectors = this.sectors
-            .selectAll("g.detector")
-            .data(d => d.layerData)
-            .enter()
-            .append("g")
-            .attr("class", "detector")
-            .attr("transform", d => "translate(" + xscale(d.minR) + ", 0)");
-
-        this.detectors
-            .append("rect")
-            .attr("class", "detector")
-            .attr("y", d => yscale(d.minLocalY))
-            .attr("height", d => dist(d.minLocalY, d.maxLocalY, yscale))
-            .attr("width", d => dist(d.minR, d.maxR, xscale));
-
-        this.layerNumbers = this.detectors
-            .append("g")
-            .append("text")
-            .attr("class", "layer-number")
-            .text(d => d.layer)
-            .attr("transform", this.layerNumberPosition.bind(this, 4));
-
-        this.detectors
-            .append("line")
-            .attr("class", "half-chamber-div")
-            .attr("x1", 0)
-            .attr("x2", d => xscale(d.maxR) - xscale(d.minR))
-            .attr("y1", yscale(0))
-            .attr("y2", yscale(0));
 
         const rotate = this.config.rotate;
 
@@ -183,8 +159,6 @@ class SectorViewComponent extends ComponentBase {
                     .transition().duration(transitionDuration)
                     .attr("transform", "rotate(" + (-sector * 20) + ")");
             }
-
-            this.detectors.classed("not-selected", d => d.sector != sector);
         }
         else {
             this.allTracks.classed("fade", false);

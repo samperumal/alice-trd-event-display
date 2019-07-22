@@ -1,4 +1,4 @@
-.sector-view-component path.detector, .sector-view-component rect.detector {
+.sector-view-component path.detector, .sector-view-component path.detector {
     fill: none;
     stroke: lightgray;
 }
