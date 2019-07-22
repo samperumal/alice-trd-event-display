@@ -46,7 +46,7 @@ class SectorViewComponent extends ComponentBase {
             .attr("d", d3.line()(zoomPath));
 
         this.container.append("path")
-            .attr("class", "detector")
+            .attr("class", "module")
             .attr("d", geomSectorXYPlane()
                 .map(d => this.line(d.d) + " Z ").join(" ")
             )
