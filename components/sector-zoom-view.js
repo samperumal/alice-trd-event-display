@@ -22,6 +22,20 @@ class SectorZoomViewComponent extends ComponentBase {
 
         this.zoomBox = this.container.append("rect");
 
+        this.pads = this.container
+            .append("path")
+            .attr("class", "pad")
+            .attr("d", geomZoomSectorXYPlanePads()
+                .map(d => this.line(d.d) + " Z ").join(" ")
+            );
+
+        this.modules = this.container
+            .append("path")
+            .attr("class", "module")
+            .attr("d", geomZoomSectorXYPlaneModules()
+                .map(d => this.line(d.d) + " Z ").join(" ")
+            );
+
         this.allTracks = this.container
             .append("path")
             .attr("class", "track");
@@ -34,21 +48,6 @@ class SectorZoomViewComponent extends ComponentBase {
             .append("path")
             .attr("class", "tracklet selected");
 
-        this.detectors = this.container
-            .append("path")
-            .attr("class", "detector");
-
-        this.modules = this.container
-            .append("path")
-            .attr("class", "module");
-
-        const modulePath = this.moduleDimensionData
-            .filter(d => d.stk == 2)
-            .map(this.detectorPath.bind(this))
-            .join(" ");
-
-        this.modules.attr("d", modulePath);
-
         // this.stackTexts = this.container
         //     .append("g")
         //     .attr("class", "stack-texts")
@@ -60,10 +59,6 @@ class SectorZoomViewComponent extends ComponentBase {
         //     .text(d => d.stack)
         //     .attr("x", d => xscale((d.minZ + d.maxZ) / 2))
         //     .attr("y", d => yscale(d.maxR + 10));
-    }
-
-    detectorPath(d) {
-        return closedRect(d.p0, d.p1, p => this.xscale(p.x), p => this.yscale(p.y));
     }
 
     draw(eventData) {

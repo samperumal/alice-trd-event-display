@@ -8,6 +8,12 @@
     stroke: darkgray;
 }
 
+.sector-view-component path.pad {
+    fill: none;
+    stroke: lightgray;
+    stroke-width: 0.2px;
+}
+
 .sector-view-component path.track {
     fill: none;
     stroke: #3392e3;
