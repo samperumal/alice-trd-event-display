@@ -39,8 +39,9 @@
 }
 
 .supermodule-view-component rect.zoom-box {
-    fill: rgb(250, 250, 250);
+    fill: none;
     stroke: darkgray;
+    stroke-dasharray: 1 2 1;
 }
 
 .supermodule-view-component rect.zoom-box.hidden {
@@ -54,4 +55,9 @@
 
 .supermodule-view-component .stack-number-title {
     font-weight: bold;
+}
+
+.supermodule-view-component path.module.tpc {
+    fill: #fafafa;
+    stroke: darkgray;
 }

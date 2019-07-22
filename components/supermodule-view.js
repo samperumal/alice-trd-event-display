@@ -22,6 +22,11 @@ class SupermoduleViewComponent extends ComponentBase {
         this.container
             .attr("class", "supermodule-view-component");
 
+        this.container
+            .append("path")
+            .attr("class", "module tpc")
+            .attr("d", this.line2(geomSectorZRPlaneTPC()));
+
         this.zoomBox = this.container.append("rect");
 
         this.allTracks = this.container

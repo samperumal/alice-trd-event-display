@@ -29,6 +29,11 @@ class SectorViewComponent extends ComponentBase {
             .attr("height", this.displayHeight)
             .attr("transform", "translate(" + (-this.displayWidth / 2) + "," + (-this.displayHeight / 2) + ")");
 
+        this.container
+            .append("path")
+            .attr("class", "module tpc")
+            .attr("d", geomSectorXYPlaneTPC().map(p => this.line(p)).join(" "));
+
         this.zoomBox = this.container
             .append("g")
             .attr("class", "zoom-box-group");
