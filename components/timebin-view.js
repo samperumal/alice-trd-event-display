@@ -191,6 +191,10 @@ class TbsumSubView {
             .attr("class", "panel-label axis-name")
             .attr("transform", `translate(${this.width / 2}, ${this.height + 2})`);
 
+        this.tbsumContainer.append("text").text("Time bin")
+            .attr("class", "panel-label axis-name tbin")
+            .attr("transform", `translate(${-15}, ${this.height / 2})rotate(-90)`);
+
         this.content = this.tbsumContainer.append("g");
     }
 
@@ -296,6 +300,10 @@ class PadSubView {
         this.padContainer.append("text").text("Pad number")
             .attr("class", "panel-label axis-name")
             .attr("transform", `translate(${this.width / 2}, ${this.height + 2})`);
+
+        this.padContainer.append("text").text("Time bin")
+            .attr("class", "panel-label axis-name tbin")
+            .attr("transform", `translate(${this.width + 15}, ${this.height / 2})rotate(90)`);
 
         this.content = this.padContainer.append("g");
 

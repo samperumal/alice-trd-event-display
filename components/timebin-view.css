@@ -24,6 +24,13 @@ rect.tbin {
     font-style: italic;
 }
 
+.time-bin-view .axis-name.tbin {
+    font-size: 10px;
+    font-weight: bold;
+    font-style: normal;
+    font-variant: normal;
+}
+
 .time-bin-view .vis-name {
     font-size: 10px;
     font-weight: bold;
