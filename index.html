@@ -27,7 +27,7 @@
     <script src="components/timebin-view.js"></script>
     <script src="components/display-mapper.js"></script>
 
-    <script src="data.min.js"></script>
+    <script src="data/data.000296934.js"></script>
 
     <title>ALICE TRD Event Display - Alpha</title>
 
@@ -340,7 +340,7 @@
         coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
         coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 300, 300));
         coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
-            dataLoadUrl: "data/"
+            dataLoadUrl: "data/000296934/"
         }));
 
         coordinator.addComponent(new TrackInformationComponent("#track-information"));
@@ -362,7 +362,7 @@
             stackInput: "#stack-input",
             maxCsumInput: "#max-csum-input",
             buttons: ["#load-digits"],
-            dataLoadUrl: "data/",
+            dataLoadUrl: "data/000296934/",
             padClick: coordinator.padSelect.bind(coordinator),
             timeBinChange: (timebin) => { $("#timebin-slider").slider("option", "value", timebin); }
         });
@@ -377,7 +377,7 @@
         if (false) {
             setTimeout(function () {
                 $("#dataTree").jstree("select_node", tree.treeData[1].children[1]);
-                digitsView.drawDigits();
+                //digitsView.drawDigits();
             }, 500);
         }
 

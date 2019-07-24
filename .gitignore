@@ -2,6 +2,6 @@
 data/old/
 openday/
 .vscode/
-data/*.json
+data/*
 data/data*.js
 geometry/*.json
