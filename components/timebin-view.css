@@ -36,3 +36,7 @@ rect.tbin {
 .time-bin-view line.divider {
     stroke: black;
 }
+
+.time-bin-view path.tracklet {
+    stroke: rgb(209, 39, 39);
+}
