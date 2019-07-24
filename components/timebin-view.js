@@ -93,23 +93,39 @@ class TimebinViewComponent extends ComponentBase {
         const sector = eventData.track.sec;
         const stack = eventData.track.stk;
 
-        //const layer = this.layerInput.attr("value");
-
         try {
             console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}`);
             const data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
+
+            const allPads = geomZoomSectorXYPlanePads();
 
             for (const layer of d3.range(6)) {
                 const trackletData = eventData.track.trklts.find(t => t.lyr == layer);
                 let location = null;
                 if (trackletData != null) {
-                    this.layerLabels[layer].text(`Layer ${layer} Pad row ${trackletData.row}`);
+                    this.layerLabels[layer].text(`Layer ${layer} Padrow ${trackletData.row}`);
+
+                    const LY = [trackletData.y1, trackletData.y2].sort((a,b) => a-b);
+
+                    const pads = allPads
+                        .filter(p => p.l == layer)
+                        .filter(p => p.d[0].x > LY[0] && p.d[2].x < LY[1]);
+
+                    const padExtent = d3.extent(pads.map(p => p.c));
+                    padExtent[1] = Math.min(143, padExtent[1] + 2);
+                    padExtent[0] = Math.max(0, padExtent[0] - 2);
+            
+                    const padIndices = d3.range(padExtent[1], padExtent[0] - 1, -1);
+
                     location = {
                         stack: trackletData.stk,
                         layer: trackletData.lyr,
                         row: trackletData.row,
                         binY: trackletData.binY,
-                        col: -1
+                        padIndices: padIndices,
+                        col: -1,
+                        y1: trackletData.y1, 
+                        y2: trackletData.y2
                     }
                 }
                 else this.layerLabels[layer].text(`Layer ${layer}`);
@@ -125,7 +141,7 @@ class TimebinViewComponent extends ComponentBase {
 
     updatePad(updateData) {
         console.log(updateData);
-        
+
         let location = null;
         if (updateData != null) {
             const layer = updateData.pos.layer;
@@ -180,15 +196,12 @@ class TbsumSubView {
             return;
         }
 
-        const layerDim = this.dimensions.filter(d => d.stack == location.stack && d.layer == location.layer)[0];
-
         let padIndices;
 
-        if (location.binY != null) {
-            const padMapping = d3.scaleLinear().domain([layerDim.minBinY, layerDim.maxBinY]).range([0, 143]);
-            const minPad = Math.floor(padMapping(location.binY)) - 4;
-            const maxPad = minPad + 8;
-            padIndices = d3.range(minPad, maxPad + 1);
+        if (location.padIndices != null) {
+            padIndices = location.padIndices;
+
+            this.xscale.domain(padIndices);
         }
         else {
             const minPad = Math.max(location.col - 3, 0);
@@ -284,21 +297,16 @@ class PadSubView {
             this.colourAxisGroup.style("display", "inherit");
         }
 
-        const layerDim = this.dimensions.filter(d => d.stack == location.stack && d.layer == location.layer)[0];
-
         let padIndices;
 
-        if (location.binY != null) {
-            const padMapping = d3.scaleLinear().domain([layerDim.minBinY, layerDim.maxBinY]).range([0, 143]);
-            const minPad = Math.floor(padMapping(location.binY)) - 2;
-            const maxPad = minPad + 4;
-            padIndices = d3.range(minPad, maxPad + 1);
+        if (location.padIndices != null) {
+            padIndices = location.padIndices;
 
-            this.xscale.domain(d3.range(maxPad, minPad - 1, -1));
+            this.xscale.domain(padIndices);
         }
         else {
-            const minPad = Math.max(location.col - 3, 0);
-            const maxPad = Math.min(location.col + 3, 143);
+            const minPad = Math.max(location.col - 2, 0);
+            const maxPad = Math.min(location.col + 2, 143);
             padIndices = d3.range(minPad, maxPad + 1);
 
             this.xscale.domain(d3.range(maxPad, minPad - 1, -1));
