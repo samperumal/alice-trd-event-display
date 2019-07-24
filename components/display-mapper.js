@@ -23,7 +23,8 @@ function* mapToDisplayDataFormat(data) {
                     sec: t.sector,
                     stk: t.stack,
                     lyr: t.layer,
-                    row: t.binZ
+                    row: t.binZ,
+                    binY: t.binY
                 };
 
                 trackletMap.set(t.id, tracklet);

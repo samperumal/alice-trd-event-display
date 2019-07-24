@@ -83,15 +83,15 @@ class TimebinViewComponent extends ComponentBase {
     }
 
     draw(eventData) {
-        if (eventData.type == "select" && eventData.trdTrack != null) {
+        if (eventData.type == "select" && eventData.track != null) {
             this.drawDigits(eventData);
         }
     }
 
     async drawDigits(eventData) {
         const eventNo = eventData.event.evno;
-        const sector = eventData.trdTrack.sector;
-        const stack = eventData.trdTrack.stack;
+        const sector = eventData.track.sec;
+        const stack = eventData.track.stk;
 
         //const layer = this.layerInput.attr("value");
 
@@ -100,14 +100,14 @@ class TimebinViewComponent extends ComponentBase {
             const data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
 
             for (const layer of d3.range(6)) {
-                const trackletData = eventData.trdTrack.trdTracklets.find(t => t.layer == layer);
+                const trackletData = eventData.track.trklts.find(t => t.lyr == layer);
                 let location = null;
                 if (trackletData != null) {
-                    this.layerLabels[layer].text(`Layer ${layer} Pad row ${trackletData.binZ}`);
+                    this.layerLabels[layer].text(`Layer ${layer} Pad row ${trackletData.row}`);
                     location = {
-                        stack: trackletData.stack,
-                        layer: trackletData.layer,
-                        row: trackletData.binZ,
+                        stack: trackletData.stk,
+                        layer: trackletData.lyr,
+                        row: trackletData.row,
                         binY: trackletData.binY,
                         col: -1
                     }
@@ -186,8 +186,8 @@ class TbsumSubView {
 
         if (location.binY != null) {
             const padMapping = d3.scaleLinear().domain([layerDim.minBinY, layerDim.maxBinY]).range([0, 143]);
-            const minPad = Math.floor(padMapping(location.binY)) - 2;
-            const maxPad = minPad + 4;
+            const minPad = Math.floor(padMapping(location.binY)) - 4;
+            const maxPad = minPad + 8;
             padIndices = d3.range(minPad, maxPad + 1);
         }
         else {
