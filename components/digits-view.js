@@ -163,14 +163,14 @@ class DigitsViewComponent extends ComponentBase {
     }
 
     draw(eventData) {
-        if (eventData != null && eventData.trdTrack != null && eventData.trdTrack.trdTracklets != null && eventData.trdTrack.trdTracklets.length > 0) {
+        if (eventData != null && eventData.track != null && eventData.track.trklts != null && eventData.track.trklts.length > 0) {
             if (eventData.type == "select") {
-                const tracklet = eventData.trdTrack.trdTracklets[0];
+                const tracklet = eventData.track.trklts[0];
 
                 this.eventInput.value = eventData.event.evno;
-                this.sectorInput.value = tracklet.sector;
-                this.stackInput.value = tracklet.stack;
-                this.selectedTrackInput = eventData.trdTrack;
+                this.sectorInput.value = tracklet.sec;
+                this.stackInput.value = tracklet.stk;
+                this.selectedTrackInput = eventData.track;
 
                 //this.drawDigits();
             }
@@ -233,7 +233,7 @@ class DigitsViewComponent extends ComponentBase {
 
         let rowLayerIds = [];
         if (this.selectedTrack != null) {
-            rowLayerIds = this.selectedTrack.trdTracklets.map(d => d.layer + d.binZ * 10 + 1000);
+            rowLayerIds = this.selectedTrack.trklts.map(d => d.layer + d.binZ * 10 + 1000);
         }
 
         this.csumColourScale.domain([0, this.maxCsum]);
