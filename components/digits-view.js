@@ -218,15 +218,16 @@ class DigitsViewComponent extends ComponentBase {
 
         this.timeBinChange(bin);
 
-        await this.drawPads(bin);
+        const stop = await this.drawPads(bin);
 
-        if (bin < 29) {
+        if (!stop && bin < 29) {
             window.requestAnimationFrame(this.animatePads.bind(this));
         }
-        else console.log(bin);
     }
 
     async drawPads(bin) {
+        let stop = false;
+
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         this.ctx.drawImage(this.offscreenCanvas, 0, 0, this.canvas.width * this.ratio, this.canvas.height * this.ratio, 0, 0, this.canvas.width, this.canvas.height);
@@ -245,6 +246,12 @@ class DigitsViewComponent extends ComponentBase {
 
         for (const layer of this.data.layers.reverse()) {
             for (const pad of layer.pads) {
+                if (pad.tbins.length == 0) continue;
+                if (bin >= pad.tbins.length) {
+                    bin = pad.tbins.length - 1;
+                    stop = true;
+                }
+
                 const x = ml + (padw + 6 * padw + padw + rs) * pad.row + padw + pad.layer * padw;
                 const y = mt + padh + (pad.col * padh);
 
@@ -263,7 +270,6 @@ class DigitsViewComponent extends ComponentBase {
                         this.ctx.fillStyle = this.csumSelectedColourScale(cumsum);
                     else this.ctx.fillStyle = this.csumColourScale(cumsum);
                     this.ctx.fillRect(x+1, y+1, padw-1, padh-1);
-                    //this.ctx.strokeRect(x, y, padw, padh);
                 }
             }
         }
@@ -274,5 +280,7 @@ class DigitsViewComponent extends ComponentBase {
         this.ctx.textBaseline = "bottom";
         this.ctx.font = 'small-caps 13px sans-serif';
         this.ctx.fillText(this.maxCsum, pane1End / 2 + padw * 50 / 2, mt + padh * 146 + 30 * padh);
+        
+        return stop;
     }
 }
