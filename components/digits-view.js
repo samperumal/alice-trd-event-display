@@ -191,7 +191,7 @@ class DigitsViewComponent extends ComponentBase {
 
         try {
             console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}: ${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
-            const data = this.data = await d3.json(`${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
+            const data = this.data = await d3.json(this.dataLoadUrl(eventNo, sector, stack));
 
             for (const layer of data.layers) {
                 for (const pad of layer.pads) {

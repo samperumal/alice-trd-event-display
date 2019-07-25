@@ -311,7 +311,7 @@
                                 min="0" /></span>
                         <span><label for="stack-input">Stack: </label><input type="number" value="0" id="stack-input"
                                 min="0" /></span>
-                        <span><label for="max-csum-input">Max Cum. Sum: </label><input type="number" value="5000"
+                        <span><label for="max-csum-input">Max Cum. Sum: </label><input type="number" value="500"
                                 id="max-csum-input" min="0" style="width: 6em;" /></span>
                         <span><input type="button" value="Load" id="load-digits" /></span>
                     </p>
@@ -338,6 +338,8 @@
 
         const data = [...mapToDisplayDataFormat(getData())];
 
+        const digitsLoadUrl = (eventNo, sector, stack) => `data/000296934/${eventNo}.${sector}.${stack}.json`;
+
         const coordinator = new ComponentCoordinator(data);
 
         const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
@@ -347,7 +349,7 @@
         coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
         coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 300, 300));
         coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
-            dataLoadUrl: "data/000296934/"
+            dataLoadUrl: digitsLoadUrl
         }));
 
         coordinator.addComponent(new TrackInformationComponent("#track-information"));
@@ -369,7 +371,7 @@
             stackInput: "#stack-input",
             maxCsumInput: "#max-csum-input",
             buttons: ["#load-digits"],
-            dataLoadUrl: "data/000296934/",
+            dataLoadUrl: digitsLoadUrl,
             padClick: coordinator.padSelect.bind(coordinator),
             timeBinChange: (timebin) => { $("#timebin-slider").slider("option", "value", timebin); }
         });
