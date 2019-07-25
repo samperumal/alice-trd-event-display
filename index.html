@@ -27,7 +27,7 @@
     <script src="components/timebin-view.js"></script>
     <script src="components/display-mapper.js"></script>
 
-    <script src="data/data.000296934.js"></script>
+    <script src="data/pPb/script.js"></script>
 
     <title>ALICE TRD Event Display - Alpha</title>
 
@@ -338,7 +338,7 @@
 
         const data = [...mapToDisplayDataFormat(getData())];
 
-        const digitsLoadUrl = (eventNo, sector, stack) => `data/000296934/${eventNo}.${sector}.${stack}.json`;
+        const digitsLoadUrl = getDigitsLoadUrl;
 
         const coordinator = new ComponentCoordinator(data);
 
