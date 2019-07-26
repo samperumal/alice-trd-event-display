@@ -75,7 +75,7 @@ class TimebinViewComponent extends ComponentBase {
             const padGroup = layerGroup.append("g").attr("class", "pad-group")
                 .attr("transform", `translate(${this.splitXBand(1)}, 0)`);
 
-            padGroup.append("text").text(`LocalY pad coordinate`).attr("class", "panel-label axis-name")
+            padGroup.append("text").text(`LocalY pad coordinate (cm)`).attr("class", "panel-label axis-name")
                 .attr("x", this.splitXBand.bandwidth() / 2);
 
             this.padSubViews.push(new PadSubView(this.padGroupWidth, this.layerGroupHeight, padGroup, midColour));
@@ -309,9 +309,9 @@ class PadSubView {
 
         this.content = this.padContainer.append("g");
 
-        this.trackletPath = this.padContainer.append("path").attr("class", "tracklet");
-        this.trackletPathPos = this.padContainer.append("path").attr("class", "tracklet").style("stroke", "blue");
-        this.trackletPathNeg = this.padContainer.append("path").attr("class", "tracklet").style("stroke", "black");
+        this.trackletPath = this.padContainer.append("path").attr("class", "tracklet orig");
+        //this.trackletPathPos = this.padContainer.append("path").attr("class", "tracklet pos").style("stroke", "blue");
+        this.trackletPathNeg = this.padContainer.append("path").attr("class", "tracklet neg lorentz");
     }
 
     draw(location, digitsData, colourScale) {
@@ -320,7 +320,7 @@ class PadSubView {
         if (location == null) {
             this.colourAxisGroup.style("display", "none");
             this.trackletPath.attr("d", null);
-            this.trackletPathPos.attr("d", null);
+            //this.trackletPathPos.attr("d", null);
             this.trackletPathNeg.attr("d", null);
             return;
         }
@@ -380,7 +380,7 @@ class PadSubView {
             .style("fill", d => colourScale(d.val));
 
         this.trackletPath.attr("d", this.tline([[location.y1, 5], [location.y2, 25]]));
-        this.trackletPathPos.attr("d", this.tline([[location.y1, 5], [location.y2p, 25]]));
+        //this.trackletPathPos.attr("d", this.tline([[location.y1, 5], [location.y2p, 25]]));
         this.trackletPathNeg.attr("d", this.tline([[location.y1, 5], [location.y2n, 25]]));
     }
 }

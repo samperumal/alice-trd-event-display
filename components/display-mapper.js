@@ -32,7 +32,7 @@ function* mapToDisplayDataFormat(data) {
                     stk: t.stack,
                     lyr: t.layer,
                     row: t.binZ,
-                    binY: t.binY,
+                    //binY: t.binY,
                     y1: y1l,
                     y2: y2l,
                     y2p: y2PosLorentz,
