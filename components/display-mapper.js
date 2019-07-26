@@ -8,9 +8,17 @@ function* mapToDisplayDataFormat(data) {
             .map(t => {
                 const layerDim = stackedLayerData.get(t.stack).get(t.layer);
 
+                const lorentzAngle = 8;
+                const tanLorentz = Math.tan(lorentzAngle / 180 * Math.PI);
+
+                const adjDyDxPos = (t.dyDx + tanLorentz) / (1 - t.dyDx * tanLorentz);
+                const adjDyDxNeg = (t.dyDx - tanLorentz) / (1 + t.dyDx * tanLorentz);
+
                 const rot = -sectorToRotationAngle(t.sector);
                 const y1l = -t.localY;
                 const y2l = -t.localY + (t.dyDx * Math.abs(layerDim.maxR - layerDim.minR));
+                const y2PosLorentz = -t.localY + (adjDyDxPos * Math.abs(layerDim.maxR - layerDim.minR));
+                const y2NegLorentz = -t.localY + (adjDyDxNeg * Math.abs(layerDim.maxR - layerDim.minR));
                 const x1l = layerDim.maxR;
                 const x2l = layerDim.minR;
 
@@ -26,7 +34,9 @@ function* mapToDisplayDataFormat(data) {
                     row: t.binZ,
                     binY: t.binY,
                     y1: y1l,
-                    y2: y2l
+                    y2: y2l,
+                    y2p: y2PosLorentz,
+                    y2n: y2NegLorentz
                 };
 
                 trackletMap.set(t.id, tracklet);

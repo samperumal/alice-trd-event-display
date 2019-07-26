@@ -131,7 +131,9 @@ class TimebinViewComponent extends ComponentBase {
                         padIndices: padIndices,
                         col: -1,
                         y1: trackletData.y1, 
-                        y2: trackletData.y2,
+                        y2: trackletData.y2, 
+                        y2p: trackletData.y2p, 
+                        y2n: trackletData.y2n,
                         ydomain: ydomain
                     }
                 }
@@ -308,14 +310,18 @@ class PadSubView {
         this.content = this.padContainer.append("g");
 
         this.trackletPath = this.padContainer.append("path").attr("class", "tracklet");
+        this.trackletPathPos = this.padContainer.append("path").attr("class", "tracklet").style("stroke", "blue");
+        this.trackletPathNeg = this.padContainer.append("path").attr("class", "tracklet").style("stroke", "black");
     }
 
     draw(location, digitsData, colourScale) {
         this.content.selectAll("rect.tbin").remove();
-        this.trackletPath.attr("d", null);
 
         if (location == null) {
             this.colourAxisGroup.style("display", "none");
+            this.trackletPath.attr("d", null);
+            this.trackletPathPos.attr("d", null);
+            this.trackletPathNeg.attr("d", null);
             return;
         }
         else {
@@ -374,5 +380,7 @@ class PadSubView {
             .style("fill", d => colourScale(d.val));
 
         this.trackletPath.attr("d", this.tline([[location.y1, 5], [location.y2, 25]]));
+        this.trackletPathPos.attr("d", this.tline([[location.y1, 5], [location.y2p, 25]]));
+        this.trackletPathNeg.attr("d", this.tline([[location.y1, 5], [location.y2n, 25]]));
     }
 }

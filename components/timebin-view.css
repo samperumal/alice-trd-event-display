@@ -47,3 +47,8 @@ rect.tbin {
 .time-bin-view path.tracklet {
     stroke: rgb(209, 39, 39);
 }
+
+.time-bin-view path.tracklet.lorentz {
+    stroke: rgb(116, 16, 136);
+    stroke-dasharray: 1 2 3;
+}
