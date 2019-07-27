@@ -6,7 +6,7 @@ class TrackInformationComponent {
 
         this.addElements({
             "ID: ": "id",
-            "pT: ": "pt",
+            "pT: ": "pT",
             "PID: ": "pid",
             "Stack:": "stk",
             "Sector:": "sec",

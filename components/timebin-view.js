@@ -112,7 +112,7 @@ class TimebinViewComponent extends ComponentBase {
                         .filter(p => p.d[0].x > LY[0] && p.d[2].x < LY[1]);
 
                     const padExtent = d3.extent(pads.map(p => p.c));
-                    padExtent[1] = Math.min(143, padExtent[1] + 2);
+                    padExtent[1] = Math.min(143, padExtent[1] + 3);
                     padExtent[0] = Math.max(0, padExtent[0] - 2);
             
                     const padIndices = d3.range(padExtent[1], padExtent[0] - 1, -1);
