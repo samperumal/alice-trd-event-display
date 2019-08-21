@@ -44,11 +44,15 @@ class SectorZoomViewComponent extends ComponentBase {
 
         this.otherTracklets = this.container
             .append("path")
-            .attr("class", "tracklet other");
+            .attr("class", "tracklet zoom other");
+
+        this.matchedTracklets = this.container
+            .append("path")
+            .attr("class", "tracklet zoom matched");
 
         this.selectedTracklet = this.container
             .append("path")
-            .attr("class", "tracklet selected");
+            .attr("class", "tracklet zoom selected");
 
         this.stackText = this.container
             .append("text")
@@ -77,7 +81,8 @@ class SectorZoomViewComponent extends ComponentBase {
 
             const otherTracklets = eventData.event.trklts.filter(t => t.stk == track.stk && t.sec == track.sec);
 
-            this.otherTracklets.attr("d", otherTracklets.map(d => line(rotateToSector(d.path, track.sec))).join(" "));
+            this.otherTracklets.attr("d", otherTracklets.filter(d => !d.matched).map(d => line(rotateToSector(d.path, track.sec))).join(" "));
+            this.matchedTracklets.attr("d", otherTracklets.filter(d => d.matched).map(d => line(rotateToSector(d.path, track.sec))).join(" "));
 
             this.modules.attr("display", "default");
             this.pads.attr("display", "default");
@@ -87,6 +92,7 @@ class SectorZoomViewComponent extends ComponentBase {
         else {
             this.selectedTrack.attr("d", null);
             this.selectedTracklet.attr("d", null);
+            this.matchedTracklets.attr("d", null);
             this.otherTracklets.attr("d", null);
 
             this.modules.attr("display", "none");

@@ -27,18 +27,25 @@
 }
 
 .sector-view-component path.tracklet {
-    stroke: red;
+    stroke: #f03b20;
     stroke-width: 1px;
 }
 
+.sector-view-component path.tracklet.zoom {
+    stroke-width: 3px;
+}
+
 .sector-view-component path.tracklet.other {
-    stroke: #ffdddd;
-    stroke-width: 2px;
+    stroke:#ffeda0;
+}
+
+.sector-view-component path.tracklet.matched {
+    stroke: #feb24c;
 }
 
 .sector-view-component path.tracklet.selected {
-    stroke: red;
-    stroke-width: 2px;
+    stroke: #f03b20;
+    stroke-width: 3px;
 }
 
 .sector-view-component .zoom {

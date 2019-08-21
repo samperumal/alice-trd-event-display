@@ -29,13 +29,19 @@
 .supermodule-view-component path.tracklet.other {
     stroke: lightgray;
     stroke-width: 0.2px;
-    fill: #ffdddd;
+    fill: #ffeda0;
+}
+
+.supermodule-view-component path.tracklet.matched {
+    stroke: lightgray;
+    stroke-width: 0.2px;
+    fill: #feb24c;
 }
 
 .supermodule-view-component path.tracklet.selected, .supermodule-view-component path.tracklet {
     stroke: lightgray;
     stroke-width: 0.2px;
-    fill: rgb(209, 39, 39); 
+    fill: #f03b20; 
 }
 
 .supermodule-view-component rect.zoom-box {
