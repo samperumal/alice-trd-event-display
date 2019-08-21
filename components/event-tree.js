@@ -9,13 +9,14 @@ function trdTrackToJSTreeNode(t) {
 }
 
 function eventToJSTreeNode(e) {
-    e.tracks.sort((a,b) => {
-        if (a.typ == b.typ)
-            return a.sec != b.sec ? a.sec - b.sec : a.stk - b.stk;
-        else if (a.typ == "Esd")
-            return 1;
-        else return -1;
-    });
+    e.tracks
+        .sort((a,b) => {
+            if (a.typ == b.typ)
+                return a.sec != b.sec ? a.sec - b.sec : a.stk - b.stk;
+            // else if (a.type == "Esd")
+            //     return 1;
+            else return -1;
+        });
 
     return {
         id: e.id,
@@ -26,7 +27,9 @@ function eventToJSTreeNode(e) {
             opened: false,
         },
         children:
-            e.tracks.map(trdTrackToJSTreeNode)
+            e.tracks
+            .filter(a => a.typ == "Trd")
+            .map(trdTrackToJSTreeNode)
     };
 }
 
