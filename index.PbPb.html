@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+    
+    <script src="d3.min.js"></script>
+
+    <script src="jquery.min.js"></script>
+    <script src="jquery-ui.js"></script>
+    <script src="jstree.min.js"></script>
+
+    <script src="common-functions.js"></script>
+    <script src="geometry/geometries.js"></script>
+    <script src="components/trd-dimensions.js"></script>
+    <script src="components/padrow-dimensions.js"></script>
+    <script src="components/component-base.js"></script>
+    <script src="components/sector-view.js"></script>
+    <script src="components/sector-zoom-view.js"></script>
+    <script src="components/supermodule-view.js"></script>
+    <script src="components/supermodule-zoom-view.js"></script>
+    <script src="components/digits-view.js"></script>
+    <script src="components/event-tree.js"></script>
+    <script src="components/component-coordinator.js"></script>
+    <script src="components/track-information.js"></script>
+    <script src="components/timebin-view.js"></script>
+    <script src="components/display-mapper.js"></script>
+
+    <script src="data/PbPb/script.js"></script>
+
+    <title>ALICE TRD Event Display - Beta</title>
+
+    <link href='./proton/style.min.css' rel='stylesheet' />
+    <link href='./components/sector-view.css' rel='stylesheet' />
+    <link href='./components/supermodule-view.css' rel='stylesheet' />
+    <link href='./components/digits-view.css' rel='stylesheet' />
+    <link href='./components/timebin-view.css' rel='stylesheet' />
+
+    <link rel="stylesheet" href="jquery-ui.css">
+
+    <style>
+        *,
+        *:before,
+        *:after {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.428571429;
+            /* background-color: #6d6d6d; */
+        }
+
+        .ui-draggable,
+        .ui-droppable {
+            background-position: top;
+        }
+
+        svg {
+            border: 1px solid black;
+        }
+
+        p {
+            margin: 0 0 10px;
+        }
+
+        #tree-container {
+            height: 300px;
+            overflow: auto;
+        }
+
+        div.component {
+            margin-right: 0.5em;
+            margin-bottom: 1.5em;
+        }
+
+        div.component p {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 0.25em;
+            color: darkslategray;
+        }
+
+        div.component p span.label-left {
+            float: left;
+            margin-left: 2em;
+        }
+
+        div.component p span.label-right {
+            float: right;
+            margin-right: 2em;
+        }
+
+        div.time-bin-view {
+            max-height: 650px;
+            overflow-y: scroll;
+        }
+
+        #sector-view-zoom {
+            stroke-width: 0.1;
+            font-size: 5px;
+        }
+
+        #sector-view-zoom path.tracklet {
+            stroke-width: 0.3;
+        }
+
+        #supermodule-view-zoom {
+            stroke-width: 0.3;
+            font-size: x-small;
+        }
+
+        #sector-view .sector-view-component text.layer-number {
+            display: none;
+        }
+
+        #sector-view-zoom .sector-view-component text.layer-number {
+            font-size: 2px;
+        }
+
+        #sector-view-zoom .zoom-box {
+            display: none;
+        }
+
+        #sector-view-zoom .sector-view-component path.track {
+            stroke-dasharray: 1;
+            stroke-width: 0.3px;
+        }
+
+        #sector-view-zoom .sector-view-component path.track.not-selected {
+            stroke-dasharray: 1;
+            stroke-width: 0.1px;
+        }
+
+        #supermodule-view-zoom .supermodule-view-component .track path {
+            stroke-dasharray: 2;
+            stroke-width: 0.8px;
+        }
+
+        #supermodule-view-zoom .supermodule-view-component .track.not-selected path {
+            stroke-dasharray: 1;
+            stroke-width: 0.3px;
+        }
+
+        input[type=number] {
+            width: 4em;
+            text-align: center;
+            margin-right: 1em;
+        }
+
+        /* Tooltip container */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted black;
+            /* If you want dots under the hoverable text */
+        }
+
+        /* Tooltip text */
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 250px;
+            background-color: rgb(211, 90, 90);
+            color: #fff;
+            text-align: center;
+            padding: 5px 5px;
+            border-radius: 6px;
+            white-space: pre-line;
+
+            /* Position the tooltip text - see examples below! */
+            position: absolute;
+            z-index: 1;
+
+            top: 100%;
+            left: 50%;
+            margin-left: -125px;
+            /* Use half of the width (120/2 = 60), to center the tooltip */
+        }
+
+        /* Show the tooltip text when you mouse over the tooltip container */
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="display: flex; flex-direction: column; ">
+        <div style="display: flex; flex-direction: row; justify-content: flex-start; flex-wrap: wrap; width: 100%;">
+            <div id="navigation-col">
+                <div class="component">
+                    <p>
+                        <span class="tooltip">Available Events
+                            <span class="tooltiptext" style="word-wrap: pre-wrap;">Each event is a collision between two atomic nuclei that results in a fireball (Quark Gluon Plasma), and many different particles are produced out of this inferno. 
+                                
+                                The ALICE detector measures the interaction of these particles with fixed targets, and uses this to reconstruct all aspects of the particle.
+
+                                The blue tracks shown to the right are the result of this reconstruction.
+                            </span>
+                        </span>
+                    </p>
+                    <div id="tree-container" style="border: 1px solid black;">
+                        <div id="dataTree">
+                        </div>
+                    </div>
+                </div>
+                <div class="component" style="vertical-align: top; padding-top: 0.4em;">
+                    <p>Track Information</p>
+                    <div style="width: 300px; height: 300px; padding: 1em; border: 1px solid black;">
+                        <table>
+                            <tbody id="track-information">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="sector-col">
+                <div class="component">
+                    <p>
+                        <span class="label-left tooltip">Sector
+                            <span class="tooltiptext">The TRD is divided into 18 sectors, spaced at 20 degree intervals</span>
+                        </span>
+                        <span class="tooltip">Summary
+                                <span class="tooltiptext">This view shows all the reconstructed particle tracks in blue, and all the measured TRD signals in red.</span>
+                        </span>
+                        <span class="label-right tooltip">XY plane
+                            <span class="tooltiptext">The XY plane is equivalent to looking down the beam pipe, with the ring centre to your right</span>
+                        </span>
+                    </p>
+                    <svg id="sector-view" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
+                </div>
+                <div class="component">
+                    <p>
+                        <span class="label-left tooltip">Sector
+                            <span class="tooltiptext">The TRD is divided into 18 sectors or supermodules, spaced at 20 degree intervals</span>
+                        </span>
+                        <span class="tooltip">Detail
+                                <span class="tooltiptext">This view focuses on a single selected track, and the corresponding measured data in a single TRD module.</span>
+                        </span>
+                        <span class="label-right tooltip">XY plane
+                            <span class="tooltiptext">The XY plane is equivalent to looking down the beam pipe, with the ring centre to your right</span>
+                        </span>
+                    </p>
+                    <svg id="sector-zoom-view" style="width: 300px; height: 300px;"
+                        preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+
+            </div>
+            <div id="stack-col">
+                <div class="component">
+                    <p>
+                        <span class="label-left tooltip">Supermodule
+                            <span class="tooltiptext">Each supermodule is further divided into 5 stacks, and each stack has 6 layers</span>
+                        </span>
+                        <span class="tooltip">Summary
+                                <span class="tooltiptext">This view shows all the reconstructed particle tracks in blue, and all the measured TRD signals in red.</span>
+                        </span>
+                        <span class="label-right tooltip">ZR plane
+                            <span class="tooltiptext">The ZR plane is equivalent to looking radially out from the centre of the beam pipe</span>
+                        </span>
+                    </p>
+                    <svg id="supermodule-view" style="width: 300px; height: 300px;"
+                        preserveAspectRatio="xMidYMid"></svg>
+                </div>
+                <div class="component">
+                    <p>
+                        <span class="label-left tooltip">Supermodule
+                            <span class="tooltiptext">Each supermodule is further divided into 5 stacks, and each stack has 6 layers</span>
+                        </span>
+                        <span class="tooltip">Detail
+                                <span class="tooltiptext">This view focuses on a single selected track, and the corresponding measured data in a single TRD module.</span>
+                        </span>
+                        <span class="label-right tooltip">ZR plane
+                            <span class="tooltiptext">The ZR plane is equivalent to looking radially out from the centre of the beam pipe</span>
+                        </span>
+                    </p>
+                    <svg id="supermodule-zoom-view" style="width: 300px; height: 300px;"
+                        preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+            </div>
+            <div id="time-bin-col">
+                <div class="component">
+                    <p style="max-width: 500px;">
+                        <span class="tooltip">Time-bin view
+                            <span class="tooltiptext">This view shows how data, measured on each pad over 30 time bins of 2 micro-seconds each, is used to reconstruct a single TRD tracklet.
+    
+                                        At least 3 tracklets are required to match a reconstructed track.
+                                    </span>
+                                </span>
+                    </p>
+                    <div class="time-bin-view" style="border: 1px solid black; text-align: center; display: block;">
+                        <svg id="timebin-view-zoom" style="width: 500px; height: 1600px; border: none;"
+                            preserveAspectRatio="xMidYMid meet"></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="display: flex; flex-direction: row;">
+            <div class="column">
+                <div class="component">
+                    <p>Digits detail view</p>
+                    <p>
+                        <span><label for="event-input">Event: </label><input type="number" value="11" id="event-input"
+                                min="0" /></span>
+                        <span><label for="sector-input">Sector: </label><input type="number" value="0" id="sector-input"
+                                min="0" /></span>
+                        <span><label for="stack-input">Stack: </label><input type="number" value="0" id="stack-input"
+                                min="0" /></span>
+                        <span><label for="max-csum-input">Max Cum. Sum: </label><input type="number" value="500"
+                                id="max-csum-input" min="0" style="width: 6em;" /></span>
+                        <span><input type="button" value="Load" id="load-digits" /></span>
+                    </p>
+                    <div style="text-align: center;">
+                        <div style="display: inline-block; margin: 1em 2em; width: 50%; text-align: center;">
+                            <div>
+                                <label for="amount">Timebin: </label>
+                                <input type="text" id="timebin-display" readonly value="0"
+                                    style="border:0; color:#f6931f; font-weight:bold; width: 2em;">
+                            </div>
+                            <div id="timebin-slider" style="margin: 0 0;">
+                            </div>
+                        </div>
+                    </div>
+                    <canvas id="digits-view" width="1480" height="580" style="background: inherit;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const stackedLayerData = getStackedLayerDimensions();
+
+        function ajoin(a, b) { return a.concat(b); }
+
+        const data = [...mapToDisplayDataFormat(getData())];
+
+        const digitsLoadUrl = getDigitsLoadUrl;
+
+        const coordinator = new ComponentCoordinator(data);
+
+        const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
+
+        coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
+        coordinator.addComponent(new SectorZoomViewComponent("#sector-zoom-view", 300, 300));
+        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
+        coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 300, 300));
+        coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
+            dataLoadUrl: digitsLoadUrl
+        }));
+
+        coordinator.addComponent(new TrackInformationComponent("#track-information"));
+
+        const timebinDisplay = $("timebin-display");
+        $("#timebin-slider").slider({
+            value: 0,
+            min: 0,
+            max: 29,
+            step: 1,
+            change: function (event, ui) {
+                $("#timebin-display").val(ui.value);
+            }
+        });
+
+        const digitsView = new DigitsViewComponent("#digits-view", 1480, 650, null, {
+            eventInput: "#event-input",
+            sectorInput: "#sector-input",
+            stackInput: "#stack-input",
+            maxCsumInput: "#max-csum-input",
+            buttons: ["#load-digits"],
+            dataLoadUrl: digitsLoadUrl,
+            padClick: coordinator.padSelect.bind(coordinator),
+            timeBinChange: (timebin) => { $("#timebin-slider").slider("option", "value", timebin); }
+        });
+
+        $("#timebin-slider").on("slide", function (event, ui) {
+            digitsView.drawPads(ui.value);
+            $("#timebin-display").val(ui.value);
+        });
+
+        coordinator.addComponent(digitsView);
+
+        if (false) {
+            setTimeout(function () {
+                $("#dataTree").jstree("select_node", tree.treeData[1].children[1]);
+                //digitsView.drawDigits();
+            }, 500);
+        }
+
+    </script>
+</body>
+
+</html>
