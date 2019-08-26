@@ -3,6 +3,9 @@ class ComponentCoordinator {
         this.data = data;
         this.dataMap = this.mapData(this.data);
         this.components = [];
+
+        this.event = null;
+        this.track = null;
     }
 
     mapData(data) {
@@ -26,20 +29,32 @@ class ComponentCoordinator {
     }
 
     treeSelect(ev, eventData) {
-        const ids = eventData.node.id.split("_");
-        
         let event = null;
-        if (ids[0] !== null)
-            event = this.dataMap[ids[0]];
-
         let track = null;
-        if (ids[1] !== null)
-            track = this.dataMap[ids[0] + "_" + ids[1]];
+
+        if (ev.type == "dehover_node") {
+            event = this.event;
+            track = this.track;
+        }
+        else {
+            const ids = eventData.node.id.split("_");
+
+            if (ids[0] !== null)
+                event = this.dataMap[ids[0]];
+
+            if (ids[1] !== null)
+                track = this.dataMap[ids[0] + "_" + ids[1]];
+
+            if (ev.type == "select_node") {
+                this.event = event;
+                this.track = track;
+            }
+        }
 
         const drawData = {
             event,
             track,
-            type: ev.type == "select_node" ? "select" : (ev.type == "hover_node" ? "hover" : "hover")
+            type: (ev.type == "select_node" || ev.type == "dehover_node") ? "select" : (ev.type == "hover_node" ? "hover" : "hover")
         };
 
         for (const component of this.components) {
@@ -49,7 +64,7 @@ class ComponentCoordinator {
 
     padSelect(data) {
         for (const component of this.components) {
-            if (component.updatePad != null) 
+            if (component.updatePad != null)
                 component.updatePad(data);
         }
     }

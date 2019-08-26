@@ -36,6 +36,7 @@ class EventTree {
 
         $(id)
             .on("hover_node.jstree", treeSelect)
+            .on("dehover_node.jstree", treeSelect)
             .on("select_node.jstree", treeSelect)
             .jstree({
                 'core': {
