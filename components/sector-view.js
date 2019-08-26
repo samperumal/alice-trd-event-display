@@ -132,10 +132,15 @@ class SectorViewComponent extends ComponentBase {
 
         const selectedTrack = eventData.track != null ? eventData.track.id : null;
 
-        if (this.selectedEventId != eventData.event.id) {
+        if (eventData.event == null) {
+            this.selectedEventId = null;
+
+            this.allTracks.attr("d", null);
+            this.allTracklets.attr("d", null);
+        }
+        else if (this.selectedEventId != eventData.event.id) {
             this.selectedEventId = eventData.event.id;
 
-            const allTrackData = eventData.event.tracks;
             this.allTracks.attr("d", eventData.event.tracks.map(d => line(d.path)).join(" "));
             this.allTracklets.attr("d", eventData.event.trklts.map(d => line(d.path)).join(" "));
         }
@@ -158,6 +163,7 @@ class SectorViewComponent extends ComponentBase {
             this.allTracklets.classed("other", false);
 
             this.selectedTrack.attr("d", null);
+            this.selectedTracklet.attr("d", null);
 
             this.zoomBox
                 .transition().duration(transitionDuration)

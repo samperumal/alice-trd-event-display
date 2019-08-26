@@ -89,28 +89,34 @@ class SupermoduleViewComponent extends ComponentBase {
 
         const padRowDimensionData = geomStackZRPlanePads();
 
+        if (eventData.event == null) {
+            this.allTracks.attr("d", null);
+            this.otherTracklets.attr("d", null);
+        }
+        else {
+            this.allTracks.attr("d", eventData.event.tracks.map(d => line(d.path)).join(" "));
+
+            this.otherTracklets.attr("d", eventData.event.trklts
+                .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
+                .map(d => this.line2(d.d))
+                .join(" ")
+            );
+        }
+
         const track = eventData.track;
 
-        this.allTracks.attr("d", eventData.event.tracks.map(d => line(d.path)).join(" "));
-
-        this.otherTracklets.attr("d", eventData.event.trklts
-            .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
-            .map(d => this.line2(d.d))
-            .join(" ")
-        );
-
-        if (eventData.track != null) {
+        if (track != null) {
             this.allTracks.classed("other", true);
             this.otherTracklets.classed("other", true);
             this.selectedTrack.attr("d", line(track.path));
 
-            this.selectedTracklets.attr("d", eventData.track.trklts
+            this.selectedTracklets.attr("d", track.trklts
                 .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
                 .map(d => this.line2(d.d))
                 .join(" ")
             );
 
-            this.setViewBox(this.stackDimensionData[eventData.track.stk]);
+            this.setViewBox(this.stackDimensionData[track.stk]);
         }
         else {
             this.allTracks.classed("other", false);
