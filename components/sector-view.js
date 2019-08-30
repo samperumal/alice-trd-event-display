@@ -167,7 +167,7 @@ class SectorViewComponent extends ComponentBase {
 
             this.zoomBox
                 .transition().duration(transitionDuration)
-                .attr("transform", "rotate(" + (-4 * 20) + ")");
+                .attr("transform", `rotate(${-4 * 20} ${xscale(0)} ${yscale(0)})`);
         }
     }
 
