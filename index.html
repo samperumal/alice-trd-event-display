@@ -39,6 +39,7 @@
     <link href='./components/supermodule-view.css' rel='stylesheet' />
     <link href='./components/digits-view.css' rel='stylesheet' />
     <link href='./components/timebin-view.css' rel='stylesheet' />
+    <link href='./components/track-information.css' rel='stylesheet' />
 
     <link rel="stylesheet" href="jquery-ui.css">
 
@@ -212,13 +213,52 @@
                     </div>
                 </div>
                 <div class="component" style="vertical-align: top; padding-top: 0.4em;">
-                    <p>Track Information</p>
-                    <div style="width: 300px; height: 300px; padding: 1em; border: 1px solid black;">
+                    <p>Information</p>
+                    <div class="track-information">
+                        <div class="info-title">Event</div>
+                        <div style="text-align: center;" class="info-event">
+                            Collision between a proton and a lead-nuclei with at an energy of 5.5 GeV
+                        </div>
+                        <div class="info-title">Track</div>
+                        <div>
                         <table>
                             <tbody id="track-information">
-
+                                   <tr><td>ID:</td><td>E1</td><td>pT:</td><td>300 meV</td></tr> 
+                                   <tr><td>Stack:</td><td>3</td><td>Alpha:</td><td>0.24</td></tr>
+                                   <tr><td>Sector:</td><td>5</td><td>Lambda:</td><td>0.36</td></tr>
+                                   <tr><td>Type:</td><td>TRD</td><td>PID:</td><td>100</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="info-title">Tracklets</div>
+                        <div>
+                            <table>
+                                <tbody id="track-information">
+                                   <tr><td>ID:</td><td>E1_TL2</td></tr> 
+                                   <tr><td>Layer:</td><td>3</td></tr>
+                                   <tr><td>Row:</td><td>5</td></tr>
+                                   <tr><td>LocalY:</td><td>TRD</td></tr>
+                                   <tr><td>DyDx:</td><td>300 meV</td></tr>
+                                   <tr><td>&nbsp;</td></tr>
+                                   <tr><td>ID:</td><td>E1_TL2</td></tr> 
+                                   <tr><td>Layer:</td><td>3</td></tr>
+                                   <tr><td>Row:</td><td>5</td></tr>
+                                   <tr><td>LocalY:</td><td>TRD</td></tr>
+                                   <tr><td>DyDx:</td><td>300 meV</td></tr>
+                                   <tr><td>&nbsp;</td></tr>
+                                   <tr><td>ID:</td><td>E1_TL2</td></tr> 
+                                   <tr><td>Layer:</td><td>3</td></tr>
+                                   <tr><td>Row:</td><td>5</td></tr>
+                                   <tr><td>LocalY:</td><td>TRD</td></tr>
+                                   <tr><td>DyDx:</td><td>300 meV</td></tr>
                             </tbody>
                         </table>
+                        </div>
+                        <div class="info-title">Triggers</div>
+                        <div>
+                            0VBA  0VBC  0TVX  0VIR  0STG  0UBA  0UBC  0VHM  0OM2  0SH1  0BPA  0BPC  1HCO  1H12  1ZED  1ZMD
+                        </div>
+                        
                     </div>
                 </div>
             </div>

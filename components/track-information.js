@@ -4,15 +4,11 @@ class TrackInformationComponent {
 
         this.elements = {};
 
-        this.addElements({
-            "ID: ": "id",
-            "pT: ": "pT",
-            "PID: ": "pid",
-            "Stack:": "stk",
-            "Sector:": "sec",
-            "Alpha:": "alpha",
-            "Lambda:" : "lambda"
-        });
+        // this.addElements({
+        //     "ID:": "id",
+        //     "Stack:": "stk",
+        //     "Sector:": "sec"
+        // });
     }
 
     addElements(elements) {
@@ -24,15 +20,19 @@ class TrackInformationComponent {
     }
 
     draw(eventData) {
-        if (eventData.track != null) {
-            for (const el in this.elements) {
-                this.elements[el].text(eventData.track[el]);
-            }
-        }
-        else {
-            for (const el in this.elements) {
-                this.elements[el].text("");
-            }
-        }
+        // if (eventData.track != null) {
+        //     const track = eventData.track;
+        //     const info = track.i;
+        //     for (const el in this.elements) {
+        //         if (track[el] != null)
+        //             this.elements[el].text(track[el]);
+        //         else this.elements[el].text("");
+        //     }
+        // }
+        // else {
+        //     for (const el in this.elements) {
+        //         this.elements[el].text("");
+        //     }
+        // }
     }
 }

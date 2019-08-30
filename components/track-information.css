@@ -1,0 +1,14 @@
+.track-information div.info-title {
+    font-weight: bold;
+    font-style: italic;
+    text-align: center;
+    margin: 0.5em 0;
+}
+
+div.track-information {
+    width: 300px; 
+    height: 300px; 
+    padding: 0 1em; 
+    border: 1px solid black;
+    overflow-y: scroll;
+}
