@@ -19,7 +19,7 @@ function eventToJSTreeNode(e) {
 
     return {
         id: e.id,
-        text: "Event " + e.evno,
+        text: "Event " + e.id,
         type: "Event",
         data: e,
         state: {

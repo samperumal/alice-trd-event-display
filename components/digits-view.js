@@ -167,7 +167,7 @@ class DigitsViewComponent extends ComponentBase {
             if (eventData.type == "select") {
                 const tracklet = eventData.track.trklts[0];
 
-                this.eventInput.value = eventData.event.evno;
+                this.eventInput.value = eventData.event.id;
                 this.sectorInput.value = tracklet.sec;
                 this.stackInput.value = tracklet.stk;
                 this.selectedTrackInput = eventData.track;

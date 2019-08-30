@@ -89,7 +89,7 @@ class TimebinViewComponent extends ComponentBase {
     }
 
     async drawDigits(eventData) {
-        const eventNo = eventData.event.evno;
+        const eventNo = eventData.event.id;
         const sector = eventData.track.sec;
         const stack = eventData.track.stk;
 
