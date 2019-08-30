@@ -81,8 +81,8 @@ class SectorZoomViewComponent extends ComponentBase {
 
             const otherTracklets = eventData.event.trklts.filter(t => t.stk == track.stk && t.sec == track.sec);
 
-            this.otherTracklets.attr("d", otherTracklets.filter(d => !d.matched).map(d => line(rotateToSector(d.path, track.sec))).join(" "));
-            this.matchedTracklets.attr("d", otherTracklets.filter(d => d.matched).map(d => line(rotateToSector(d.path, track.sec))).join(" "));
+            this.otherTracklets.attr("d", otherTracklets.filter(d => d.trk == null).map(d => line(rotateToSector(d.path, track.sec))).join(" "));
+            this.matchedTracklets.attr("d", otherTracklets.filter(d => d.trk != null).map(d => line(rotateToSector(d.path, track.sec))).join(" "));
 
             this.modules.attr("display", "default");
             this.pads.attr("display", "default");

@@ -106,14 +106,14 @@ class SupermoduleZoomViewComponent extends ComponentBase {
             const otherTracklets = eventData.event.trklts.filter(t => t.stk == track.stk && t.sec == track.sec);
 
             this.otherTracklets.attr("d", otherTracklets
-                .filter(d => !d.matched)    
+                .filter(d => d.trk == null)    
                 .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
                 .map(d => this.line2(d.d) + " Z ")
                 .join(" ")
             );
 
             this.matchedTracklets.attr("d", otherTracklets
-                .filter(d => d.matched)    
+                .filter(d => d.trk != null)    
                 .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
                 .map(d => this.line2(d.d) + " Z ")
                 .join(" ")
