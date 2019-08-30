@@ -2,7 +2,7 @@
 function trdTrackToJSTreeNode(t) {
     return {
         id: t.id,
-        text: `${t.type} track ${t.id.substring(4)} (Sector ${t.sec}, Stack ${t.stk})`,
+        text: `${t.typ} track ${t.id.substring(4)} (Sector ${t.sec}, Stack ${t.stk})`,
         data: t,
         type: "Track"
     };
@@ -10,9 +10,9 @@ function trdTrackToJSTreeNode(t) {
 
 function eventToJSTreeNode(e) {
     e.tracks.sort((a,b) => {
-        if (a.type == b.type)
+        if (a.typ == b.typ)
             return a.sec != b.sec ? a.sec - b.sec : a.stk - b.stk;
-        else if (a.type == "Esd")
+        else if (a.typ == "Esd")
             return 1;
         else return -1;
     });
