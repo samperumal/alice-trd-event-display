@@ -34,7 +34,7 @@ function* mapToDisplayDataFormat(data) {
         const tracks = ev.tracks
             .filter(t => t.path != null && t.path.length > 0)
             .map(t => {
-                t.trklts = t.trklts.map(tl => trackletMap.get(tl));
+                t.trklts = t.tlids.map(tl => trackletMap.get(tl));
                 return t;
             });
 
