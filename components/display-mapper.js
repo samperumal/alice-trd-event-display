@@ -38,11 +38,10 @@ function* mapToDisplayDataFormat(data) {
                 return t;
             });
 
-        yield {
-            id: ev.id,
-            tracks,
-            trklts
-        };
+        ev.tracks = tracks;
+        ev.trklts = trklts;
+
+        yield ev;
     }
 }
 

@@ -214,15 +214,13 @@
                 </div>
                 <div class="component" style="vertical-align: top; padding-top: 0.4em;">
                     <p>Information</p>
-                    <div class="track-information">
+                    <div id="track-information" class="track-information">
                         <div class="info-title">Event</div>
-                        <div style="text-align: center;" class="info-event">
-                            Collision between a proton and a lead-nuclei with at an energy of 5.5 GeV
-                        </div>
+                        <div style="text-align: center;" class="info-event"></div>
                         <div class="info-title">Track</div>
                         <div>
-                        <table>
-                            <tbody id="track-information">
+                            <table>
+                                <tbody>
                                    <tr><td>ID:</td><td>E1</td><td>pT:</td><td>300 meV</td></tr> 
                                    <tr><td>Stack:</td><td>3</td><td>Alpha:</td><td>0.24</td></tr>
                                    <tr><td>Sector:</td><td>5</td><td>Lambda:</td><td>0.36</td></tr>
@@ -233,7 +231,7 @@
                         <div class="info-title">Tracklets</div>
                         <div>
                             <table>
-                                <tbody id="track-information">
+                                <tbody>
                                    <tr><td>ID:</td><td>E1_TL2</td></tr> 
                                    <tr><td>Layer:</td><td>3</td></tr>
                                    <tr><td>Row:</td><td>5</td></tr>
@@ -251,8 +249,8 @@
                                    <tr><td>Row:</td><td>5</td></tr>
                                    <tr><td>LocalY:</td><td>TRD</td></tr>
                                    <tr><td>DyDx:</td><td>300 meV</td></tr>
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
                         </div>
                         <div class="info-title">Triggers</div>
                         <div>
@@ -375,8 +373,6 @@
         </div>
     </div>
     <script>
-        const stackedLayerData = getStackedLayerDimensions();
-
         function ajoin(a, b) { return a.concat(b); }
 
         const data = [...mapToDisplayDataFormat(getData())];
