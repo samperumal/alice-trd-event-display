@@ -193,7 +193,7 @@ class DigitsViewComponent extends ComponentBase {
             console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}: ${this.dataLoadUrl}${eventNo}.${sector}.${stack}.json`);
             const data = this.data = await d3.json(this.dataLoadUrl(eventNo, sector, stack));
 
-            for (const layer of data.layers) {
+            for (const layer of data.lyrs) {
                 for (const pad of layer.pads) {
                     let csum = 0;
                     pad.csum = [];
@@ -244,7 +244,7 @@ class DigitsViewComponent extends ComponentBase {
         this.ctx.strokeStyle = "white";
         this.ctx.lineWidth = 1;
 
-        for (const layer of this.data.layers.reverse()) {
+        for (const layer of this.data.lyrs.reverse()) {
             for (const pad of layer.pads) {
                 if (pad.tbins.length == 0) continue;
                 if (bin >= pad.tbins.length) {
@@ -252,11 +252,11 @@ class DigitsViewComponent extends ComponentBase {
                     stop = true;
                 }
 
-                const x = ml + (padw + 6 * padw + padw + rs) * pad.row + padw + layer.layer * padw;
+                const x = ml + (padw + 6 * padw + padw + rs) * pad.row + padw + layer.lyr * padw;
                 const y = mt + padh + (pad.col * padh);
 
                 if (pad.tbins[bin] > 0) {
-                    if (rowLayerIds.includes(layer.layer + pad.row * 10 + 1000))
+                    if (rowLayerIds.includes(layer.lyr + pad.row * 10 + 1000))
                         this.ctx.fillStyle = this.binSelectedColourScale(pad.tbins[bin]);
                     else this.ctx.fillStyle = this.binColourScale(pad.tbins[bin]);
                     this.ctx.fillRect(x + paneXOffset, y, padw, padh);
@@ -266,7 +266,7 @@ class DigitsViewComponent extends ComponentBase {
                 const cumsum = pad.csum[bin];
 
                 if (cumsum > 0) {
-                    if (rowLayerIds.includes(layer.layer + pad.row * 10 + 1000))
+                    if (rowLayerIds.includes(layer.lyr + pad.row * 10 + 1000))
                         this.ctx.fillStyle = this.csumSelectedColourScale(cumsum);
                     else this.ctx.fillStyle = this.csumColourScale(cumsum);
                     this.ctx.fillRect(x+1, y+1, padw-1, padh-1);

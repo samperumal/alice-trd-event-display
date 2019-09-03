@@ -139,8 +139,11 @@ class TimebinViewComponent extends ComponentBase {
                 }
                 else this.layerLabels[layer].text(`Layer ${layer}`);
 
-                this.tbsumSubViews[layer].draw(location, data.layers[layer]);
-                this.padSubViews[layer].draw(location, data.layers[layer], this.colourScale);
+                // Find corresponding layer, if any, in digits data
+                const layerData = data.lyrs.find(l => l.lyr == layer);
+
+                this.tbsumSubViews[layer].draw(location, layerData);
+                this.padSubViews[layer].draw(location, layerData, this.colourScale);
             }
         }
         catch (err) {
@@ -201,7 +204,7 @@ class TbsumSubView {
     }
 
     draw(location, digitsData) {
-        if (location == null) {
+        if (location == null || digitsData == null) {
             this.content.selectAll("rect.tbsum").remove();
             this.xscale.domain([256, 0]);
             this.xaxis.call(d3.axisBottom(this.xscale).ticks(5, "s"));
@@ -317,7 +320,7 @@ class PadSubView {
     draw(location, digitsData, colourScale) {
         this.content.selectAll("rect.tbin").remove();
 
-        if (location == null) {
+        if (location == null || digitsData == null) {
             this.colourAxisGroup.style("display", "none");
             this.trackletPath.attr("d", null);
             //this.trackletPathPos.attr("d", null);

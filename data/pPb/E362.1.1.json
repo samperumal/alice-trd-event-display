@@ -1,14 +1,14 @@
 {
-	"event": 362,
-	"layers": [
+	"evid": 362,
+	"lyrs": [
 		{
-			"layer": 0,
+			"lyr": 0,
 			"pads": [
 
 			]
 		},
 		{
-			"layer": 1,
+			"lyr": 1,
 			"pads": [
 				{
 					"row": 0,
@@ -233,7 +233,7 @@
 			]
 		},
 		{
-			"layer": 2,
+			"lyr": 2,
 			"pads": [
 				{
 					"row": 0,
@@ -613,7 +613,7 @@
 			]
 		},
 		{
-			"layer": 3,
+			"lyr": 3,
 			"pads": [
 				{
 					"row": 0,
@@ -838,13 +838,13 @@
 			]
 		},
 		{
-			"layer": 4,
+			"lyr": 4,
 			"pads": [
 
 			]
 		},
 		{
-			"layer": 5,
+			"lyr": 5,
 			"pads": [
 				{
 					"row": 0,
