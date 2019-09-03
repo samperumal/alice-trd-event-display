@@ -234,7 +234,7 @@ class DigitsViewComponent extends ComponentBase {
 
         let rowLayerIds = [];
         if (this.selectedTrack != null) {
-            rowLayerIds = this.selectedTrack.trklts.map(d => d.layer + d.binZ * 10 + 1000);
+            rowLayerIds = this.selectedTrack.trklts.map(d => d.lyr + d.row * 10 + 1000);
         }
 
         this.csumColourScale.domain([0, this.maxCsum]);
@@ -252,11 +252,11 @@ class DigitsViewComponent extends ComponentBase {
                     stop = true;
                 }
 
-                const x = ml + (padw + 6 * padw + padw + rs) * pad.row + padw + pad.layer * padw;
+                const x = ml + (padw + 6 * padw + padw + rs) * pad.row + padw + layer.layer * padw;
                 const y = mt + padh + (pad.col * padh);
 
                 if (pad.tbins[bin] > 0) {
-                    if (rowLayerIds.includes(pad.layer + pad.row * 10 + 1000))
+                    if (rowLayerIds.includes(layer.layer + pad.row * 10 + 1000))
                         this.ctx.fillStyle = this.binSelectedColourScale(pad.tbins[bin]);
                     else this.ctx.fillStyle = this.binColourScale(pad.tbins[bin]);
                     this.ctx.fillRect(x + paneXOffset, y, padw, padh);
@@ -266,7 +266,7 @@ class DigitsViewComponent extends ComponentBase {
                 const cumsum = pad.csum[bin];
 
                 if (cumsum > 0) {
-                    if (rowLayerIds.includes(pad.layer + pad.row * 10 + 1000))
+                    if (rowLayerIds.includes(layer.layer + pad.row * 10 + 1000))
                         this.ctx.fillStyle = this.csumSelectedColourScale(cumsum);
                     else this.ctx.fillStyle = this.csumColourScale(cumsum);
                     this.ctx.fillRect(x+1, y+1, padw-1, padh-1);
