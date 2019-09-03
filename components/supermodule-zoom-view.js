@@ -12,8 +12,7 @@ class SupermoduleZoomViewComponent extends ComponentBase {
 
         const xscale = this.xscale, yscale = this.yscale;
 
-        this.line = d3.line().x(d => xscale(-d.z)).y(d => yscale(d.r));
-        this.line2 = d3.line().x(d => xscale(d.x)).y(d => yscale(d.y));
+        this.line = d3.line().x(d => xscale(d.x)).y(d => yscale(d.y));
 
         // Create map of paths per stack, for efficiency
         this.stackPaths = new Map();
@@ -26,12 +25,12 @@ class SupermoduleZoomViewComponent extends ComponentBase {
 
             const modulePath = moduleData
                 .filter(d => d.stk == stack)
-                .map(d => this.line2(d.d) + " Z ")
+                .map(d => this.line(d.d) + " Z ")
                 .join(" ");
 
             const padPath = padData
                 .filter(d => d.s == stack && d.d != null && d.d.length > 0)
-                .map(d => this.line2(d.d) + " Z ")
+                .map(d => this.line(d.d) + " Z ")
                 .join(" ");
 
             this.stackPaths.set(+stack, {
@@ -79,6 +78,14 @@ class SupermoduleZoomViewComponent extends ComponentBase {
     }
 
     draw(eventData) {
+        function rotateToSector(track) {
+            const sector = track.sec;
+            return track.path.map(d => {
+                const rot = rotate(d.x, d.y, -20 * (4 - sector));
+                return { x: -d.z, y: rot[1] };
+            });
+        }
+
         const line = this.line;
 
         if (eventData.track != null) {
@@ -93,13 +100,13 @@ class SupermoduleZoomViewComponent extends ComponentBase {
 
             this.modules.attr("d", this.stackPaths.get(track.stk).modulePath);
 
-            this.selectedTrack.attr("d", line(track.path));
+            this.selectedTrack.attr("d", line(rotateToSector(track)));
 
             const padRowDimensionData = geomStackZRPlanePads();
 
             this.selectedTracklets.attr("d", track.trklts
                 .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
-                .map(d => this.line2(d.d) + " Z ")
+                .map(d => this.line(d.d) + " Z ")
                 .join(" ")
             );
 
@@ -108,14 +115,14 @@ class SupermoduleZoomViewComponent extends ComponentBase {
             this.otherTracklets.attr("d", otherTracklets
                 .filter(d => d.trk == null)    
                 .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
-                .map(d => this.line2(d.d) + " Z ")
+                .map(d => this.line(d.d) + " Z ")
                 .join(" ")
             );
 
             this.matchedTracklets.attr("d", otherTracklets
                 .filter(d => d.trk != null)    
                 .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
-                .map(d => this.line2(d.d) + " Z ")
+                .map(d => this.line(d.d) + " Z ")
                 .join(" ")
             );
 

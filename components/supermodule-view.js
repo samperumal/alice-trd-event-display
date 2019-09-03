@@ -16,8 +16,7 @@ class SupermoduleViewComponent extends ComponentBase {
         xscale.domain([-370, 370]);
         yscale.domain([600, -140]);
 
-        this.line = d3.line().x(d => xscale(-d.z)).y(d => yscale(d.r));
-        this.line2 = d3.line().x(d => xscale(d.x)).y(d => yscale(d.y));
+        this.line = d3.line().x(d => xscale(d.x)).y(d => yscale(d.y));
 
         this.container
             .attr("class", "supermodule-view-component");
@@ -25,7 +24,7 @@ class SupermoduleViewComponent extends ComponentBase {
         this.container
             .append("path")
             .attr("class", "module tpc")
-            .attr("d", this.line2(geomSectorZRPlaneTPC()));
+            .attr("d", this.line(geomSectorZRPlaneTPC()));
 
         this.zoomBox = this.container.append("rect");
 
@@ -46,7 +45,7 @@ class SupermoduleViewComponent extends ComponentBase {
             .attr("class", "tracklet selected");
 
         const modulePath = moduleDimensionData
-            .map(d => this.line2(d.d) + " Z ")
+            .map(d => this.line(d.d) + " Z ")
             .join(" ");
 
         this.modules = this.container
@@ -56,7 +55,7 @@ class SupermoduleViewComponent extends ComponentBase {
 
         const padPath = geomStackZRPlanePads()
             .filter(d => d.d != null && d.d.length > 0)
-            .map(d => this.line2(d.d) + " Z ")
+            .map(d => this.line(d.d) + " Z ")
             .join(" ");
 
         this.pads = this.container
@@ -85,6 +84,14 @@ class SupermoduleViewComponent extends ComponentBase {
     }
 
     draw(eventData) {
+        function rotateToSector(track) {
+            const sector = track.sec;
+            return track.path.map(d => {
+                const rot = rotate(d.x, d.y, -20 * (4 - sector));
+                return { x: -d.z, y: rot[1] };
+            });
+        }
+
         const line = this.line;
 
         const padRowDimensionData = geomStackZRPlanePads();
@@ -94,11 +101,11 @@ class SupermoduleViewComponent extends ComponentBase {
             this.otherTracklets.attr("d", null);
         }
         else {
-            this.allTracks.attr("d", eventData.event.tracks.map(d => line(d.path)).join(" "));
+            this.allTracks.attr("d", eventData.event.tracks.map(d => line(rotateToSector(d))).join(" "));
 
             this.otherTracklets.attr("d", eventData.event.trklts
                 .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
-                .map(d => this.line2(d.d))
+                .map(d => this.line(d.d))
                 .join(" ")
             );
         }
@@ -108,11 +115,11 @@ class SupermoduleViewComponent extends ComponentBase {
         if (track != null) {
             this.allTracks.classed("other", true);
             this.otherTracklets.classed("other", true);
-            this.selectedTrack.attr("d", line(track.path));
+            this.selectedTrack.attr("d", line(rotateToSector(track)));
 
             this.selectedTracklets.attr("d", track.trklts
                 .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
-                .map(d => this.line2(d.d))
+                .map(d => this.line(d.d))
                 .join(" ")
             );
 
