@@ -13,3 +13,9 @@ div.track-information {
     overflow-y: scroll;
     font-size: small;
 }
+
+div.track-information em {
+    font-weight: bold;
+    font-style: normal;
+    color: rgb(0, 132, 255);
+}
