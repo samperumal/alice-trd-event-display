@@ -11,4 +11,5 @@ div.track-information {
     padding: 0 1em; 
     border: 1px solid black;
     overflow-y: scroll;
+    font-size: small;
 }
