@@ -12,7 +12,7 @@ class ThreejsComponent {
     init(id) {
 
         const scene = this.scene = new THREE.Scene();
-        scene.background = new THREE.Color( 0xffffff );
+        scene.background = new THREE.Color(0xffffff);
 
         const renderer = this.renderer = new THREE.WebGLRenderer({
             antialias: true,
@@ -42,9 +42,11 @@ class ThreejsComponent {
 
         // world
 
+        // Central sphere
         const sphG = new THREE.SphereBufferGeometry(10);
-        scene.add(new THREE.LineSegments(new THREE.WireframeGeometry(sphG), new THREE.LineBasicMaterial( { color: 0xff0000 } )));
+        scene.add(new THREE.LineSegments(new THREE.WireframeGeometry(sphG), new THREE.LineBasicMaterial({ color: 0x00ff00 })));
 
+        // TRD Modules
         const detectors = this.detectors = new THREE.Object3D();
 
         for (const layer of geomLayers3D()) {
@@ -52,30 +54,58 @@ class ThreejsComponent {
             rotObj.rotation.fromArray([0, 0, layer.rot / 180 * Math.PI]);
 
             var geometry = new THREE.BoxBufferGeometry(layer.w, layer.h, layer.d);
-            var wireframe = new THREE.EdgesGeometry( geometry );
-            var line = new THREE.LineSegments( wireframe, 
-                new THREE.LineBasicMaterial( { color: new THREE.Color(`hsl(${layer.rot}, ${20 + layer.lyr * 10}%, ${20 + layer.stk * 10}%)`) } ) 
+            var wireframe = new THREE.EdgesGeometry(geometry);
+            var line = new THREE.LineSegments(wireframe,
+                new THREE.LineBasicMaterial({ color: new THREE.Color(`hsl(${layer.rot}, ${20 + layer.lyr * 10}%, ${20 + layer.stk * 10}%)`) })
             );
             line.position.x = layer.x;
             line.position.y = layer.y;
             line.position.z = layer.z;
-            
-            rotObj.add( line );
-        
-            detectors.add( rotObj );
+
+            rotObj.add(line);
+
+            detectors.add(rotObj);
         }
 
         scene.add(detectors);
+
+        // Tracks
+        this.tracks = null;
     }
 
     render() {
 
         this.renderer.render(this.scene, this.camera);
-
     }
 
     draw(eventData) {
+        //const paths = eventData.event.tracks.map(t => t.path.map(p => [p.x, p.y, p.z]).reduce((a, b) => a.concat(b)));
 
+        if (this.tracks != null) this.scene.remove(this.tracks);
+
+        this.tracks = new THREE.Object3D();        
+
+        for (const track of eventData.event.tracks) {
+            const path = track.path.map(p => [p.x, p.y, p.z]).reduce((a, b) => a.concat(b));
+
+            const geometry = new THREE.BufferGeometry();
+
+            const vertices = new Float32Array(path);
+
+            // itemSize = 3 because there are 3 values (components) per vertex
+            geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+            const line = new THREE.Line(geometry,
+                new THREE.LineBasicMaterial({ color: 0xff0000 })
+            );
+
+            this.tracks.add(line);
+        }
+
+        this.scene.add(this.tracks);
+
+        this.render();
+
+        //console.log(eventData.event);
     }
 }
 
