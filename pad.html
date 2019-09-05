@@ -2,226 +2,142 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>three.js webgl - orbit controls</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <!-- <link type="text/css" rel="stylesheet" href="main.css"> -->
     <style>
         body {
-            margin: 0
+            background-color: #ccc;
+            color: #000;
         }
 
-        canvas {
-            width: 600px;
-            height: 600px;
+        a {
+            color: #f00;
         }
     </style>
-    <script src="three.min.js"></script>
-    <script src="js/OrbitControls.js"></script>
-    <script src="d3.min.js"></script>
-    <script src="components/trd-dimensions.js"></script>
 </head>
 
 <body>
-    <canvas id="c">
+    <canvas id="cnvs" style="width: 300px; height: 300px;"></canvas>
 
-    </canvas>
-    <script>
-        'use strict';
+    <script type="module">
 
-        /* global THREE */
+        import * as THREE from './js/three.module.js';
 
-        const chambers = [];
-        let camera, controls;
+        import { OrbitControls } from './js/OrbitControls.js';
 
-        function main() {
-            const canvas = document.querySelector('#c');
-            const renderer = new THREE.WebGLRenderer({ canvas });
+        var camera, controls, scene, renderer;
 
-            const fov = 40;
-            const aspect = 2;  // the canvas default
-            const near = 0.1;
-            const far = 1000;
-            camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-            
-            camera.position.set(325.7, 500, 0);
-            camera.lookAt(325.7, 0, 0);
+        init();
+        render(); // remove when using next line for animation loop (requestAnimationFrame)
+        //animate();
 
-            controls = new THREE.OrbitControls( camera, canvas );
+        function init() {
 
-            const scene = new THREE.Scene();
-            scene.background = new THREE.Color(0xAAAAAA);
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color( 0xaaaaaa );
+            //scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 
-            // Add lights
-            {
-                const color = 0xFFFFFF;
-                const intensity = 1;
-                const light = new THREE.DirectionalLight(color, intensity);
-                light.position.set(-1, 2, 4);
-                scene.add(light);
-            }
-            {
-                const color = 0xFFFFFF;
-                const intensity = 1;
-                const light = new THREE.DirectionalLight(color, intensity);
-                light.position.set(1, -2, -4);
-                scene.add(light);
-            }
+            renderer = new THREE.WebGLRenderer({
+                antialias: true,
+                canvas: document.getElementById("cnvs")
+            });
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(300, 300);
+            //document.body.appendChild(renderer.domElement);
 
-            const objects = [];
-            const spread = 15;
+            camera = new THREE.PerspectiveCamera(75, 1, 1, 2000);
+            camera.position.set(400, 200, 0);
 
-            function addObject(x, y, obj) {
-                obj.position.x = x * spread;
-                obj.position.y = y * spread;
+            // controls
 
-                scene.add(obj);
-                objects.push(obj);
-            }
+            controls = new OrbitControls(camera, renderer.domElement);
 
-            function createMaterial() {
-                const material = new THREE.MeshPhongMaterial({
-                    side: THREE.DoubleSide,
-                    opacity: 0.8,
-                    transparent: false,
-                    side: THREE.DoubleSide
-                });
+            controls.addEventListener('change', render); // call this only in static scenes (i.e., if there is no animation loop)
 
-                const hue = Math.random();
-                const saturation = 1;
-                const luminance = .5;
-                material.color.setHSL(hue, saturation, luminance);
+            // controls.enableDamping = false; // an animation loop is required when either damping or auto-rotation are enabled
+            // controls.dampingFactor = 0.05;
 
-                return material;
-            }
+            controls.screenSpacePanning = false;
 
-            function addSolidGeometry(x, y, geometry) {
-                const mesh = new THREE.Mesh(geometry, createMaterial());
-                addObject(x, y, mesh);
-            }
+            controls.minDistance = -1500;
+            controls.maxDistance = 1500;
 
-            function addLineGeometry(x, y, geometry) {
-                const material = new THREE.LineBasicMaterial({ color: 0x000000 });
-                const mesh = new THREE.LineSegments(geometry, material);
-                addObject(x, y, mesh);
-            }
+            //controls.maxPolarAngle = Math.PI / 2;
 
-            // Add objects
-            {
-                const width = 8;
-                const height = 8;
-                const depth = 8;
-                addSolidGeometry(-2, 2, new THREE.BoxBufferGeometry(width, height, depth));
-            }
-            {
-                const width = 9;
-                const height = 9;
-                const widthSegments = 2;
-                const heightSegments = 2;
-                addSolidGeometry(-1, 2, new THREE.PlaneBufferGeometry(width, height, widthSegments, heightSegments));
-            }
-            {
-                const width = 8;
-                const height = 8;
-                const depth = 8;
-                addLineGeometry(0, 2, new THREE.EdgesGeometry(new THREE.BoxBufferGeometry(width, height, depth)));
-            }
-            {
-                const width = 8;
-                const height = 8;
-                const depth = 8;
-                addLineGeometry(1, 2, new THREE.WireframeGeometry(new THREE.BoxBufferGeometry(width, height, depth)));
-            }
+            // world
 
-            const trd_dim = getDimensions();//.filter(d => d.stack == d.layer);
+            var geometry = new THREE.BoxBufferGeometry(300, 200, 100);
+            var material = new THREE.MeshPhongMaterial({ color: 0xdddddd, flatShading: true });
 
-            function getSupermoduleCenteredTransformation(dim) {
-                // R maps to X, localY maps to Y, Z maps to Z, 90 deg anti-clockwise rotation around Z
-                const xmin = d3.min(dim, d => d.minR), xmax = d3.max(dim, d => d.maxR);
-                const ymin = d3.min(dim, d => d.minLocalY), ymax = d3.max(dim, d => d.maxLocalY);
-                const zmin = d3.min(dim, d => d.minZ), zmax = d3.max(dim, d => d.maxZ);
+            var wireframe = new THREE.EdgesGeometry( geometry );
 
-                const pos = {
-                    x: -(xmin + xmax) / 2,
-                    y: -(ymin + ymax) / 2,
-                    z: -(zmin + zmax) / 2,
-                };
+            var line = new THREE.LineSegments( wireframe );
+            line.material.depthTest = false;
+            //line.material.opacity = 0.25;
+            //line.material.transparent = true;
 
-                console.log(pos, [xmin, xmax, ymin, ymax, zmin, zmax]);
+            scene.add( line );
 
-                return pos;
-            }
+            // for (var i = 0; i < 500; i++) {
 
-            const container = new THREE.Object3D();
-            scene.add(container);
-            const supermodules = new THREE.Object3D();
-            container.add(supermodules);
+                // var mesh = new THREE.Mesh(geometry, material);
+                // // mesh.position.x = Math.random() * 1600 - 800;
+                // // mesh.position.y = 0;
+                // // mesh.position.z = Math.random() * 1600 - 800;
+                // mesh.updateMatrix();
+                // mesh.matrixAutoUpdate = false;
+                // scene.add(mesh);
 
-            const colours = ["red", "green", "blue", "orange", "purple"];
+            // }
 
-            for (const chamber of trd_dim) {
-                const width = Math.abs(chamber.maxR - chamber.minR); // x size
-                const height = Math.abs(chamber.maxLocalY - chamber.minLocalY); // y size
-                const depth = Math.abs(chamber.maxZ - chamber.minZ); // z size
+            // lights
 
-                console.log(width, height, depth);
+            var light = new THREE.DirectionalLight(0xffffff);
+            light.position.set(1000, 1000, 1000);
+            scene.add(light);
 
-                const boxGeom = new THREE.BoxBufferGeometry(width, height, depth);
-                const geometry = new THREE.EdgesGeometry(boxGeom);
-                const material = new THREE.LineBasicMaterial({ color: colours[(chamber.stack) % 5] });
-                const mesh = new THREE.LineSegments(geometry, material);
+            // var light = new THREE.DirectionalLight(0x002288);
+            // light.position.set(- 1, - 1, - 1);
+            // scene.add(light);
 
-                mesh.position.z = chamber.minZ + depth / 2;
-                mesh.position.y = chamber.minLocalY + height / 2;
-                mesh.position.x = chamber.midR;
-                console.log(mesh.position);
+            // var light = new THREE.AmbientLight(0xffffff);
+            // scene.add(light);
 
-                supermodules.add(mesh);
-                chambers.push(mesh);
-            }
+            //
 
-            //Object.assign(scene.position, getSupermoduleCenteredTransformation(trd_dim));
-            getSupermoduleCenteredTransformation(trd_dim);
+            window.addEventListener('resize', onWindowResize, false);
 
-            function resizeRendererToDisplaySize(renderer) {
-                const canvas = renderer.domElement;
-                const width = canvas.clientWidth;
-                const height = canvas.clientHeight;
-                const needResize = canvas.width !== width || canvas.height !== height;
-                if (needResize) {
-                    renderer.setSize(width, height, true);
-                }
-                return needResize;
-            }
-
-            function render(time) {
-                time *= 0.001;
-
-                if (resizeRendererToDisplaySize(renderer)) {
-                    const canvas = renderer.domElement;
-                    camera.aspect = canvas.clientWidth / canvas.clientHeight;
-                    camera.updateProjectionMatrix();
-                }
-
-                objects.forEach((obj, ndx) => {
-                    const speed = .1 + 3 * .5;
-                    const rot = time * speed;
-                    obj.rotation.x = rot;
-                    obj.rotation.y = rot;
-                });
-
-                //supermodules.rotation.y = time * 0.5;
-                // container.rotation.y = time * 0.5;
-
-                renderer.render(scene, camera);
-
-                requestAnimationFrame(render);
-            }
-
-            requestAnimationFrame(render);
         }
 
-        main();
+        function onWindowResize() {
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+        }
+
+        function animate() {
+
+            requestAnimationFrame(animate);
+
+            //controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
+
+            render();
+
+        }
+
+        function render() {
+
+            renderer.render(scene, camera);
+
+        }
+
     </script>
+
 </body>
 
 </html>
