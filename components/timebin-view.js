@@ -387,3 +387,5 @@ class PadSubView {
         this.trackletPathNeg.attr("d", this.tline([[location.y1, 5], [location.y2n, 25]]));
     }
 }
+
+function ajoin(a, b) { return a.concat(b); }

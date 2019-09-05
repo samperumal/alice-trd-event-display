@@ -293,13 +293,16 @@
             <div id="time-bin-col">                
                 <div class="component">
                     <p>
-                        <span class="label-left tooltip">Supermodule
+                        <span class="label-left tooltip">
                             <span class="tooltiptext">Each supermodule is further divided into 5 stacks, and each stack has 6 layers</span>
                         </span>
-                        <span class="tooltip">Summary
-                            <span class="tooltiptext">This view shows all the reconstructed particle tracks in blue, and all the measured TRD signals in red.</span>
+                        <span class="tooltip">3D interactive view 
+                            <span class="tooltiptext">This view shows all reconstructed particle tracks in blue, together with the TRD modules.
+
+                                You can click-and-drag to rotate the display, and use the mouse-wheel to zoom in and out.
+                            </span>
                         </span>
-                        <span class="label-right tooltip">ZR plane
+                        <span class="label-right tooltip">
                             <span class="tooltiptext">The ZR plane is equivalent to looking radially out from the centre of the beam pipe</span>
                         </span>
                     </p>
@@ -365,14 +368,14 @@
 
         const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
 
-        // coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
-        // coordinator.addComponent(new SectorZoomViewComponent("#sector-zoom-view", 300, 300));
-        // coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
-        // coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 300, 300));
+        coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
+        coordinator.addComponent(new SectorZoomViewComponent("#sector-zoom-view", 300, 300));
+        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
+        coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 300, 300));
         coordinator.addComponent(new ThreejsComponent("threejs-view", 520, 300));
-        // coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
-        //     dataLoadUrl: digitsLoadUrl
-        // }));
+        coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
+            dataLoadUrl: digitsLoadUrl
+        }));
 
         coordinator.addComponent(new TrackInformationComponent("#track-information"));
 

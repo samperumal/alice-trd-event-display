@@ -22,7 +22,7 @@ class ThreejsComponent {
         renderer.setSize(520, 300);
 
         const camera = this.camera = new THREE.PerspectiveCamera(50, 520 / 300, 1, 3000);
-        camera.position.set(1100, 0, 1100);
+        camera.position.set(1100, 1100, 1100);
 
         // controls
 
@@ -56,7 +56,10 @@ class ThreejsComponent {
             var geometry = new THREE.BoxBufferGeometry(layer.w, layer.h, layer.d);
             var wireframe = new THREE.EdgesGeometry(geometry);
             var line = new THREE.LineSegments(wireframe,
-                new THREE.LineBasicMaterial({ color: new THREE.Color(`hsl(${layer.rot}, ${20 + layer.lyr * 10}%, ${20 + layer.stk * 10}%)`) })
+                new THREE.LineBasicMaterial({
+                    color: new THREE.Color(`hsl(${layer.rot}, 50%, 80%)`),
+                    linewidth: 0.5
+                })
             );
             line.position.x = layer.x;
             line.position.y = layer.y;
@@ -83,29 +86,37 @@ class ThreejsComponent {
 
         if (this.tracks != null) this.scene.remove(this.tracks);
 
-        this.tracks = new THREE.Object3D();        
+        if (eventData.event != null && eventData.event.tracks != null) {
+            this.tracks = new THREE.Object3D();
 
-        for (const track of eventData.event.tracks) {
-            const path = track.path.map(p => [p.x, p.y, p.z]).reduce((a, b) => a.concat(b));
+            const unselectedMaterial = new THREE.LineDashedMaterial({ color: 0xdbebf9 });
+            const selectedMaterial = new THREE.LineDashedMaterial({ color: 0x3392e3 });
 
-            const geometry = new THREE.BufferGeometry();
+            const selectedId = (eventData.track != null) ? eventData.track.id : null;
 
-            const vertices = new Float32Array(path);
+            for (const track of eventData.event.tracks) {
+                const path = track.path.map(p => [p.x, p.y, p.z]).reduce((a, b) => a.concat(b));
 
-            // itemSize = 3 because there are 3 values (components) per vertex
-            geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
-            const line = new THREE.Line(geometry,
-                new THREE.LineBasicMaterial({ color: 0xff0000 })
-            );
+                const geometry = new THREE.BufferGeometry();
 
-            this.tracks.add(line);
+                const vertices = new Float32Array(path);
+
+                const material = (selectedId == null || selectedId == track.id) ? selectedMaterial : unselectedMaterial;
+
+                // itemSize = 3 because there are 3 values (components) per vertex
+                geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+                const line = new THREE.Line(geometry, material);
+
+                this.tracks.add(line);
+            }
+
+            this.scene.add(this.tracks);
+        }
+        else {
+            this.tracks = null;
         }
 
-        this.scene.add(this.tracks);
-
         this.render();
-
-        //console.log(eventData.event);
     }
 }
 
