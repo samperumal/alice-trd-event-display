@@ -5,6 +5,7 @@
     <title>three.js webgl - orbit controls</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <script src="geometry/geometries3d.js"></script>
     <!-- <link type="text/css" rel="stylesheet" href="main.css"> -->
     <style>
         body {
@@ -47,8 +48,9 @@
             renderer.setSize(300, 300);
             //document.body.appendChild(renderer.domElement);
 
-            camera = new THREE.PerspectiveCamera(75, 1, 1, 2000);
-            camera.position.set(400, 200, 0);
+            camera = new THREE.PerspectiveCamera(50, 1, 1, 2000);
+            camera.position.set(1500, 0, 0);
+
 
             // controls
 
@@ -68,17 +70,37 @@
 
             // world
 
-            var geometry = new THREE.BoxBufferGeometry(300, 200, 100);
-            var material = new THREE.MeshPhongMaterial({ color: 0xdddddd, flatShading: true });
+            //var material = new THREE.MeshPhongMaterial({ color: 0xdddddd, flatShading: true });
+            var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
 
-            var wireframe = new THREE.EdgesGeometry( geometry );
+            const sphG = new THREE.SphereBufferGeometry(10);
+            scene.add(new THREE.LineSegments(new THREE.WireframeGeometry(sphG), new THREE.LineBasicMaterial( { color: 0xff0000 } )));
 
-            var line = new THREE.LineSegments( wireframe );
-            line.material.depthTest = false;
-            //line.material.opacity = 0.25;
-            //line.material.transparent = true;
+            const detectors = new THREE.Object3D();
 
-            scene.add( line );
+            for (const layer of geomLayers3D()) {
+                //if (layer.lyr != 0) continue;
+                const rotObj = new THREE.Object3D();
+                rotObj.rotation.fromArray([0, 0, layer.rot / 180 * Math.PI]);
+
+                var geometry = new THREE.BoxBufferGeometry(layer.w, layer.h, layer.d);
+                var wireframe = new THREE.EdgesGeometry( geometry );
+                var line = new THREE.LineSegments( wireframe, 
+                    new THREE.LineBasicMaterial( { color: new THREE.Color(`hsl(${layer.rot}, ${20 + layer.lyr * 10}%, ${20 + layer.stk * 10}%)`) } ) 
+                );
+                line.position.x = layer.x;
+                line.position.y = layer.y;
+                line.position.z = layer.z;
+                
+                rotObj.add( line );
+            
+                detectors.add( rotObj );
+            }
+
+            scene.add(detectors);
+            // line.material.depthTest = false;
+            // line.material.opacity = 0.25;
+            // line.material.transparent = true;
 
             // for (var i = 0; i < 500; i++) {
 
