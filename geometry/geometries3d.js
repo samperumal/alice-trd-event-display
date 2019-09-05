@@ -6484,3 +6484,4 @@ function geomLayers3D() { const dims = [
 	return dims;
 }
 
+export { geomLayers3D };

@@ -64,7 +64,7 @@
             background-position: top;
         }
 
-        svg {
+        svg, canvas {
             border: 1px solid black;
         }
 
@@ -100,7 +100,7 @@
         }
 
         div.time-bin-view {
-            max-height: 650px;
+            max-height: 300px;
             overflow-y: scroll;
         }
 
@@ -290,15 +290,29 @@
                         preserveAspectRatio="xMidYMid meet"></svg>
                 </div>
             </div>
-            <div id="time-bin-col">
+            <div id="time-bin-col">                
+                <div class="component">
+                    <p>
+                        <span class="label-left tooltip">Supermodule
+                            <span class="tooltiptext">Each supermodule is further divided into 5 stacks, and each stack has 6 layers</span>
+                        </span>
+                        <span class="tooltip">Summary
+                            <span class="tooltiptext">This view shows all the reconstructed particle tracks in blue, and all the measured TRD signals in red.</span>
+                        </span>
+                        <span class="label-right tooltip">ZR plane
+                            <span class="tooltiptext">The ZR plane is equivalent to looking radially out from the centre of the beam pipe</span>
+                        </span>
+                    </p>
+                    <canvas id="threejs-view" style="width: 520px; height: 300px;"></canvas>
+                </div>
                 <div class="component">
                     <p style="max-width: 500px;">
                         <span class="tooltip">Time-bin view
                             <span class="tooltiptext">This view shows how data, measured on each pad over 30 time bins of 2 micro-seconds each, is used to reconstruct a single TRD tracklet.
-    
-                                        At least 3 tracklets are required to match a reconstructed track.
-                                    </span>
-                                </span>
+
+                                At least 3 tracklets are required to match a reconstructed track.
+                            </span>
+                        </span>
                     </p>
                     <div class="time-bin-view" style="border: 1px solid black; text-align: center; display: block;">
                         <svg id="timebin-view-zoom" style="width: 500px; height: 1600px; border: none;"
@@ -338,7 +352,9 @@
             </div>
         </div>
     </div>
-    <script>
+    <script type="module">
+        import { ThreejsComponent } from './components/threejs-view.js';
+
         function ajoin(a, b) { return a.concat(b); }
 
         const data = [...mapToDisplayDataFormat(getData())];
@@ -349,13 +365,14 @@
 
         const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
 
-        coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
-        coordinator.addComponent(new SectorZoomViewComponent("#sector-zoom-view", 300, 300));
-        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
-        coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 300, 300));
-        coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
-            dataLoadUrl: digitsLoadUrl
-        }));
+        // coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
+        // coordinator.addComponent(new SectorZoomViewComponent("#sector-zoom-view", 300, 300));
+        // coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
+        // coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 300, 300));
+        coordinator.addComponent(new ThreejsComponent("threejs-view", 520, 300));
+        // coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
+        //     dataLoadUrl: digitsLoadUrl
+        // }));
 
         coordinator.addComponent(new TrackInformationComponent("#track-information"));
 
@@ -388,7 +405,7 @@
 
         coordinator.addComponent(digitsView);
 
-        if (false) {
+        if (true) {
             setTimeout(function () {
                 $("#dataTree").jstree("select_node", tree.treeData[1].children[1]);
                 //digitsView.drawDigits();
