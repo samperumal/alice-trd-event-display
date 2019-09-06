@@ -130,7 +130,8 @@ class ThreejsComponent {
             this.tracklets = new THREE.Group();
 
             const unselectedMaterial = new THREE.LineBasicMaterial({ color: 0xdbebf9, opacity: 0.25, transparent: true });
-            const selectedMaterial = new THREE.LineBasicMaterial({ color: 0x3392e3, opacity: 0.25, transparent: true });
+            const selectedMaterial = new THREE.LineBasicMaterial({ color: 0x3392e3 });
+            const allMaterial = new THREE.LineBasicMaterial({ color: 0x3392e3, opacity: 0.25, transparent: true });
 
             const selectedTrackletMaterial = new THREE.LineBasicMaterial({ color: 0xf03b20 });
             const matchedTrackletMaterial = new THREE.LineBasicMaterial({ color: 0xfeb24c });
@@ -141,7 +142,10 @@ class ThreejsComponent {
 
             for (const track of eventData.event.tracks) {
                 if (selectedStack == null || (selectedStack == track.stk)) {
-                    const material = (selectedId == null || selectedId == track.id) ? selectedMaterial : unselectedMaterial;
+                    let material;
+                    if (selectedId == null)
+                        material = allMaterial;
+                    else material = (selectedId == track.id) ? selectedMaterial : unselectedMaterial;
 
                     this.tracks.add(this.createLineObject3D(track, material));
 
@@ -161,7 +165,7 @@ class ThreejsComponent {
                     this.tracklets.add(this.createLineObject3D(tracklet, otherTrackletMaterial));
 
             this.trackletGroup.add(this.tracklets);
-            this.trackGroup.add(this.tracks);            
+            this.trackGroup.add(this.tracks);
 
             this.stackMap.forEach((object, stack) => object.visible = (eventData.track == null) || (stack == eventData.track.stk));
         }
@@ -178,7 +182,7 @@ class ThreejsComponent {
                 const geometry = new THREE.BufferGeometry();
                 const vertices = new Float32Array(obj.path3d);
                 geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
-                obj.line = new THREE.Line(geometry, material);        
+                obj.line = new THREE.Line(geometry, material);
             }
             else throw "no path3d exists on object";
         else obj.line.material = material;
