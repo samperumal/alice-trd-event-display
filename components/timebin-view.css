@@ -36,7 +36,7 @@ rect.tbin {
     font-weight: bold;
 }
 
-.time-bin-view .y-axis .tick text {
+.time-bin-view .y-axis .tick text, .time-bin-view .x-axis .tick text {
     font-size: 9px;
 }
 
