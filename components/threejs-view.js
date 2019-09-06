@@ -81,8 +81,6 @@ class ThreejsComponent {
 
         scene.add(detectors);
 
-        // detectors.visible = false;
-
         // var axesHelper = new THREE.AxesHelper( 500 );
         // scene.add( axesHelper );
 
@@ -95,8 +93,11 @@ class ThreejsComponent {
         this.renderer.render(this.scene, this.camera);
     }
 
-    toggleDetectors(visible) {
-        this.detectors.visible = visible;
+    toggleDetectors() {
+        this.detectors.visible = !this.detectors.visible;
+        this.render();
+
+        return this.detectors.visible;
     }
 
     draw(eventData) {
