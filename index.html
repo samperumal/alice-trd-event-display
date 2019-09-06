@@ -311,7 +311,7 @@
                         <input id="toggleDetectors" type="button" value="Hide detectors" />
                         <input id="toggleTracklets" type="button" value="Hide tracklets" />
                         <input id="toggleTracks" type="button" value="Hide tracks" />
-                </div>
+                    </div>
                 </div>
                 <div class="component">
                     <p style="max-width: 500px;">
@@ -329,7 +329,7 @@
                 </div>
             </div>
         </div>
-        <div style="display: flex; flex-direction: row;">
+        <div style="display: none; flex-direction: row;">
             <div class="column">
                 <div class="component">
                     <p>Digits detail view</p>
@@ -412,27 +412,27 @@
             }
         });
 
-        const digitsView = new DigitsViewComponent("#digits-view", 1480, 650, null, {
-            eventInput: "#event-input",
-            sectorInput: "#sector-input",
-            stackInput: "#stack-input",
-            maxCsumInput: "#max-csum-input",
-            buttons: ["#load-digits"],
-            dataLoadUrl: digitsLoadUrl,
-            padClick: coordinator.padSelect.bind(coordinator),
-            timeBinChange: (timebin) => { $("#timebin-slider").slider("option", "value", timebin); }
-        });
+        // const digitsView = new DigitsViewComponent("#digits-view", 1480, 650, null, {
+        //     eventInput: "#event-input",
+        //     sectorInput: "#sector-input",
+        //     stackInput: "#stack-input",
+        //     maxCsumInput: "#max-csum-input",
+        //     buttons: ["#load-digits"],
+        //     dataLoadUrl: digitsLoadUrl,
+        //     padClick: coordinator.padSelect.bind(coordinator),
+        //     timeBinChange: (timebin) => { $("#timebin-slider").slider("option", "value", timebin); }
+        // });
 
-        $("#timebin-slider").on("slide", function (event, ui) {
-            digitsView.drawPads(ui.value);
-            $("#timebin-display").val(ui.value);
-        });
+        // $("#timebin-slider").on("slide", function (event, ui) {
+        //     digitsView.drawPads(ui.value);
+        //     $("#timebin-display").val(ui.value);
+        // });
 
-        coordinator.addComponent(digitsView);
+        // coordinator.addComponent(digitsView);
 
-        if (true) {
+        if (false) {
             setTimeout(function () {
-                $("#dataTree").jstree("select_node", tree.treeData[1].children[1]);
+                $("#dataTree").jstree("select_node", tree.treeData[2].children[1]);
                 //digitsView.drawDigits();
             }, 500);
         }
