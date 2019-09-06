@@ -82,6 +82,11 @@ class ThreejsComponent {
 
         scene.add(detectors);
 
+        // detectors.visible = false;
+
+        // var axesHelper = new THREE.AxesHelper( 500 );
+        // scene.add( axesHelper );
+
         // Tracks
         this.tracks = null;
     }
@@ -118,7 +123,30 @@ class ThreejsComponent {
                 geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
                 const line = new THREE.Line(geometry, material);
 
-                if (selectedStack == null || (selectedStack == track.stk && track.typ == "Trd"))
+                if (selectedStack == null || (selectedStack == track.stk))
+                    this.tracks.add(line);
+            }
+
+            const selectedTrackletMaterial = new THREE.LineDashedMaterial({ color: 0xf03b20 });
+            const matchedTrackletMaterial = new THREE.LineDashedMaterial({ color: 0xfeb24c });
+            const otherTrackletMaterial = new THREE.LineDashedMaterial({ color: 0xffeda0 });
+
+            for (const tracklet of eventData.event.trklts) {
+                const geometry = new THREE.BufferGeometry();
+
+                const vertices = new Float32Array(tracklet.path3d);
+
+                let material;
+                if (selectedId == null || selectedId == tracklet.trk)
+                    material = selectedTrackletMaterial;
+                else if (tracklet.trk != null)
+                    material = matchedTrackletMaterial;
+                else material = otherTrackletMaterial;
+
+                geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+                const line = new THREE.Line(geometry, material);
+
+                if (selectedStack == null || (selectedStack == tracklet.stk))
                 this.tracks.add(line);
             }
 

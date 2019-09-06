@@ -16,11 +16,21 @@ function* mapToDisplayDataFormat(data) {
 
                 const y1l = -t.lY;
                 const y2l = -t.lY + (t.dyDx * xr);
+
+                const z1 = -layerDim.minZ;
+                const z2 = -layerDim.maxZ;
                 
                 const [x1, y1] = rotate(x1l, y1l, rot);
                 const [x2, y2] = rotate(x2l, y2l, rot);
 
                 t.path = [{x: x1, y: -y1}, {x: x2, y: -y2}];
+                t.path3d = [
+                    x1, -y1, z1,
+                    x2, -y2, z1,
+                    x2, -y2, z2,
+                    x1, -y1, z2,
+                    x1, -y1, z1
+                ];
                 t.y1 = y1l;
                 t.y2 = y2l;
                 t.y2p = -t.lY + (t.dyDxAP * xr);
