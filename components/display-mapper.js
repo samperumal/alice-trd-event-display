@@ -17,8 +17,8 @@ function* mapToDisplayDataFormat(data) {
                 const y1l = -t.lY;
                 const y2l = -t.lY + (t.dyDx * xr);
 
-                const z1 = -layerDim.minZ;
-                const z2 = -layerDim.maxZ;
+                const z1 = -(layerDim.minZ + layerDim.zsize * t.row);
+                const z2 = -(layerDim.minZ + layerDim.zsize * (t.row + 1));
                 
                 const [x1, y1] = rotate(x1l, y1l, rot);
                 const [x2, y2] = rotate(x2l, y2l, rot);
