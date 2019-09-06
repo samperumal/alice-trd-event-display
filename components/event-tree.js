@@ -12,9 +12,9 @@ function eventToJSTreeNode(e) {
     e.tracks
         .sort((a,b) => {
             if (a.typ == b.typ)
-                return a.sec != b.sec ? a.sec - b.sec : a.stk - b.stk;
-            // else if (a.type == "Esd")
-            //     return 1;
+                return a.stk != b.stk ? a.stk - b.stk : a.sec - b.sec;
+            else if (a.typ == "Esd")
+                return 1;
             else return -1;
         });
 
