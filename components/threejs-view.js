@@ -46,11 +46,11 @@ class ThreejsComponent {
         scene.add(new THREE.LineSegments(new THREE.WireframeGeometry(sphG), new THREE.LineBasicMaterial({ color: 0x00ff00 })));
 
         // TRD Modules
-        const detectors = this.detectors = new THREE.Object3D();
+        const detectors = this.detectorGroup = new THREE.Group();
 
         const stackMap = this.stackMap = new Map();
         for (let s = 0; s < 5; s++) {
-            const stackObj = new THREE.Object3D();
+            const stackObj = new THREE.Group();
             stackMap.set(s, stackObj);
             detectors.add(stackObj);
         }
@@ -86,6 +86,13 @@ class ThreejsComponent {
 
         // Tracks
         this.tracks = null;
+        this.tracklets = null;
+
+        this.trackGroup = new THREE.Group();
+        this.trackletGroup = new THREE.Group();
+
+        scene.add(this.trackletGroup);
+        scene.add(this.trackGroup);
     }
 
     render() {
@@ -94,10 +101,21 @@ class ThreejsComponent {
     }
 
     toggleDetectors() {
-        this.detectors.visible = !this.detectors.visible;
+        this.detectorGroup.visible = !this.detectorGroup.visible;
         this.render();
+        return this.detectorGroup.visible;
+    }
 
-        return this.detectors.visible;
+    toggleTracklets() {
+        this.trackletGroup.visible = !this.trackletGroup.visible;
+        this.render();
+        return this.trackletGroup.visible;
+    }
+
+    toggleTracks() {
+        this.trackGroup.visible = !this.trackGroup.visible;
+        this.render();
+        return this.trackGroup.visible;
     }
 
     draw(eventData) {
@@ -107,8 +125,8 @@ class ThreejsComponent {
         if (this.tracklets != null) this.scene.remove(this.tracklets);
 
         if (eventData.event != null && eventData.event.tracks != null) {
-            this.tracks = new THREE.Object3D();
-            this.tracklets = new THREE.Object3D();
+            this.tracks = new THREE.Group();
+            this.tracklets = new THREE.Group();
 
             const unselectedMaterial = new THREE.LineBasicMaterial({ color: 0xdbebf9, opacity: 0.25, transparent: true });
             const selectedMaterial = new THREE.LineBasicMaterial({ color: 0x3392e3 });
@@ -141,8 +159,8 @@ class ThreejsComponent {
                 if (selectedStack == tracklet.stk && tracklet.trk == null)
                     this.tracklets.add(this.createLineObject3D(tracklet, otherTrackletMaterial));
 
-            this.scene.add(this.tracklets);
-            this.scene.add(this.tracks);            
+            this.trackletGroup.add(this.tracklets);
+            this.trackGroup.add(this.tracks);            
 
             this.stackMap.forEach((object, stack) => object.visible = (eventData.track == null) || (stack == eventData.track.stk));
         }

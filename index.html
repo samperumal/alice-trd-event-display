@@ -309,6 +309,8 @@
                     <canvas id="threejs-view" style="width: 520px; height: 300px;"></canvas>
                     <div style="vertical-align: top; padding-bottom: 13px; margin-top:-35px; text-align: center; z-index: 100; position: absolute; width: 520px;">
                         <input id="toggleDetectors" type="button" value="Hide detectors" />
+                        <input id="toggleTracklets" type="button" value="Hide tracklets" />
+                        <input id="toggleTracks" type="button" value="Hide tracks" />
                 </div>
                 </div>
                 <div class="component">
@@ -376,14 +378,22 @@
         coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
         coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 300, 300));
         
+        // ** ThreeJS initialisation
         const three = new ThreejsComponent("threejs-view", 520, 300);
         coordinator.addComponent(three);
-        function toggleDetectors(a, b) {
+        document.getElementById("toggleDetectors").addEventListener("click", (button) => {
             const visible = three.toggleDetectors();
-            this.value = `${visible ? "Hide" : "Show"} detectors`;
-        }
-        const toggleDetectorsButton = document.getElementById("toggleDetectors");
-        toggleDetectorsButton.addEventListener("click", toggleDetectors);
+            button.currentTarget.value = `${visible ? "Hide" : "Show"} detectors`;
+        });
+        document.getElementById("toggleTracklets").addEventListener("click", (button) => {
+            const visible = three.toggleTracklets();
+            button.currentTarget.value = `${visible ? "Hide" : "Show"} tracklets`;
+        });
+        document.getElementById("toggleTracks").addEventListener("click", (button) => {
+            const visible = three.toggleTracks();
+            button.currentTarget.value = `${visible ? "Hide" : "Show"} tracks`;
+        });
+        // ** ThreeJS initialisation
 
         coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
             dataLoadUrl: digitsLoadUrl
