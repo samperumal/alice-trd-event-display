@@ -49,6 +49,13 @@ class ThreejsComponent {
         // TRD Modules
         const detectors = this.detectors = new THREE.Object3D();
 
+        const stackMap = this.stackMap = new Map();
+        for (let s = 0; s < 5; s++) {
+            const stackObj = new THREE.Object3D();
+            stackMap.set(s, stackObj);
+            detectors.add(stackObj);
+        }
+
         for (const layer of geomLayers3D()) {
             const rotObj = new THREE.Object3D();
             rotObj.rotation.fromArray([0, 0, layer.rot / 180 * Math.PI]);
@@ -61,13 +68,16 @@ class ThreejsComponent {
                     linewidth: 0.5
                 })
             );
+            
             line.position.x = layer.x;
             line.position.y = layer.y;
             line.position.z = layer.z;
 
             rotObj.add(line);
 
-            detectors.add(rotObj);
+            const stackObj = stackMap.get(layer.stk);
+
+            stackObj.add(rotObj);
         }
 
         scene.add(detectors);
@@ -93,6 +103,7 @@ class ThreejsComponent {
             const selectedMaterial = new THREE.LineDashedMaterial({ color: 0x3392e3 });
 
             const selectedId = (eventData.track != null) ? eventData.track.id : null;
+            const selectedStack = (eventData.track != null) ? eventData.track.stk : null;
 
             for (const track of eventData.event.tracks) {
                 const path = track.path.map(p => [p.x, p.y, p.z]).reduce((a, b) => a.concat(b));
@@ -107,10 +118,13 @@ class ThreejsComponent {
                 geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
                 const line = new THREE.Line(geometry, material);
 
+                if (selectedStack == null || (selectedStack == track.stk && track.typ == "Trd"))
                 this.tracks.add(line);
             }
 
             this.scene.add(this.tracks);
+
+            this.stackMap.forEach((object, stack) => object.visible = (eventData.track == null) || (stack == eventData.track.stk));
         }
         else {
             this.tracks = null;
