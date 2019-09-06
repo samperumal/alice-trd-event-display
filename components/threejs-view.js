@@ -2,14 +2,13 @@ import * as THREE from '../js/three.module.js';
 import { OrbitControls } from '../js/OrbitControls.js';
 import { geomLayers3D } from '../geometry/geometries3d.js';
 
-
 class ThreejsComponent {
-    constructor(id, config) {
-        this.init(id);
+    constructor(id, width, height) {
+        this.init(id, width, height);
         this.render();
     }
 
-    init(id) {
+    init(id, width, height) {
 
         const scene = this.scene = new THREE.Scene();
         scene.background = new THREE.Color(0xffffff);
@@ -19,9 +18,9 @@ class ThreejsComponent {
             canvas: document.getElementById(id)
         });
         renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(520, 300);
+        renderer.setSize(width, height);
 
-        const camera = this.camera = new THREE.PerspectiveCamera(50, 520 / 300, 1, 3000);
+        const camera = this.camera = new THREE.PerspectiveCamera(50, width / height, 1, 3000);
         camera.position.set(1100, 1100, 1100);
 
         // controls
@@ -64,11 +63,11 @@ class ThreejsComponent {
             var wireframe = new THREE.EdgesGeometry(geometry);
             var line = new THREE.LineSegments(wireframe,
                 new THREE.LineBasicMaterial({
-                    color: new THREE.Color(`hsl(${layer.rot}, 50%, 80%)`),
+                    color: new THREE.Color(`hsl(100, ${Math.round((layer.sec / 18) * 100)}%, 80%)`),
                     linewidth: 0.5
                 })
             );
-            
+
             line.position.x = layer.x;
             line.position.y = layer.y;
             line.position.z = layer.z;
@@ -96,61 +95,53 @@ class ThreejsComponent {
         this.renderer.render(this.scene, this.camera);
     }
 
+    toggleDetectors(visible) {
+        this.detectors.visible = visible;
+    }
+
     draw(eventData) {
-        //const paths = eventData.event.tracks.map(t => t.path.map(p => [p.x, p.y, p.z]).reduce((a, b) => a.concat(b)));
+        //if (eventData.type != "select") return;
 
         if (this.tracks != null) this.scene.remove(this.tracks);
+        if (this.tracklets != null) this.scene.remove(this.tracklets);
 
         if (eventData.event != null && eventData.event.tracks != null) {
             this.tracks = new THREE.Object3D();
+            this.tracklets = new THREE.Object3D();
 
-            const unselectedMaterial = new THREE.LineDashedMaterial({ color: 0xdbebf9 });
-            const selectedMaterial = new THREE.LineDashedMaterial({ color: 0x3392e3 });
+            const unselectedMaterial = new THREE.LineBasicMaterial({ color: 0xdbebf9, opacity: 0.25, transparent: true });
+            const selectedMaterial = new THREE.LineBasicMaterial({ color: 0x3392e3 });
+
+            const selectedTrackletMaterial = new THREE.LineBasicMaterial({ color: 0xf03b20 });
+            const matchedTrackletMaterial = new THREE.LineBasicMaterial({ color: 0xfeb24c });
+            const otherTrackletMaterial = new THREE.LineBasicMaterial({ color: 0xffeda0, opacity: 0.25, transparent: true });
 
             const selectedId = (eventData.track != null) ? eventData.track.id : null;
             const selectedStack = (eventData.track != null) ? eventData.track.stk : null;
 
             for (const track of eventData.event.tracks) {
-                const path = track.path.map(p => [p.x, p.y, p.z]).reduce((a, b) => a.concat(b));
+                if (selectedStack == null || (selectedStack == track.stk)) {
+                    const material = (selectedId == null || selectedId == track.id) ? selectedMaterial : unselectedMaterial;
 
-                const geometry = new THREE.BufferGeometry();
+                    this.tracks.add(this.createLineObject3D(track, material));
 
-                const vertices = new Float32Array(path);
-
-                const material = (selectedId == null || selectedId == track.id) ? selectedMaterial : unselectedMaterial;
-
-                // itemSize = 3 because there are 3 values (components) per vertex
-                geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
-                const line = new THREE.Line(geometry, material);
-
-                if (selectedStack == null || (selectedStack == track.stk))
-                    this.tracks.add(line);
+                    if (selectedId != null) {
+                        for (const tracklet of track.trklts) {
+                            this.tracklets.add(this.createLineObject3D(tracklet, selectedId == track.id ? selectedTrackletMaterial : matchedTrackletMaterial));
+                        }
+                    }
+                }
             }
 
-            const selectedTrackletMaterial = new THREE.LineDashedMaterial({ color: 0xf03b20 });
-            const matchedTrackletMaterial = new THREE.LineDashedMaterial({ color: 0xfeb24c });
-            const otherTrackletMaterial = new THREE.LineDashedMaterial({ color: 0xffeda0 });
+            if (selectedId == null)
+                for (const tracklet of eventData.event.trklts)
+                    this.tracklets.add(this.createLineObject3D(tracklet, selectedTrackletMaterial));
+            else for (const tracklet of eventData.event.trklts)
+                if (selectedStack == tracklet.stk && tracklet.trk == null)
+                    this.tracklets.add(this.createLineObject3D(tracklet, otherTrackletMaterial));
 
-            for (const tracklet of eventData.event.trklts) {
-                const geometry = new THREE.BufferGeometry();
-
-                const vertices = new Float32Array(tracklet.path3d);
-
-                let material;
-                if (selectedId == null || selectedId == tracklet.trk)
-                    material = selectedTrackletMaterial;
-                else if (tracklet.trk != null)
-                    material = matchedTrackletMaterial;
-                else material = otherTrackletMaterial;
-
-                geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
-                const line = new THREE.Line(geometry, material);
-
-                if (selectedStack == null || (selectedStack == tracklet.stk))
-                this.tracks.add(line);
-            }
-
-            this.scene.add(this.tracks);
+            this.scene.add(this.tracklets);
+            this.scene.add(this.tracks);            
 
             this.stackMap.forEach((object, stack) => object.visible = (eventData.track == null) || (stack == eventData.track.stk));
         }
@@ -159,6 +150,20 @@ class ThreejsComponent {
         }
 
         this.render();
+    }
+
+    createLineObject3D(obj, material) {
+        if (obj.line == null)
+            if (obj.path3d != null) {
+                const geometry = new THREE.BufferGeometry();
+                const vertices = new Float32Array(obj.path3d);
+                geometry.addAttribute('position', new THREE.BufferAttribute(vertices, 3));
+                obj.line = new THREE.Line(geometry, material);        
+            }
+            else throw "no path3d exists on object";
+        else obj.line.material = material;
+
+        return obj.line;
     }
 }
 

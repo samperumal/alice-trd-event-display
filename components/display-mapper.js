@@ -45,6 +45,7 @@ function* mapToDisplayDataFormat(data) {
             .filter(t => t.path != null && t.path.length > 0)
             .map(t => {
                 t.trklts = t.tlids.map(tl => trackletMap.get(tl));
+                t.path3d = t.path.map(p => [p.x, p.y, p.z]).reduce((a, b) => a.concat(b));
                 return t;
             });
 
