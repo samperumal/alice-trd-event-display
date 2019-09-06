@@ -311,6 +311,7 @@
                         <input id="toggleDetectors" type="button" value="Hide detectors" />
                         <input id="toggleTracklets" type="button" value="Hide tracklets" />
                         <input id="toggleTracks" type="button" value="Hide tracks" />
+                        <input id="resetControls" type="button" value="Reset camera" />
                     </div>
                 </div>
                 <div class="component">
@@ -392,6 +393,9 @@
         document.getElementById("toggleTracks").addEventListener("click", (button) => {
             const visible = three.toggleTracks();
             button.currentTarget.value = `${visible ? "Hide" : "Show"} tracks`;
+        });
+        document.getElementById("resetControls").addEventListener("click", (button) => {
+            three.resetControls();
         });
         // ** ThreeJS initialisation
 

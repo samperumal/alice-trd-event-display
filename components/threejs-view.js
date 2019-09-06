@@ -34,8 +34,8 @@ class ThreejsComponent {
 
         controls.screenSpacePanning = false;
 
-        controls.minDistance = -3000;
-        controls.maxDistance = 3000;
+        controls.minDistance = 100;
+        controls.maxDistance = 2000;
 
         //controls.maxPolarAngle = Math.PI / 2;
 
@@ -97,7 +97,6 @@ class ThreejsComponent {
     }
 
     render() {
-
         this.renderer.render(this.scene, this.camera);
     }
 
@@ -117,6 +116,10 @@ class ThreejsComponent {
         this.trackGroup.visible = !this.trackGroup.visible;
         this.render();
         return this.trackGroup.visible;
+    }
+
+    resetControls() {
+        this.controls.reset();
     }
 
     draw(eventData) {
