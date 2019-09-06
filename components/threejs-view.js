@@ -63,8 +63,9 @@ class ThreejsComponent {
             var wireframe = new THREE.EdgesGeometry(geometry);
             var line = new THREE.LineSegments(wireframe,
                 new THREE.LineBasicMaterial({
-                    color: new THREE.Color(`hsl(100, ${Math.round((layer.sec / 18) * 100)}%, 80%)`),
-                    linewidth: 0.5
+                    color: new THREE.Color(`lightgray`),
+                    linewidth: 0.5,
+                    opacity: 0.5, transparent: true
                 })
             );
 
@@ -121,19 +122,19 @@ class ThreejsComponent {
     draw(eventData) {
         //if (eventData.type != "select") return;
 
-        if (this.tracks != null) this.scene.remove(this.tracks);
-        if (this.tracklets != null) this.scene.remove(this.tracklets);
+        if (this.tracks != null) this.trackGroup.remove(this.tracks);
+        if (this.tracklets != null) this.trackletGroup.remove(this.tracklets);
 
         if (eventData.event != null && eventData.event.tracks != null) {
             this.tracks = new THREE.Group();
             this.tracklets = new THREE.Group();
 
             const unselectedMaterial = new THREE.LineBasicMaterial({ color: 0xdbebf9, opacity: 0.25, transparent: true });
-            const selectedMaterial = new THREE.LineBasicMaterial({ color: 0x3392e3 });
+            const selectedMaterial = new THREE.LineBasicMaterial({ color: 0x3392e3, opacity: 0.25, transparent: true });
 
             const selectedTrackletMaterial = new THREE.LineBasicMaterial({ color: 0xf03b20 });
             const matchedTrackletMaterial = new THREE.LineBasicMaterial({ color: 0xfeb24c });
-            const otherTrackletMaterial = new THREE.LineBasicMaterial({ color: 0xffeda0, opacity: 0.25, transparent: true });
+            const otherTrackletMaterial = new THREE.LineBasicMaterial({ color: 0xffeda0 });
 
             const selectedId = (eventData.track != null) ? eventData.track.id : null;
             const selectedStack = (eventData.track != null) ? eventData.track.stk : null;
