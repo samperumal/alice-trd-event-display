@@ -37,6 +37,9 @@ class ThreejsComponent {
         controls.minDistance = 100;
         controls.maxDistance = 2000;
 
+        controls.autoRotate = true;
+        
+
         //controls.maxPolarAngle = Math.PI / 2;
 
         // world
@@ -95,6 +98,18 @@ class ThreejsComponent {
 
         scene.add(this.trackletGroup);
         scene.add(this.trackGroup);
+
+        this.animate();
+    }
+
+    animate() {
+
+        requestAnimationFrame( this.animate.bind(this) );
+
+        this.controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
+
+        this.render();
+
     }
 
     render() {
