@@ -65,6 +65,10 @@ class SupermoduleZoomViewComponent extends ComponentBase {
             .append("path")
             .attr("class", "module");
 
+        this.otherTracks = this.container
+            .append("path")
+            .attr("class", "other track");
+        
         this.selectedTrack = this.container
             .append("path")
             .attr("class", "selected track");
@@ -102,6 +106,9 @@ class SupermoduleZoomViewComponent extends ComponentBase {
 
             this.selectedTrack.attr("d", line(rotateToSector(track)));
 
+            const filteredOtherTracks = eventData.event.tracks.filter(d => d.typ == "Trd" && d.id != track.id && d.sec == track.sec && d.stk == track.stk); 
+            this.otherTracks.attr("d", filteredOtherTracks.map(d => line(rotateToSector(d))));
+
             const padRowDimensionData = geomStackZRPlanePads();
 
             this.selectedTracklets.attr("d", track.trklts
@@ -130,6 +137,7 @@ class SupermoduleZoomViewComponent extends ComponentBase {
         }
         else {
             this.selectedTrack.attr("d", null);
+            this.otherTracks.attr("d", null);
             this.selectedTracklets.attr("d", null);
             this.matchedTracklets.attr("d", null);
             this.otherTracklets.attr("d", null);

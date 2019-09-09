@@ -26,7 +26,7 @@
 
 .sector-view-component path.track.selected {
     stroke: #3392e3;
-    stroke-width: 2px;
+    stroke-width: 3px;
     stroke-dasharray: 2 1;
 }
 

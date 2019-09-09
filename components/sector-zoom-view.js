@@ -38,6 +38,10 @@ class SectorZoomViewComponent extends ComponentBase {
                 .map(d => this.line(d.d) + " Z ").join(" ")
             );
 
+        this.otherTracks = this.container
+            .append("path")
+            .attr("class", "other track");
+        
         this.selectedTrack = this.container
             .append("path")
             .attr("class", "selected track");
@@ -76,6 +80,8 @@ class SectorZoomViewComponent extends ComponentBase {
             const track = eventData.track;
 
             this.selectedTrack.attr("d", line(rotateToSector(eventData.track.path, track.sec)));
+            const filteredOtherTracks = eventData.event.tracks.filter(d => d.typ == "Trd" && d.id != track.id && d.sec == track.sec && d.stk == track.stk); 
+            this.otherTracks.attr("d", filteredOtherTracks.map(d => line(rotateToSector(d.path, d.sec))));
 
             this.selectedTracklet.attr("d", track.trklts.map(d => line(rotateToSector(d.path, track.sec))).join(" "));
 
@@ -91,6 +97,7 @@ class SectorZoomViewComponent extends ComponentBase {
         }
         else {
             this.selectedTrack.attr("d", null);
+            this.otherTracks.attr("d", null);
             this.selectedTracklet.attr("d", null);
             this.matchedTracklets.attr("d", null);
             this.otherTracklets.attr("d", null);
