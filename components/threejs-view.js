@@ -132,7 +132,7 @@ class ThreejsComponent {
             this.tracks = new THREE.Group();
             this.tracklets = new THREE.Group();
 
-            const unselectedMaterial = new THREE.LineBasicMaterial({ color: 0xdbebf9, opacity: 0.25, transparent: true });
+            const unselectedMaterial = new THREE.LineBasicMaterial({ color: 0xdbebf9, opacity: 1.0, transparent: true });
             const selectedMaterial = new THREE.LineBasicMaterial({ color: 0x3392e3 });
             const allMaterial = new THREE.LineBasicMaterial({ color: 0x3392e3, opacity: 0.25, transparent: true });
 
@@ -144,7 +144,7 @@ class ThreejsComponent {
             const selectedStack = (eventData.track != null) ? eventData.track.stk : null;
 
             for (const track of eventData.event.tracks) {
-                if (selectedStack == null || (selectedStack == track.stk)) {
+                {
                     let material;
                     if (selectedId == null)
                         material = allMaterial;
@@ -164,7 +164,7 @@ class ThreejsComponent {
                 for (const tracklet of eventData.event.trklts)
                     this.tracklets.add(this.createLineObject3D(tracklet, selectedTrackletMaterial));
             else for (const tracklet of eventData.event.trklts)
-                if (selectedStack == tracklet.stk && tracklet.trk == null)
+                if (tracklet.trk == null)
                     this.tracklets.add(this.createLineObject3D(tracklet, otherTrackletMaterial));
 
             this.trackletGroup.add(this.tracklets);
