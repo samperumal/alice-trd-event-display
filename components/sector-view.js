@@ -50,6 +50,10 @@ class SectorViewComponent extends ComponentBase {
 
         this.container.classed("sector-view-component", true);
 
+        this.allEsdTracks = this.container
+            .append("path")
+            .attr("class", "track esd");
+
         this.allTracks = this.container
             .append("path")
             .attr("class", "track");
@@ -136,12 +140,14 @@ class SectorViewComponent extends ComponentBase {
             this.selectedEventId = null;
 
             this.allTracks.attr("d", null);
+            this.allEsdTracks.attr("d", null);
             this.allTracklets.attr("d", null);
         }
         else if (this.selectedEventId != eventData.event.id) {
             this.selectedEventId = eventData.event.id;
 
-            this.allTracks.attr("d", eventData.event.tracks.map(d => line(d.path)).join(" "));
+            this.allTracks.attr("d", eventData.event.tracks.filter(t => t.typ == "Trd").map(d => line(d.path)).join(" "));
+            this.allEsdTracks.attr("d", eventData.event.tracks.filter(t => t.typ == "Esd").map(d => line(d.path)).join(" "));
             this.allTracklets.attr("d", eventData.event.trklts.map(d => line(d.path)).join(" "));
         }
 

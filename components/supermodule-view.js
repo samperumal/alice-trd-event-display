@@ -28,6 +28,10 @@ class SupermoduleViewComponent extends ComponentBase {
 
         this.zoomBox = this.container.append("rect");
 
+        this.allEsdTracks = this.container
+            .append("path")
+            .attr("class", "track esd");
+
         this.allTracks = this.container
             .append("path")
             .attr("class", "other track");
@@ -98,11 +102,13 @@ class SupermoduleViewComponent extends ComponentBase {
 
         if (eventData.event == null) {
             this.allTracks.attr("d", null);
+            this.allEsdTracks.attr("d", null);
             this.otherTracklets.attr("d", null);
         }
         else {
-            this.allTracks.attr("d", eventData.event.tracks.map(d => line(rotateToSector(d))).join(" "));
-
+            this.allTracks.attr("d", eventData.event.tracks.filter(t => t.typ == "Trd").map(d => line(rotateToSector(d))).join(" "));
+            this.allEsdTracks.attr("d", eventData.event.tracks.filter(t => t.typ == "Esd").map(d => line(rotateToSector(d))).join(" "));
+            
             this.otherTracklets.attr("d", eventData.event.trklts
                 .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
                 .map(d => this.line(d.d))

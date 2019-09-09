@@ -17,6 +17,10 @@
 }
 
 .sector-view-component path.track.other {
+    stroke: #b37ce5;
+}
+
+.sector-view-component path.track.esd {
     stroke: #cfe9ff;
 }
 

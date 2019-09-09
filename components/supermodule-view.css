@@ -17,6 +17,10 @@
 }
 
 .supermodule-view-component path.track.other {
+    stroke: #b37ce5;
+}
+
+.supermodule-view-component path.track.esd {
     stroke: #cfe9ff;
 }
 
