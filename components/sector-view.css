@@ -79,6 +79,6 @@
 }
 
 .sector-view-component path.module.tpc {
-    fill: #fafafa;
-    stroke: darkgray;
+    fill: #f4f4f4;
+    stroke: none;
 }

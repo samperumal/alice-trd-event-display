@@ -93,7 +93,7 @@ class SectorZoomViewComponent extends ComponentBase {
             this.modules.attr("display", "default");
             this.pads.attr("display", "default");
 
-            this.stackText.text(`Sector ${eventData.track.sec}`);
+            this.stackText.text(`Sector ${eventData.track.sec}, Stack ${eventData.track.stk}`);
         }
         else {
             this.selectedTrack.attr("d", null);

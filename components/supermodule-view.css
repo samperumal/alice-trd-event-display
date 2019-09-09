@@ -51,7 +51,6 @@
 .supermodule-view-component rect.zoom-box {
     fill: none;
     stroke: darkgray;
-    stroke-dasharray: 1 2 1;
 }
 
 .supermodule-view-component rect.zoom-box.hidden {
@@ -68,6 +67,6 @@
 }
 
 .supermodule-view-component path.module.tpc {
-    fill: #fafafa;
-    stroke: darkgray;
+    fill: #f4f4f4;
+    stroke: none;
 }

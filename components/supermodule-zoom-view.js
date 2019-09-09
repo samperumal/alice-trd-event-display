@@ -43,8 +43,6 @@ class SupermoduleZoomViewComponent extends ComponentBase {
         this.container
             .attr("class", "supermodule-view-component");
 
-        this.zoomBox = this.container.append("rect");
-
         this.pads = this.container
             .append("path")
             .attr("class", "pad");
@@ -69,6 +67,8 @@ class SupermoduleZoomViewComponent extends ComponentBase {
             .append("path")
             .attr("class", "other track");
         
+        this.zoomBox = this.container.append("rect");
+
         this.selectedTrack = this.container
             .append("path")
             .attr("class", "selected track");
@@ -133,7 +133,7 @@ class SupermoduleZoomViewComponent extends ComponentBase {
                 .join(" ")
             );
 
-            this.stackText.text(`Stack ${eventData.track.stk}`);
+            this.stackText.text(`Sector ${eventData.track.sec}, Stack ${eventData.track.stk}`);
         }
         else {
             this.selectedTrack.attr("d", null);
