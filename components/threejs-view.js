@@ -49,11 +49,18 @@ class ThreejsComponent {
         const detectors = this.detectorGroup = new THREE.Group();
 
         const stackMap = this.stackMap = new Map();
-        for (let s = 0; s < 5; s++) {
-            const stackObj = new THREE.Group();
-            stackMap.set(s, stackObj);
-            detectors.add(stackObj);
-        }
+        
+        for (let sec = 0; sec < 18; sec++)
+            for (let stk = 0; stk < 5; stk++) {
+                const stackObj = new THREE.Group();
+                stackMap.set(sec * 5 + stk, stackObj);
+                detectors.add(stackObj);
+            }
+
+        const selectedMaterial = new THREE.LineBasicMaterial({
+                color: new THREE.Color(`lightgray`),
+                opacity: 0.5, transparent: false
+            })
 
         for (const layer of geomLayers3D()) {
             const rotObj = new THREE.Object3D();
@@ -61,13 +68,7 @@ class ThreejsComponent {
 
             var geometry = new THREE.BoxBufferGeometry(layer.w, layer.h, layer.d);
             var wireframe = new THREE.EdgesGeometry(geometry);
-            var line = new THREE.LineSegments(wireframe,
-                new THREE.LineBasicMaterial({
-                    color: new THREE.Color(`lightgray`),
-                    linewidth: 0.5,
-                    opacity: 0.5, transparent: true
-                })
-            );
+            var line = new THREE.LineSegments(wireframe, selectedMaterial);
 
             line.position.x = layer.x;
             line.position.y = layer.y;
@@ -75,7 +76,7 @@ class ThreejsComponent {
 
             rotObj.add(line);
 
-            const stackObj = stackMap.get(layer.stk);
+            const stackObj = stackMap.get(layer.sec * 5 + layer.stk);
 
             stackObj.add(rotObj);
         }
@@ -132,9 +133,9 @@ class ThreejsComponent {
             this.tracks = new THREE.Group();
             this.tracklets = new THREE.Group();
 
-            const unselectedMaterial = new THREE.LineBasicMaterial({ color: 0xdbebf9, opacity: 1.0, transparent: true });
             const selectedMaterial = new THREE.LineBasicMaterial({ color: 0x3392e3 });
-            const allMaterial = new THREE.LineBasicMaterial({ color: 0x3392e3, opacity: 0.25, transparent: true });
+            const unselectedMaterial = new THREE.LineBasicMaterial({ color: 0xb37ce5, opacity: 0.5, transparent: true });
+            const esdMaterial = new THREE.LineBasicMaterial({ color: 0xdbebf9, opacity: 0.5, transparent: true });
 
             const selectedTrackletMaterial = new THREE.LineBasicMaterial({ color: 0xf03b20 });
             const matchedTrackletMaterial = new THREE.LineBasicMaterial({ color: 0xfeb24c });
@@ -147,8 +148,12 @@ class ThreejsComponent {
                 {
                     let material;
                     if (selectedId == null)
-                        material = allMaterial;
-                    else material = (selectedId == track.id) ? selectedMaterial : unselectedMaterial;
+                        material = selectedMaterial;
+                    else if (selectedId == track.id)
+                        material = selectedMaterial;
+                    else if (track.typ == "Trd")
+                        material = unselectedMaterial;
+                    else material = esdMaterial;
 
                     this.tracks.add(this.createLineObject3D(track, material));
 
@@ -170,7 +175,10 @@ class ThreejsComponent {
             this.trackletGroup.add(this.tracklets);
             this.trackGroup.add(this.tracks);
 
-            this.stackMap.forEach((object, stack) => object.visible = (eventData.track == null) || (stack == eventData.track.stk));
+            this.stackMap.forEach((object, stack) => {
+                object.visible = (eventData.track == null) || (stack == eventData.track.sec * 5 + eventData.track.stk);
+                // object.visible = (eventData.track == null) || (stack % 5) == eventData.track.stk || Math.floor(stack / 5) == eventData.track.sec;
+            });
         }
         else {
             this.tracks = null;
