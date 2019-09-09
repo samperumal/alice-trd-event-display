@@ -48,6 +48,15 @@ class ThreejsComponent {
         const sphG = new THREE.SphereBufferGeometry(10);
         scene.add(new THREE.LineSegments(new THREE.WireframeGeometry(sphG), new THREE.LineBasicMaterial({ color: 0x00ff00 })));
 
+        // White directional light at half intensity shining from the top.
+        const directionalLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
+        directionalLight.position.set(0, 1, 1);
+        scene.add( directionalLight );
+
+        const directionalLight2 = new THREE.DirectionalLight( 0xffffff, 1.0 );
+        directionalLight2.position.set(0, -1, -1);
+        scene.add( directionalLight2 );
+
         // TRD Modules
         const detectors = this.detectorGroup = new THREE.Group();
 
@@ -60,18 +69,19 @@ class ThreejsComponent {
                 detectors.add(stackObj);
             }
 
-        const selectedMaterial = new THREE.LineBasicMaterial({
-                color: new THREE.Color(`lightgray`),
-                opacity: 0.5, transparent: false
+        const selectedMaterial = new THREE.MeshLambertMaterial({
+                color: new THREE.Color("white"),
+                opacity: 0.75,
+                transparent: true
             })
 
         for (const layer of geomLayers3D()) {
             const rotObj = new THREE.Object3D();
             rotObj.rotation.fromArray([0, 0, layer.rot / 180 * Math.PI]);
 
-            var geometry = new THREE.BoxBufferGeometry(layer.w, layer.h, layer.d);
-            var wireframe = new THREE.EdgesGeometry(geometry);
-            var line = new THREE.LineSegments(wireframe, selectedMaterial);
+            const geometry = new THREE.BoxBufferGeometry(layer.w, layer.h, layer.d);
+            const wireframe = new THREE.EdgesGeometry(geometry);
+            const line = new THREE.Mesh(geometry, selectedMaterial); //new THREE.LineSegments(wireframe, selectedMaterial);
 
             line.position.x = layer.x;
             line.position.y = layer.y;
