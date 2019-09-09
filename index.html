@@ -153,11 +153,6 @@
             stroke-width: 0.3px;
         }
 
-        .header {
-            width: 100%;
-            height: 80px;
-        }
-
         input[type=number] {
             width: 4em;
             text-align: center;
@@ -197,12 +192,47 @@
         .tooltip:hover .tooltiptext {
             visibility: visible;
         }
+
+        .header {
+            width: 100%;
+            height: 100px;
+            display: flex; 
+            flex-direction: row; 
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            font-size: 40px;
+            margin-block-start: 0em;
+            vertical-align: top;
+        }
+
+        .logo {
+            background-image: url("img/alice_logo.png");            
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 80px;
+            height: 80px;
+            display: inline-block;
+        }
+
+        .header-text {
+            display: inline-block;
+            vertical-align: bottom;
+            height: 80px;
+            margin-left: 0.5em;
+            margin-right: 1em;
+            color: #b7412d
+        }
     </style>
 </head>
 
 <body>
     <div class="header">
-
+        <div><div class="logo"></div></div>
+        <h1><div class="header-text">TRD Event Display</div></h1>
+        <div><div class="logo"></div></div>
     </div>
     <div style="display: flex; flex-direction: row; justify-content: center; width: 100%;">
         <div style="display: flex; flex-direction: column; width: 100%; justify-content: space-between; ">
