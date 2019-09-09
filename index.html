@@ -64,8 +64,9 @@
             background-position: top;
         }
 
-        svg, canvas {
-            border: 1px solid black;
+        /* Component borders */
+        svg, canvas, #tree-container, div.track-information, div.time-bin-view {
+            border: none; /* 1px solid black; */
         }
 
         p {
@@ -102,7 +103,6 @@
         div.time-bin-view {
             max-height: 380px;
             overflow-y: scroll;
-            border: 1px solid black; 
             text-align: center; 
             display: block;
         }
@@ -155,7 +155,7 @@
 
         .header {
             width: 100%;
-            height: 100px;
+            height: 80px;
         }
 
         input[type=number] {
@@ -205,8 +205,8 @@
 
     </div>
     <div style="display: flex; flex-direction: row; justify-content: center; width: 100%;">
-        <div style="display: flex; flex-direction: column; width: 100%; ">
-            <div style="display: flex; flex-direction: row; justify-content: space-around; flex-wrap: wrap; width: 100%;">
+        <div style="display: flex; flex-direction: column; width: 100%; justify-content: space-between; ">
+            <div style="display: flex; flex-direction: row; justify-content: space-between; flex-wrap: wrap; width: 100%;">
                 <div id="navigation-col">
                     <div class="component">
                         <p>
@@ -219,7 +219,7 @@
                                 </span>
                             </span>
                         </p>
-                        <div id="tree-container" style="border: 1px solid black;">
+                        <div id="tree-container">
                             <div id="dataTree">
                             </div>
                         </div>
