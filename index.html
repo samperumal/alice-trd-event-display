@@ -541,7 +541,8 @@
 
         if (true) {
             setTimeout(function () {
-                $("#dataTree").jstree("select_node", tree.treeData[2].children[1]);
+                //$("#dataTree").jstree("select_node", tree.treeData[2].children[1]);
+                tree.changeSelection();
                 //digitsView.drawDigits();
             }, 500);
         }

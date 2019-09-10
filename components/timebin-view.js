@@ -94,7 +94,7 @@ class TimebinViewComponent extends ComponentBase {
         const stack = eventData.track.stk;
 
         try {
-            console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}`);
+            //console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}`);
             const data = await d3.json(this.dataLoadUrl(eventNo, sector, stack));
 
             const allPads = geomZoomSectorXYPlanePads();
