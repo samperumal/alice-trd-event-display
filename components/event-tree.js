@@ -40,8 +40,11 @@ class EventTree {
         this.tree = $(id);
 
         this.tree
-            .on("hover_node.jstree", this.treeSelectChanged.bind(this))
-            .on("dehover_node.jstree", this.treeSelectChanged.bind(this))
+            .on("hover_node.jstree", ((ev, eventData) => {
+                this.tree.jstree("deselect_all", true);  
+                this.tree.jstree("select_node", eventData.node);  
+            }).bind(this))
+            //.on("dehover_node.jstree", this.treeSelectChanged.bind(this))
             .on("select_node.jstree", this.treeSelectChanged.bind(this))
             .jstree({
                 'core': {
