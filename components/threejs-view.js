@@ -27,12 +27,13 @@ class ThreejsComponent {
 
         const controls = this.controls = new OrbitControls(camera, renderer.domElement);
 
-        controls.addEventListener('change', this.render.bind(this)); // call this only in static scenes (i.e., if there is no animation loop)
+        //controls.addEventListener('change', this.render.bind(this)); // call this only in static scenes (i.e., if there is no animation loop)
 
         // controls.enableDamping = false; // an animation loop is required when either damping or auto-rotation are enabled
         // controls.dampingFactor = 0.05;
 
-        controls.screenSpacePanning = false;
+        controls.screenSpacePanning = true;
+        controls.enablePan = false;
 
         controls.minDistance = 100;
         controls.maxDistance = 2000;
@@ -46,16 +47,17 @@ class ThreejsComponent {
 
         // Central sphere
         const sphG = new THREE.SphereBufferGeometry(10);
-        scene.add(new THREE.LineSegments(new THREE.WireframeGeometry(sphG), new THREE.LineBasicMaterial({ color: 0x00ff00 })));
+        const sphereObj = new THREE.LineSegments(new THREE.WireframeGeometry(sphG), new THREE.LineBasicMaterial({ color: 0x00ff00 }));
+        scene.add(sphereObj);
 
         // White directional light at half intensity shining from the top.
-        const directionalLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
-        directionalLight.position.set(0, 1, 1);
+        const directionalLight = this.directionalLight = new THREE.DirectionalLight( 0xffffff, 0.80 );
+        //directionalLight.target = camera;
+        directionalLight.position.set(0, 1, 0);
         scene.add( directionalLight );
 
-        const directionalLight2 = new THREE.DirectionalLight( 0xffffff, 1.0 );
-        directionalLight2.position.set(0, -1, -1);
-        scene.add( directionalLight2 );
+        const ambientLight = new THREE.AmbientLight( 0xffffff, 0.2 );        
+        scene.add( ambientLight );
 
         // TRD Modules
         const detectors = this.detectorGroup = new THREE.Group();
@@ -71,8 +73,10 @@ class ThreejsComponent {
 
         const selectedMaterial = new THREE.MeshLambertMaterial({
                 color: new THREE.Color("white"),
+                reflectivity: 1,
+                shininess: 30,
                 opacity: 0.75,
-                transparent: true
+                transparent: false
             })
 
         for (const layer of geomLayers3D()) {
@@ -117,6 +121,8 @@ class ThreejsComponent {
         requestAnimationFrame( this.animate.bind(this) );
 
         this.controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
+
+        this.directionalLight.position.set(this.camera.position.x, this.camera.position.y, this.camera.position.z).normalize();
 
         this.render();
 
@@ -201,8 +207,8 @@ class ThreejsComponent {
             this.trackGroup.add(this.tracks);
 
             this.stackMap.forEach((object, stack) => {
-                object.visible = (eventData.track == null) || (stack == eventData.track.sec * 5 + eventData.track.stk);
-                // object.visible = (eventData.track == null) || (stack % 5) == eventData.track.stk || Math.floor(stack / 5) == eventData.track.sec;
+                // object.visible = (eventData.track == null) || (stack == eventData.track.sec * 5 + eventData.track.stk);
+                object.visible = (eventData.track == null) || (stack % 5) == eventData.track.stk || Math.floor(stack / 5) == eventData.track.sec;
             });
         }
         else {
