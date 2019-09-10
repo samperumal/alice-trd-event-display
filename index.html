@@ -424,14 +424,32 @@
             <div class="legend">
                 <div style="font-weight: bold; font-size: 16px; align-self: center;">Legend</div>
                 <div style="display: flex; flex-direction: column;">
+                    <div><div style="border: darkgray 2px solid;" class="legend-color"></div><div class="legend-text">Detector module</div></div>
+                    <div><div style="border-color: lightgray;" class="legend-color"></div><div class="legend-text">Detector pad</div></div>
+                    <div><div style="background-color: #f4f4f4; border: none;" class="legend-color"></div><div class="legend-text">ALICE TPC</div></div>
+                </div>
+                <div style="display: flex; flex-direction: column;">
                     <div><div style="background-color: #3392e3;" class="legend-color"></div><div class="legend-text">Selected TRD track</div></div>
                     <div><div style="background-color: #b37ce5;" class="legend-color"></div><div class="legend-text">Other TRD track</div></div>
-                    <div><div style="background-color: #cfe9ff;" class="legend-color"></div><div class="legend-text">ESD track</div></div>
+                    <div><div style="background-color: #cfe9ff;" class="legend-color"></div><div class="legend-text">Background track</div></div>
                 </div>
                 <div style="display: flex; flex-direction: column;">
                     <div><div style="background-color: #f03b20;" class="legend-color"></div><div class="legend-text">Selected TRD tracklet</div></div>
                     <div><div style="background-color: #feb24c;" class="legend-color"></div><div class="legend-text">Matched TRD tracklet</div></div>
                     <div><div style="background-color: #ffeda0;" class="legend-color"></div><div class="legend-text">Other TRD tracklet</div></div>
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <div>
+                        <svg class="legend-color time-bin-view">
+                            <path d="M0,4 L20,4" class="tracklet"></path>
+                        </svg>
+                        <div class="legend-text">Lorentz corrected tracklet</div></div>
+                    <div>
+                        <svg class="legend-color time-bin-view">
+                            <path d="M0,5 L20,5" class="tracklet lorentz"></path>
+                        </svg>
+                        <div class="legend-text">Raw reconstructed tracklet</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -544,7 +562,7 @@
                 //$("#dataTree").jstree("select_node", tree.treeData[2].children[1]);
                 tree.changeSelection();
                 //digitsView.drawDigits();
-            }, 500);
+            }, 1500);
         }
 
     </script>

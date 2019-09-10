@@ -81,6 +81,6 @@ class EventTree {
             this.tree.jstree("select_node", this.treeData[0]);
         }
 
-        window.setTimeout(this.changeSelection.bind(this), 5000);
+        window.setTimeout(this.changeSelection.bind(this), 15000);
     }
 }

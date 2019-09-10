@@ -2,7 +2,7 @@ class TimebinViewComponent extends ComponentBase {
     constructor(id, width, height, viewBox, config) {
         super(id, width, height, marginDef(5, 5, 5, 5), `0 0 ${width} ${height}`);
 
-        this.container.classed("time-bin-view", true);
+        this.container.classed("time-bin-view", true).style("display", "none");
 
         this.dimensions = getDimensions();
 
