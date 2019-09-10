@@ -26,7 +26,7 @@ class TimebinViewComponent extends ComponentBase {
         this.padSubViews = [];
         this.layerLabels = [];
 
-        this.colourScale = d3.scaleSequential(d3.interpolateGreens).domain([100, 0]);
+        this.colourScale = d3.scaleSequential(d3.interpolateBuGn).domain([100, 0]);
 
         const midColour = this.colourScale(65);
 
@@ -57,9 +57,9 @@ class TimebinViewComponent extends ComponentBase {
                     .attr("x1", this.splitXBand(0)).attr("x2", this.splitXBand(1) + this.splitXBand.bandwidth());
 
             this.layerLabels.push(
-                layerGroup.append("text").attr("class", "panel-label")
-                    .attr("y", -15)
-                    .attr("x", this.displayWidth / 2)
+                layerGroup.append("text").attr("class", "panel-label layer-label")
+                    .attr("y", -2)
+                    .attr("x", this.displayWidth / 2 - 5)
             );
 
             this.layerGroups.push(layerGroup);
@@ -99,11 +99,16 @@ class TimebinViewComponent extends ComponentBase {
 
             const allPads = geomZoomSectorXYPlanePads();
 
-            for (const layer of d3.range(6)) {
+            let sortedLayers = eventData.track.trklts.map(t => t.lyr);
+            sortedLayers = d3.range(6).filter(l => !sortedLayers.includes(l)).concat(sortedLayers);
+
+            for (const index of d3.range(6)) {
+                const layer = sortedLayers[index];
+
                 const trackletData = eventData.track.trklts.find(t => t.lyr == layer);
                 let location = null;
                 if (trackletData != null) {
-                    this.layerLabels[layer].text(`Layer ${layer} Padrow ${trackletData.row}`);
+                    this.layerLabels[index].text(`Layer ${layer} Padrow ${trackletData.row}`);
 
                     const LY = [trackletData.y1, trackletData.y2].sort((a,b) => a-b);
 
@@ -117,11 +122,15 @@ class TimebinViewComponent extends ComponentBase {
             
                     const padIndices = d3.range(padExtent[1], padExtent[0] - 1, -1);
 
-                    const padBounds = allPads.filter(p => p.l == layer)
-                        .filter(p => padIndices.includes(p.c))
-                        .map(p => p.d.map(d => d.x)).reduce(ajoin);
+                    const includedPads = allPads.filter(p => p.l == layer)
+                        .filter(p => padIndices.includes(p.c));
+
+                    const padBounds = includedPads
+                        .map(p => p.d.map(d => d.x)).reduce(ajoin)
 
                     const ydomain = d3.extent(padBounds);
+
+                    const binydomain = d3.range(25);
 
                     location = {
                         stack: trackletData.stk,
@@ -134,16 +143,17 @@ class TimebinViewComponent extends ComponentBase {
                         y2: trackletData.y2, 
                         y2p: trackletData.y2p, 
                         y2n: trackletData.y2n,
-                        ydomain: ydomain
+                        ydomain: ydomain,
+                        binydomain: binydomain
                     }
                 }
-                else this.layerLabels[layer].text(`Layer ${layer}`);
+                else this.layerLabels[index].text(`No data`);
 
                 // Find corresponding layer, if any, in digits data
                 const layerData = data.lyrs.find(l => l.lyr == layer);
 
-                this.tbsumSubViews[layer].draw(location, layerData);
-                this.padSubViews[layer].draw(location, layerData, this.colourScale);
+                this.tbsumSubViews[index].draw(location, layerData);
+                this.padSubViews[index].draw(location, layerData, this.colourScale);
             }
         }
         catch (err) {
@@ -208,8 +218,12 @@ class TbsumSubView {
             this.content.selectAll("rect.tbsum").remove();
             this.xscale.domain([256, 0]);
             this.xaxis.call(d3.axisBottom(this.xscale).ticks(5, "s"));
+            this.tbsumContainer.style("visibility", "hidden");
 
             return;
+        }
+        else {
+            this.tbsumContainer.style("visibility", "visible");
         }
 
         let padIndices;
@@ -270,17 +284,16 @@ class PadSubView {
 
         this.dimensions = getDimensions();
 
-        this.yscale = d3.scaleBand().domain(d3.range(30)).range([40, height - 20]).paddingInner(0.2).paddingOuter(0.2);
+        this.binyscale = d3.scaleBand().range([40, height - 20]).paddingInner(0.2).paddingOuter(0.2);
 
         this.xscale = d3.scaleBand().domain(d3.range(90, 99)).range([0, width - 20]).paddingInner(0.1).paddingOuter(0.1);
 
         this.tscale = d3.scaleLinear().range([0, width - 20]);
 
-        this.tline = d3.line().x(d => this.tscale(d[0])).y(d => this.yscale(d[1]));
+        this.tline = d3.line().x(d => this.tscale(d[0])).y(d => this.binyscale(d[1]));
 
         this.yaxis = this.padContainer.append("g").attr("class", "y-axis")
-            .attr("transform", `translate(${this.width - 20}, 0)`)
-            .call(d3.axisRight(this.yscale).tickValues(d3.range(0, 30, 3)));
+            .attr("transform", `translate(${this.width - 20}, 0)`);
 
         this.xaxis = this.padContainer.append("g").attr("class", "x-axis")
             .attr("transform", `translate(0, ${height - 20})`)
@@ -321,14 +334,16 @@ class PadSubView {
         this.content.selectAll("rect.tbin").remove();
 
         if (location == null || digitsData == null) {
-            this.colourAxisGroup.style("display", "none");
             this.trackletPath.attr("d", null);
             //this.trackletPathPos.attr("d", null);
             this.trackletPathNeg.attr("d", null);
+            this.colourAxisGroup.style("visibility", "hidden");
+            this.padContainer.style("visibility", "hidden");
             return;
         }
         else {
-            this.colourAxisGroup.style("display", "inherit");
+            this.colourAxisGroup.style("visibility", "visible");
+            this.padContainer.style("visibility", "visible");
         }
 
         let padIndices;
@@ -338,6 +353,8 @@ class PadSubView {
 
             this.xscale.domain(padIndices);
             this.tscale.domain(location.ydomain);
+            this.binyscale.domain(location.binydomain);
+            this.yaxis.call(d3.axisRight(this.binyscale).tickValues(d3.range(0, d3.max(location.binydomain) + 1, 3)));
         }
         else {
             const minPad = Math.max(location.col - 2, 0);
@@ -359,13 +376,13 @@ class PadSubView {
         this.xaxis.call(d3.axisBottom(this.xscale));
         this.taxis.call(d3.axisTop(this.tscale).ticks(5));
 
-        const xscale = this.xscale, yscale = this.yscale;
+        const xscale = this.xscale, binyscale = this.binyscale;
 
         const maxVal = d3.max(pads, d => d.val);
 
         colourScale.domain([0, maxVal]);
 
-        const zscale = d3.scaleLinear().domain(colourScale.domain().reverse()).range(this.yscale.range());
+        const zscale = d3.scaleLinear().domain(colourScale.domain().reverse()).range(this.binyscale.range());
 
         this.colourAxisGroup.call(d3.axisLeft(zscale));
 
@@ -378,13 +395,13 @@ class PadSubView {
             .attr("class", "tbin")
             .attr("x", d => xscale(d.pad))
             .attr("width", xscale.bandwidth())
-            .attr("y", d => yscale(d.tbin))
-            .attr("height", yscale.bandwidth())
+            .attr("y", d => binyscale(d.tbin))
+            .attr("height", binyscale.bandwidth())
             .style("fill", d => colourScale(d.val));
 
-        this.trackletPath.attr("d", this.tline([[location.y1, 5], [location.y2, 25]]));
+        this.trackletPath.attr("d", this.tline([[location.y1, 0], [location.y2, 24]]));
         //this.trackletPathPos.attr("d", this.tline([[location.y1, 5], [location.y2p, 25]]));
-        this.trackletPathNeg.attr("d", this.tline([[location.y1, 5], [location.y2n, 25]]));
+        this.trackletPathNeg.attr("d", this.tline([[location.y1, 0], [location.y2n, 24]]));
     }
 }
 

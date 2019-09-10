@@ -12,6 +12,11 @@ rect.tbin {
     text-anchor: middle;
     dominant-baseline: text-before-edge;
 }
+.time-bin-view .panel-label.layer-label {
+    fill: rgb(0, 132, 255);
+    font-weight: bold;
+    font-size: 12px;
+}
 
 .time-bin-view .pad-adc-label {
     font-size: 9px;
@@ -45,12 +50,12 @@ rect.tbin {
 }
 
 .time-bin-view path.tracklet {
-    stroke: rgb(209, 39, 39);
+    stroke: #f03b20;
     stroke-width: 2px;
 }
 
 .time-bin-view path.tracklet.lorentz {
-    stroke: rgb(156, 49, 177);
+    stroke: #f03b20;
     stroke-dasharray: 4;
     stroke-linecap: round;
 }
