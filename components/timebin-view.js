@@ -191,13 +191,12 @@ class TbsumSubView {
 
         this.dimensions = getDimensions();
 
-        this.yscale = d3.scaleBand().domain(d3.range(30)).range([40, height - 20]).paddingInner(0.2).paddingOuter(0.2);
+        this.binyscale = d3.scaleBand().range([40, height - 20]).paddingInner(0.2).paddingOuter(0.2);
 
         this.xscale = d3.scaleLinear().domain([1000, 0]).range([20, width - 20]);
 
         this.yaxis = this.tbsumContainer.append("g").attr("class", "y-axis")
-            .attr("transform", "translate(20, 0)")
-            .call(d3.axisLeft(this.yscale).tickValues(d3.range(0, 30, 3)));
+            .attr("transform", "translate(20, 0)");
 
         this.xaxis = this.tbsumContainer.append("g").attr("class", "x-axis")
             .attr("transform", `translate(0, ${height - 20})`);
@@ -241,7 +240,7 @@ class TbsumSubView {
 
         const pads = digitsData.pads.filter(p => p.row == location.row && padIndices.includes(p.col));
 
-        const tbinSum = d3.range(30);
+        const tbinSum = d3.range(location.binydomain.length);
         for (const index in tbinSum)
             tbinSum[index] = 0;
 
@@ -255,17 +254,20 @@ class TbsumSubView {
         this.xscale.domain([maxAdcCount, 0]);
 
         this.xaxis.call(d3.axisBottom(this.xscale).ticks(5, "s"));
+        
+        this.binyscale.domain(location.binydomain);
+        this.yaxis.call(d3.axisRight(this.binyscale).tickValues(d3.range(0, d3.max(location.binydomain) + 1, 3)));
 
         const allRects = this.content.selectAll("rect.tbsum")
             .data(tbinSum);
 
         allRects.exit().remove();
 
-        const xscale = this.xscale, yscale = this.yscale;
+        const xscale = this.xscale, binyscale = this.binyscale;
 
         allRects.enter().append("rect").attr("class", "tbsum")
-            .attr("y", (d, i) => yscale(i))
-            .attr("height", yscale.bandwidth());
+            .attr("y", (d, i) => binyscale(i))
+            .attr("height", binyscale.bandwidth());
 
         this.content.selectAll("rect.tbsum")
             .attr("x", d => xscale(d))
