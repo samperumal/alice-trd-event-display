@@ -4,6 +4,7 @@ import { geomLayers3D } from '../geometry/geometries3d.js';
 
 class ThreejsComponent {
     constructor(id, width, height) {
+        this.detectorMode = 1;
         this.init(id, width, height);
         this.render();
     }
@@ -73,10 +74,8 @@ class ThreejsComponent {
 
         const selectedMaterial = new THREE.MeshLambertMaterial({
                 color: new THREE.Color("white"),
-                reflectivity: 1,
-                shininess: 30,
                 opacity: 0.75,
-                transparent: false
+                transparent: true
             })
 
         for (const layer of geomLayers3D()) {
@@ -133,9 +132,30 @@ class ThreejsComponent {
     }
 
     toggleDetectors() {
-        this.detectorGroup.visible = !this.detectorGroup.visible;
+        this.detectorMode = (this.detectorMode + 1) % 3;
+
+        this.updateDetectors();
+
         this.render();
-        return this.detectorGroup.visible;
+
+        return this.detectorMode;
+    }
+
+    updateDetectors() {
+        this.stackMap.forEach((object, stack) => {
+            if (this.detectorMode == 0) {
+                // Hide all detectors
+                object.visible = false;
+            }
+            else if (this.detectorMode == 1) {
+                // Show selected stack and sector
+                object.visible = this.selectedTrack == null || (stack % 5) == this.selectedTrack.stk || Math.floor(stack / 5) == this.selectedTrack.sec;
+            }
+            else if (this.detectorMode == 2) {
+                // Show only selected module
+                object.visible = this.selectedTrack == null || (stack == this.selectedTrack.sec * 5 + this.selectedTrack.stk); 
+            }                
+        });
     }
 
     toggleTracklets() {
@@ -205,15 +225,16 @@ class ThreejsComponent {
 
             this.trackletGroup.add(this.tracklets);
             this.trackGroup.add(this.tracks);
-
-            this.stackMap.forEach((object, stack) => {
-                // object.visible = (eventData.track == null) || (stack == eventData.track.sec * 5 + eventData.track.stk);
-                object.visible = (eventData.track == null) || (stack % 5) == eventData.track.stk || Math.floor(stack / 5) == eventData.track.sec;
-            });
         }
         else {
             this.tracks = null;
         }
+
+        if (eventData != null && eventData.track != null)
+            this.selectedTrack = eventData.track;
+        else this.selectedTrack = null;
+
+        this.updateDetectors();
 
         this.render();
     }

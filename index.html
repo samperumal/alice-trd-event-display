@@ -342,8 +342,8 @@
                     </p>
                     <canvas id="threejs-view" style="width: 520px; height: 380px;"></canvas>
                     <div
-                        style="vertical-align: top; padding-bottom: 13px; margin-top:-35px; text-align: center; z-index: 100; position: absolute; width: 520px;">
-                        <input id="toggleDetectors" type="button" value="Hide detectors" />
+                        style="vertical-align: top; padding-bottom: 13px; margin-top:-15px; text-align: center; z-index: 100; position: absolute; width: 520px;">
+                        <input id="toggleDetectors" type="button" value="Toggle detectors" />
                         <input id="toggleTracklets" type="button" value="Hide tracklets" />
                         <input id="toggleTracks" type="button" value="Hide tracks" />
                         <input id="resetControls" type="button" value="Reset camera" />
@@ -489,7 +489,6 @@
         coordinator.addComponent(three);
         document.getElementById("toggleDetectors").addEventListener("click", (button) => {
             const visible = three.toggleDetectors();
-            button.currentTarget.value = `${visible ? "Hide" : "Show"} detectors`;
         });
         document.getElementById("toggleTracklets").addEventListener("click", (button) => {
             const visible = three.toggleTracklets();
