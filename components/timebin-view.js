@@ -83,8 +83,12 @@ class TimebinViewComponent extends ComponentBase {
     }
 
     draw(eventData) {
-        if (eventData.type == "select" && eventData.track != null) {
+        if (eventData.track != null) {
             this.drawDigits(eventData);
+            this.container.style("display", "inherit");
+        }
+        else {
+            this.container.style("display", "none");
         }
     }
 
