@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
     <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
-    
+
     <script src="d3.min.js"></script>
 
     <script src="jquery.min.js"></script>
@@ -32,13 +32,14 @@
 
     <script src="data/PbPb/script.js"></script>
 
-    <title>ALICE TRD Event Display - Beta</title>
+    <title>ALICE TRD Event Display - Alpha</title>
 
     <link href='./proton/style.min.css' rel='stylesheet' />
     <link href='./components/sector-view.css' rel='stylesheet' />
     <link href='./components/supermodule-view.css' rel='stylesheet' />
     <link href='./components/digits-view.css' rel='stylesheet' />
     <link href='./components/timebin-view.css' rel='stylesheet' />
+    <link href='./components/track-information.css' rel='stylesheet' />
 
     <link rel="stylesheet" href="jquery-ui.css">
 
@@ -63,8 +64,14 @@
             background-position: top;
         }
 
-        svg {
-            border: 1px solid black;
+        /* Component borders */
+        svg,
+        canvas,
+        #tree-container,
+        div.track-information,
+        div.time-bin-view {
+            border: none;
+            /* border: 1px solid black; */
         }
 
         p {
@@ -72,8 +79,12 @@
         }
 
         #tree-container {
-            height: 300px;
-            overflow: auto;
+            width: 300px;
+            height: 360px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            margin-top: 20px;
+            padding-left: 0.5em;
         }
 
         div.component {
@@ -99,8 +110,10 @@
         }
 
         div.time-bin-view {
-            max-height: 650px;
+            max-height: 380px;
             overflow-y: scroll;
+            text-align: center;
+            display: block;
         }
 
         #sector-view-zoom {
@@ -188,127 +201,264 @@
         .tooltip:hover .tooltiptext {
             visibility: visible;
         }
+
+        .header {
+            width: 100%;
+            height: 100px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            font-size: 50px;
+            margin-block-start: 0em;
+            vertical-align: top;
+        }
+
+        .logo {
+            background-image: url("img/alice_logo.png");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 80px;
+            height: 80px;
+            display: inline-block;
+        }
+
+        .header-text {
+            display: inline-block;
+            vertical-align: bottom;
+            height: 80px;
+            margin-left: 0.5em;
+            margin-right: 1em;
+            color: #b7412d
+        }
+
+        .legend {
+            display: flex; 
+            flex-direction: row; 
+            justify-content: center; 
+            width: 100%; 
+            /* border: 1px solid blue; */
+        }
+
+        .legend-color {
+            width: 20px; 
+            height: 10px; 
+            display: inline-block;
+            margin-right: 5px;
+            border: 1px darkgray solid;
+        }
+
+        .legend-text {
+            display: inline-block;
+        }
+
+        .legend > div {
+            margin: 0 20px;
+        }
     </style>
 </head>
 
 <body>
-    <div style="display: flex; flex-direction: column; ">
-        <div style="display: flex; flex-direction: row; justify-content: flex-start; flex-wrap: wrap; width: 100%;">
-            <div id="navigation-col">
+    <div class="header">
+        <div>
+            <div class="logo"></div>
+        </div>
+        <h1>
+            <div class="header-text">TRD Event Display</div>
+        </h1>
+        <div>
+            <div class="logo"></div>
+        </div>
+    </div>
+    <div style="display: flex; flex-direction: row; justify-content: center; width: 100%;">
+        <div style="display: flex; flex-direction: column; width: 100%; justify-content: space-between; ">
+            <div style="display: flex; flex-direction: row; justify-content: space-between; flex-wrap: wrap; width: 100%;">
                 <div class="component">
                     <p>
                         <span class="tooltip">Available Events
-                            <span class="tooltiptext" style="word-wrap: pre-wrap;">Each event is a collision between two atomic nuclei that results in a fireball (Quark Gluon Plasma), and many different particles are produced out of this inferno. 
-                                
-                                The ALICE detector measures the interaction of these particles with fixed targets, and uses this to reconstruct all aspects of the particle.
+                            <span class="tooltiptext" style="word-wrap: pre-wrap;">Each event is a collision between two
+                                atomic nuclei that results in a fireball (Quark Gluon Plasma), and many different
+                                particles are produced out of this inferno.
+
+                                The ALICE detector measures the interaction of these particles with fixed targets, and
+                                uses this to reconstruct all aspects of the particle.
 
                                 The blue tracks shown to the right are the result of this reconstruction.
                             </span>
                         </span>
                     </p>
-                    <div id="tree-container" style="border: 1px solid black;">
+                    <div id="tree-container">
                         <div id="dataTree">
                         </div>
                     </div>
                 </div>
-                <div class="component" style="vertical-align: top; padding-top: 0.4em;">
-                    <p>Track Information</p>
-                    <div style="width: 300px; height: 300px; padding: 1em; border: 1px solid black;">
-                        <table>
-                            <tbody id="track-information">
-
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div id="sector-col">
                 <div class="component">
                     <p>
                         <span class="label-left tooltip">Sector
-                            <span class="tooltiptext">The TRD is divided into 18 sectors, spaced at 20 degree intervals</span>
+                            <span class="tooltiptext">The TRD is divided into 18 sectors, spaced at 20 degree
+                                intervals</span>
                         </span>
                         <span class="tooltip">Summary
-                                <span class="tooltiptext">This view shows all the reconstructed particle tracks in blue, and all the measured TRD signals in red.</span>
+                            <span class="tooltiptext">This view shows all the reconstructed particle tracks in blue, and
+                                all the measured TRD signals in red.</span>
                         </span>
                         <span class="label-right tooltip">XY plane
-                            <span class="tooltiptext">The XY plane is equivalent to looking down the beam pipe, with the ring centre to your right</span>
+                            <span class="tooltiptext">The XY plane is equivalent to looking down the beam pipe, with the
+                                ring centre to your right</span>
                         </span>
                     </p>
-                    <svg id="sector-view" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
+                    <svg id="sector-view" style="width: 380px; height: 380px;" preserveAspectRatio="xMidYMid"></svg>
                 </div>
-                <div class="component">
-                    <p>
-                        <span class="label-left tooltip">Sector
-                            <span class="tooltiptext">The TRD is divided into 18 sectors or supermodules, spaced at 20 degree intervals</span>
-                        </span>
-                        <span class="tooltip">Detail
-                                <span class="tooltiptext">This view focuses on a single selected track, and the corresponding measured data in a single TRD module.</span>
-                        </span>
-                        <span class="label-right tooltip">XY plane
-                            <span class="tooltiptext">The XY plane is equivalent to looking down the beam pipe, with the ring centre to your right</span>
-                        </span>
-                    </p>
-                    <svg id="sector-zoom-view" style="width: 300px; height: 300px;"
-                        preserveAspectRatio="xMidYMid meet"></svg>
-                </div>
-
-            </div>
-            <div id="stack-col">
                 <div class="component">
                     <p>
                         <span class="label-left tooltip">Supermodule
-                            <span class="tooltiptext">Each supermodule is further divided into 5 stacks, and each stack has 6 layers</span>
+                            <span class="tooltiptext">Each supermodule is further divided into 5 stacks, and each stack
+                                has 6 layers</span>
                         </span>
                         <span class="tooltip">Summary
-                                <span class="tooltiptext">This view shows all the reconstructed particle tracks in blue, and all the measured TRD signals in red.</span>
+                            <span class="tooltiptext">This view shows all the reconstructed particle tracks in blue, and
+                                all the measured TRD signals in red.</span>
                         </span>
                         <span class="label-right tooltip">ZR plane
-                            <span class="tooltiptext">The ZR plane is equivalent to looking radially out from the centre of the beam pipe</span>
+                            <span class="tooltiptext">The ZR plane is equivalent to looking radially out from the centre
+                                of the beam pipe</span>
                         </span>
                     </p>
-                    <svg id="supermodule-view" style="width: 300px; height: 300px;"
+                    <svg id="supermodule-view" style="width: 380px; height: 380px;"
                         preserveAspectRatio="xMidYMid"></svg>
                 </div>
                 <div class="component">
                     <p>
-                        <span class="label-left tooltip">Supermodule
-                            <span class="tooltiptext">Each supermodule is further divided into 5 stacks, and each stack has 6 layers</span>
+                        <span class="tooltip">3D interactive view
+                            <span class="tooltiptext">This view shows all reconstructed particle tracks in blue,
+                                together with the TRD modules.
+
+                                You can click-and-drag to rotate the display, and use the mouse-wheel to zoom in and
+                                out.
+                            </span>
+                        </span>
+                    </p>
+                    <canvas id="threejs-view" style="width: 520px; height: 380px;"></canvas>
+                    <div
+                        style="vertical-align: top; padding-bottom: 13px; margin-top:-15px; text-align: center; z-index: 100; position: absolute; width: 520px;">
+                        <input id="toggleDetectors" type="button" value="Toggle detectors" />
+                        <input id="toggleTracklets" type="button" value="Hide tracklets" />
+                        <input id="toggleTracks" type="button" value="Hide tracks" />
+                        <input id="resetControls" type="button" value="Reset camera" />
+                    </div>
+                </div>
+
+            </div>
+            <div style="width: 100%; height: 10px;"></div>
+            <div style="display: flex; flex-direction: row; justify-content: space-between; flex-wrap: wrap; width: 100%;">
+                <div class="component" style="vertical-align: top; padding-top: 0.4em;">
+                    <p>Information</p>
+                    <div id="track-information" class="track-information">
+                        <div class="info-title">Event</div>
+                        <div style="text-align: center;" class="info-event"></div>
+                        <div class="info-title info-track">Track</div>
+                        <div style="text-align: center;" class="info-track info-track-text"></div>
+                        <div class="info-title info-tracklets">Tracklets</div>
+                        <div style="text-align: center;" class="info-tracklets info-tracklets-text"></div>
+                        <div class="info-title">Triggers</div>
+                        <div style="text-align: center;" class="info-triggers"></div>
+                    </div>
+                </div>
+                <div class="component">
+                    <p>
+                        <span class="label-left tooltip">Sector
+                            <span class="tooltiptext">The TRD is divided into 18 sectors or supermodules, spaced at 20
+                                degree intervals</span>
                         </span>
                         <span class="tooltip">Detail
-                                <span class="tooltiptext">This view focuses on a single selected track, and the corresponding measured data in a single TRD module.</span>
+                            <span class="tooltiptext">This view focuses on a single selected track, and the
+                                corresponding measured data in a single TRD module.</span>
                         </span>
-                        <span class="label-right tooltip">ZR plane
-                            <span class="tooltiptext">The ZR plane is equivalent to looking radially out from the centre of the beam pipe</span>
+                        <span class="label-right tooltip">XY plane
+                            <span class="tooltiptext">The XY plane is equivalent to looking down the beam pipe, with the
+                                ring centre to your right</span>
                         </span>
                     </p>
-                    <svg id="supermodule-zoom-view" style="width: 300px; height: 300px;"
+                    <svg id="sector-zoom-view" style="width: 380px; height: 380px;"
                         preserveAspectRatio="xMidYMid meet"></svg>
                 </div>
-            </div>
-            <div id="time-bin-col">
                 <div class="component">
-                    <p style="max-width: 500px;">
-                        <span class="tooltip">Time-bin view
-                            <span class="tooltiptext">This view shows how data, measured on each pad over 30 time bins of 2 micro-seconds each, is used to reconstruct a single TRD tracklet.
-    
-                                        At least 3 tracklets are required to match a reconstructed track.
-                                    </span>
-                                </span>
+                    <p>
+                        <span class="label-left tooltip">Supermodule
+                            <span class="tooltiptext">Each supermodule is further divided into 5 stacks, and each stack
+                                has 6 layers</span>
+                        </span>
+                        <span class="tooltip">Detail
+                            <span class="tooltiptext">This view focuses on a single selected track, and the
+                                corresponding measured data in a single TRD module.</span>
+                        </span>
+                        <span class="label-right tooltip">ZR plane
+                            <span class="tooltiptext">The ZR plane is equivalent to looking radially out from the centre
+                                of the beam pipe</span>
+                        </span>
                     </p>
-                    <div class="time-bin-view" style="border: 1px solid black; text-align: center; display: block;">
+                    <svg id="supermodule-zoom-view" style="width: 380px; height: 380px;"
+                        preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+                <div class="component">
+                    <p>
+                        <span class="tooltip">Time-bin view
+                            <span class="tooltiptext">
+                                This view shows how data is used to reconstruct a single TRD tracklet.
+
+                                Charge deposition is measured in 30 time bins of 2 micro-seconds each.
+
+                                At least 3 tracklets are required to match a reconstructed track.
+                            </span>
+                        </span>
+                    </p>
+                    <div class="time-bin-view">
                         <svg id="timebin-view-zoom" style="width: 500px; height: 1600px; border: none;"
                             preserveAspectRatio="xMidYMid meet"></svg>
                     </div>
                 </div>
             </div>
+            <div class="legend">
+                <div style="font-weight: bold; font-size: 16px; align-self: center;">Legend</div>
+                <div style="display: flex; flex-direction: column;">
+                    <div><div style="border: darkgray 2px solid;" class="legend-color"></div><div class="legend-text">Detector module</div></div>
+                    <div><div style="border-color: lightgray;" class="legend-color"></div><div class="legend-text">Detector pad</div></div>
+                    <div><div style="background-color: #f4f4f4; border: none;" class="legend-color"></div><div class="legend-text">ALICE TPC</div></div>
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <div><div style="background-color: #3392e3;" class="legend-color"></div><div class="legend-text">Selected TRD track</div></div>
+                    <div><div style="background-color: #b37ce5;" class="legend-color"></div><div class="legend-text">Other TRD track</div></div>
+                    <div><div style="background-color: #cfe9ff;" class="legend-color"></div><div class="legend-text">Background track</div></div>
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <div><div style="background-color: #f03b20;" class="legend-color"></div><div class="legend-text">Selected TRD tracklet</div></div>
+                    <div><div style="background-color: #feb24c;" class="legend-color"></div><div class="legend-text">Matched TRD tracklet</div></div>
+                    <div><div style="background-color: #ffeda0;" class="legend-color"></div><div class="legend-text">Other TRD tracklet</div></div>
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <div>
+                        <svg class="legend-color time-bin-view">
+                            <path d="M0,4 L20,4" class="tracklet"></path>
+                        </svg>
+                        <div class="legend-text">Lorentz corrected tracklet</div></div>
+                    <div>
+                        <svg class="legend-color time-bin-view">
+                            <path d="M0,4 L20,4" class="tracklet lorentz"></path>
+                        </svg>
+                        <div class="legend-text">Raw reconstructed tracklet</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div style="display: flex; flex-direction: row;">
+        <div style="display: none; flex-direction: row;">
             <div class="column">
                 <div class="component">
                     <p>Digits detail view</p>
                     <p>
-                        <span><label for="event-input">Event: </label><input type="number" value="11" id="event-input"
+                        <span><label for="event-input">Event: </label><input type="text" value="11" id="event-input"
                                 min="0" /></span>
                         <span><label for="sector-input">Sector: </label><input type="number" value="0" id="sector-input"
                                 min="0" /></span>
@@ -334,8 +484,9 @@
             </div>
         </div>
     </div>
-    <script>
-        const stackedLayerData = getStackedLayerDimensions();
+    </div>
+    <script type="module">
+        import { ThreejsComponent } from './components/threejs-view.js';
 
         function ajoin(a, b) { return a.concat(b); }
 
@@ -347,10 +498,30 @@
 
         const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
 
-        coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
-        coordinator.addComponent(new SectorZoomViewComponent("#sector-zoom-view", 300, 300));
-        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
-        coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 300, 300));
+        coordinator.addComponent(new SectorViewComponent("#sector-view", 380, 380));
+        coordinator.addComponent(new SectorZoomViewComponent("#sector-zoom-view", 380, 380));
+        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 380, 380));
+        coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 380, 380));
+
+        // ** ThreeJS initialisation
+        const three = new ThreejsComponent("threejs-view", 520, 380);
+        coordinator.addComponent(three);
+        document.getElementById("toggleDetectors").addEventListener("click", (button) => {
+            const visible = three.toggleDetectors();
+        });
+        document.getElementById("toggleTracklets").addEventListener("click", (button) => {
+            const visible = three.toggleTracklets();
+            button.currentTarget.value = `${visible ? "Hide" : "Show"} tracklets`;
+        });
+        document.getElementById("toggleTracks").addEventListener("click", (button) => {
+            const visible = three.toggleTracks();
+            button.currentTarget.value = `${visible ? "Hide" : "Show"} tracks`;
+        });
+        document.getElementById("resetControls").addEventListener("click", (button) => {
+            three.resetControls();
+        });
+        // ** ThreeJS initialisation
+
         coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
             dataLoadUrl: digitsLoadUrl
         }));
@@ -368,29 +539,30 @@
             }
         });
 
-        const digitsView = new DigitsViewComponent("#digits-view", 1480, 650, null, {
-            eventInput: "#event-input",
-            sectorInput: "#sector-input",
-            stackInput: "#stack-input",
-            maxCsumInput: "#max-csum-input",
-            buttons: ["#load-digits"],
-            dataLoadUrl: digitsLoadUrl,
-            padClick: coordinator.padSelect.bind(coordinator),
-            timeBinChange: (timebin) => { $("#timebin-slider").slider("option", "value", timebin); }
-        });
+        // const digitsView = new DigitsViewComponent("#digits-view", 1480, 650, null, {
+        //     eventInput: "#event-input",
+        //     sectorInput: "#sector-input",
+        //     stackInput: "#stack-input",
+        //     maxCsumInput: "#max-csum-input",
+        //     buttons: ["#load-digits"],
+        //     dataLoadUrl: digitsLoadUrl,
+        //     padClick: coordinator.padSelect.bind(coordinator),
+        //     timeBinChange: (timebin) => { $("#timebin-slider").slider("option", "value", timebin); }
+        // });
 
-        $("#timebin-slider").on("slide", function (event, ui) {
-            digitsView.drawPads(ui.value);
-            $("#timebin-display").val(ui.value);
-        });
+        // $("#timebin-slider").on("slide", function (event, ui) {
+        //     digitsView.drawPads(ui.value);
+        //     $("#timebin-display").val(ui.value);
+        // });
 
-        coordinator.addComponent(digitsView);
+        // coordinator.addComponent(digitsView);
 
-        if (false) {
+        if (true) {
             setTimeout(function () {
-                $("#dataTree").jstree("select_node", tree.treeData[1].children[1]);
+                //$("#dataTree").jstree("select_node", tree.treeData[2].children[1]);
+                tree.changeSelection();
                 //digitsView.drawDigits();
-            }, 500);
+            }, 1500);
         }
 
     </script>
