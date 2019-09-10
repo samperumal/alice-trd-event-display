@@ -2,7 +2,7 @@
 function trdTrackToJSTreeNode(t) {
     return {
         id: t.id,
-        text: `${t.typ} track ${t.id.substring(4)} (Sector ${t.sec}, Stack ${t.stk})`,
+        text: `Track ${t.id.split("_")[1].substring(1)}  [Stack ${t.stk}, Sector ${t.sec}]`,
         data: t,
         type: "Track"
     };
@@ -20,7 +20,7 @@ function eventToJSTreeNode(e) {
 
     return {
         id: e.id,
-        text: "Event " + e.id,
+        text: "Event " + e.id.substring(1),
         type: "Event",
         data: e,
         state: {

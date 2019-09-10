@@ -37,7 +37,7 @@ class TrackInformationComponent {
 
             if (ev.i != null) {
                 if (ev.i.be != null && ev.i.bt != null) {
-                    const collision_system = "a proton and a lead nuclei";
+                    const collision_system = "a proton and a lead nucleus";
                     const energy = (ev.i.be / 1000) + " TeV";
                     event_text = `Collision between ${collision_system} at an energy of <em>${energy}</em>`;
                 }
@@ -61,7 +61,7 @@ class TrackInformationComponent {
             track_text = `${track.typ} track ${track.id} traverses Sector ${track.sec}, Stack ${track.stk} of the TRD`;
             if (info.pT != null) track_text += ` with a transverse momentum of <em>${info.pT} eV</em>.`; else track_text += ".";
 
-            if (info.pid != null) track_text += `\n\n The calculated PID value of ${info.pid} indicates this is likely ${info.pid >= 100 ? "an electron" : "a pion"} track.`;
+            if (info.pid != null) track_text += `\n\n The calculated PID value of ${info.pid} indicates this is likely <em>${info.pid >= 100 ? "an electron" : "a pion"}</em> track.`;
 
             let num_tracks = "None";
             if (eventData.track.trklts != null && eventData.track.trklts.length > 0) {

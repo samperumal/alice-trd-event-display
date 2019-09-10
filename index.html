@@ -80,9 +80,10 @@
 
         #tree-container {
             width: 300px;
-            height: 380px;
-            overflow: auto;
-            padding-top: 1em;
+            height: 360px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            margin-top: 20px;
             padding-left: 0.5em;
         }
 
@@ -210,7 +211,7 @@
         }
 
         .header h1 {
-            font-size: 40px;
+            font-size: 50px;
             margin-block-start: 0em;
             vertical-align: top;
         }
@@ -421,16 +422,16 @@
                 </div>
             </div>
             <div class="legend">
-                <div style="vertical-align: bottom; font-weight: bold; font-size: 16px; align-self: center;">Legend</div>
+                <div style="font-weight: bold; font-size: 16px; align-self: center;">Legend</div>
                 <div style="display: flex; flex-direction: column;">
-                    <div><div style="background-color: blue;" class="legend-color"></div><div class="legend-text">Selected TRD track</div></div>
+                    <div><div style="background-color: #3392e3;" class="legend-color"></div><div class="legend-text">Selected TRD track</div></div>
                     <div><div style="background-color: #b37ce5;" class="legend-color"></div><div class="legend-text">Other TRD track</div></div>
-                    <div><div style="background-color: lightblue;" class="legend-color"></div><div class="legend-text">ESD track</div></div>
+                    <div><div style="background-color: #cfe9ff;" class="legend-color"></div><div class="legend-text">ESD track</div></div>
                 </div>
                 <div style="display: flex; flex-direction: column;">
-                    <div><div style="background-color: red;" class="legend-color"></div><div class="legend-text">Selected TRD tracklet</div></div>
-                    <div><div style="background-color: orange;" class="legend-color"></div><div class="legend-text">Matched TRD tracklet</div></div>
-                    <div><div style="background-color: yellow;" class="legend-color"></div><div class="legend-text">Other TRD tracklet</div></div>
+                    <div><div style="background-color: #f03b20;" class="legend-color"></div><div class="legend-text">Selected TRD tracklet</div></div>
+                    <div><div style="background-color: #feb24c;" class="legend-color"></div><div class="legend-text">Matched TRD tracklet</div></div>
+                    <div><div style="background-color: #ffeda0;" class="legend-color"></div><div class="legend-text">Other TRD tracklet</div></div>
                 </div>
             </div>
         </div>
