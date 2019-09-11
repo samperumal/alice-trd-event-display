@@ -59,7 +59,7 @@ class TrackInformationComponent {
             const info = track.i;
 
             track_text = `${track.typ} track ${track.id} traverses Sector ${track.sec}, Stack ${track.stk} of the TRD`;
-            if (info.pT != null) track_text += ` with a transverse momentum of <em>${info.pT} eV</em>.`; else track_text += ".";
+            if (info.pT != null) track_text += ` with a transverse momentum of <em>${info.pT} GeV</em>.`; else track_text += ".";
 
             if (info.pid != null) track_text += `\n\n The calculated PID value of ${info.pid} indicates this is likely <em>${info.pid >= 100 ? "an electron" : "a pion"}</em> track.`;
 
