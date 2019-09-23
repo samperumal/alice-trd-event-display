@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+        }
+
+        div {
+            border: 1px solid black;
+            box-sizing: border-box;
+        }
+
+        .page {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            flex-basis: 10%;
+            background-color: green;
+        }
+
+        .content {
+            flex-basis: 90%;
+            display: flex;
+            flex-direction: column;
+            background-color: cadetblue;
+        }
+
+        .row {
+            display: flex;
+            flex-direction: row;
+            background-color: chocolate;
+            flex-wrap: wrap;
+            align-content: stretch;
+            align-items: stretch;
+            justify-content: space-evenly;
+        }
+
+        .col1, .col2, .col3, .col4 {
+            min-height: 300px;
+        }
+
+        .col1 {
+            flex-grow: 2;
+            min-width: 200px;
+            background-color: yellow;
+        }
+
+        .col2,
+        .col3 {
+            flex-grow: 3;
+            min-width: 300px;;
+        }
+
+        .col2 {
+            background-color: orange;
+        }
+
+        .col3 {
+            background-color: firebrick;
+        }
+
+        .col4 {
+            flex-grow: 5;
+            min-width: 500px;
+            background-color: violet;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <div class="header">
+
+        </div>
+        <div class="content">
+            <div class="row">
+                <div class="col1"></div>
+                <div class="col2"></div>
+                <div class="col3"></div>
+                <div class="col4"></div>
+            </div>
+            <div class="row">
+
+            </div>
+            <div style="height: 20px;">
+
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
