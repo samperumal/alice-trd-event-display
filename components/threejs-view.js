@@ -34,7 +34,7 @@ class ThreejsComponent {
         // controls.dampingFactor = 0.05;
 
         controls.screenSpacePanning = true;
-        controls.enablePan = false;
+        controls.enablePan = true;
 
         controls.minDistance = 100;
         controls.maxDistance = 2000;
