@@ -5,16 +5,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+
+    <script src="d3.min.js"></script>
+
+    <script src="jquery.min.js"></script>
+    <script src="jquery-ui.js"></script>
+    <script src="jstree.min.js"></script>
+
+    <script src="common-functions.js"></script>
+    <script src="geometry/geometries.js"></script>
+    <script src="components/trd-dimensions.js"></script>
+    <script src="components/padrow-dimensions.js"></script>
+    <script src="components/component-base.js"></script>
+    <script src="components/sector-view.js"></script>
+    <script src="components/sector-zoom-view.js"></script>
+    <script src="components/supermodule-view.js"></script>
+    <script src="components/supermodule-zoom-view.js"></script>
+    <script src="components/digits-view.js"></script>
+    <script src="components/event-tree.js"></script>
+    <script src="components/component-coordinator.js"></script>
+    <script src="components/track-information.js"></script>
+    <script src="components/timebin-view.js"></script>
+    <script src="components/display-mapper.js"></script>
+
+    <script src="data/pPb/script.js"></script>
+
+    <title>ALICE TRD Event Display - Alpha</title>
+
+    <link href='./proton/style.min.css' rel='stylesheet' />
+    <link href='./components/sector-view.css' rel='stylesheet' />
+    <link href='./components/supermodule-view.css' rel='stylesheet' />
+    <link href='./components/digits-view.css' rel='stylesheet' />
+    <link href='./components/timebin-view.css' rel='stylesheet' />
+    <link href='./components/track-information.css' rel='stylesheet' />
+
+    <link rel="stylesheet" href="jquery-ui.css">
+
     <style>
+        *,
+        *:before,
+        *:after {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
         body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.428571429;
+            /* background-color: #6d6d6d; */
+
             margin: 0px;
             padding: 0px;
         }
 
         div {
-            border: 1px solid black;
+            /* border: 1px solid black; */
             box-sizing: border-box;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
         }
 
         .page {
@@ -44,20 +97,24 @@
             justify-content: space-evenly;
         }
 
-        .col1, .col2, .col3, .col4 {
+        .col1,
+        .col2,
+        .col3,
+        .col4 {
             min-height: 300px;
+            min-width: 300px;
+            max-height: 380px;
         }
 
         .col1 {
             flex-grow: 2;
-            min-width: 200px;
             background-color: yellow;
+            max-width: 300px;
         }
 
         .col2,
         .col3 {
             flex-grow: 3;
-            min-width: 300px;;
         }
 
         .col2 {
@@ -69,10 +126,17 @@
         }
 
         .col4 {
-            flex-grow: 5;
-            min-width: 500px;
+            flex-grow: 3;
             background-color: violet;
         }
+
+        #dataTree,
+        #timebin-view {
+            max-height: 380px;
+            overflow-y: auto;
+        }
+
+        #timebin-view {}
     </style>
 </head>
 
@@ -83,12 +147,60 @@
         </div>
         <div class="content">
             <div class="row">
-                <div class="col1"></div>
-                <div class="col2"></div>
-                <div class="col3"></div>
-                <div class="col4"></div>
+                <div id="dataTree" class="col1"></div>
+                <div class="col2">
+                    <svg id="sector-view">
+
+                    </svg>
+                </div>
+                <div class="col3">
+                    <svg id="supermodule-view">
+
+                    </svg>
+                </div>
+                <div class="col4">
+                    <canvas id="threejs-view" style="width: auto; height: auto;"></canvas>
+                    <div
+                        style="display: none; vertical-align: top; padding-bottom: 13px; margin-top:-15px; text-align: center; z-index: 100; position: absolute;">
+                        <input id="toggleDetectors" type="button" value="Toggle detectors" />
+                        <input id="toggleTracklets" type="button" value="Hide tracklets" />
+                        <input id="toggleTracks" type="button" value="Hide tracks" />
+                        <input id="resetControls" type="button" value="Reset camera" />
+                    </div>
+                </div>
             </div>
             <div class="row">
+
+                <div class="col1">
+                    <p>Information</p>
+                    <div id="track-information" class="track-information">
+                        <div class="info-title">Event</div>
+                        <div style="text-align: center;" class="info-event"></div>
+                        <div class="info-title info-track">Track</div>
+                        <div style="text-align: center;" class="info-track info-track-text"></div>
+                        <div class="info-title info-tracklets">Tracklets</div>
+                        <div style="text-align: center;" class="info-tracklets info-tracklets-text"></div>
+                        <div class="info-title">Triggers</div>
+                        <div style="text-align: center;" class="info-triggers"></div>
+                    </div>
+                </div>
+                <div class="col2">
+                    <svg id="sector-zoom-view">
+
+                    </svg>
+                </div>
+                <div class="col3">
+                    <svg id="supermodule-zoom-view">
+
+                    </svg>
+                </div>
+                <div class="col4">
+                    <div id="timebin-view">
+                        <svg id="timebin-view-zoom">
+
+                        </svg>
+                    </div>
+                </div>
 
             </div>
             <div style="height: 20px;">
@@ -96,6 +208,87 @@
             </div>
         </div>
     </div>
+    <script type="module">
+        import { ThreejsComponent } from './components/threejs-view.js';
+
+        function ajoin(a, b) { return a.concat(b); }
+
+        const data = [...mapToDisplayDataFormat(getData())];
+
+        const digitsLoadUrl = getDigitsLoadUrl;
+
+        const coordinator = new ComponentCoordinator(data);
+
+        const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
+
+        coordinator.addComponent(new TrackInformationComponent("#track-information"));
+
+        coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
+        coordinator.addComponent(new SectorZoomViewComponent("#sector-zoom-view", 300, 300));
+        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
+        coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 300, 300));
+
+        // ** ThreeJS initialisation
+        // const three = new ThreejsComponent("threejs-view", 520, 380);
+        // coordinator.addComponent(three);
+        // document.getElementById("toggleDetectors").addEventListener("click", (button) => {
+        //     const visible = three.toggleDetectors();
+        // });
+        // document.getElementById("toggleTracklets").addEventListener("click", (button) => {
+        //     const visible = three.toggleTracklets();
+        //     button.currentTarget.value = `${visible ? "Hide" : "Show"} tracklets`;
+        // });
+        // document.getElementById("toggleTracks").addEventListener("click", (button) => {
+        //     const visible = three.toggleTracks();
+        //     button.currentTarget.value = `${visible ? "Hide" : "Show"} tracks`;
+        // });
+        // document.getElementById("resetControls").addEventListener("click", (button) => {
+        //     three.resetControls();
+        // });
+        // ** ThreeJS initialisation
+
+        coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
+            dataLoadUrl: digitsLoadUrl
+        }));
+
+        // const timebinDisplay = $("timebin-display");
+        // $("#timebin-slider").slider({
+        //     value: 0,
+        //     min: 0,
+        //     max: 29,
+        //     step: 1,
+        //     change: function (event, ui) {
+        //         $("#timebin-display").val(ui.value);
+        //     }
+        // });
+
+        // const digitsView = new DigitsViewComponent("#digits-view", 1480, 650, null, {
+        //     eventInput: "#event-input",
+        //     sectorInput: "#sector-input",
+        //     stackInput: "#stack-input",
+        //     maxCsumInput: "#max-csum-input",
+        //     buttons: ["#load-digits"],
+        //     dataLoadUrl: digitsLoadUrl,
+        //     padClick: coordinator.padSelect.bind(coordinator),
+        //     timeBinChange: (timebin) => { $("#timebin-slider").slider("option", "value", timebin); }
+        // });
+
+        // $("#timebin-slider").on("slide", function (event, ui) {
+        //     digitsView.drawPads(ui.value);
+        //     $("#timebin-display").val(ui.value);
+        // });
+
+        // coordinator.addComponent(digitsView);
+
+        if (true) {
+            setTimeout(function () {
+                $("#dataTree").jstree("select_node", tree.treeData[2].children[1]);
+                // tree.changeSelection();
+                //digitsView.drawDigits();
+            }, 1500);
+        }
+
+    </script>
 </body>
 
 </html>
