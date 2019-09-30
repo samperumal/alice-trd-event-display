@@ -76,8 +76,35 @@
         }
 
         .header {
-            flex: 1 1 8%;
+            flex: 1 1 10%;
             background-color: green;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            background-image: url("img/alice_logo.png");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 7vh;
+            height: 7.3vh;
+            display: inline-block;
+            margin-left: 1em;
+            margin-right: 1em;
+        }
+
+        .header-text {
+            display: inline-block;
+            vertical-align: bottom;
+            margin-left: 0.5em;
+            margin-right: 1em;
+            color: #b7412d;
+            font-size: 3.5em;
+            font-weight: bold;
+            text-align: center;
         }
 
         .content {
@@ -142,7 +169,9 @@
 <body>
     <div class="page">
         <div class="header">
-            <h1>Testing</h1>
+            <div class="logo"></div>
+            <div class="header-text">TRD Event Display</div>
+            <div class="logo"></div>
         </div>
         <div class="content">
             <div class="row">
