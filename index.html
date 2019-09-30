@@ -30,7 +30,7 @@
 
     <script src="data/pPb/script.js"></script>
 
-    <title>ALICE TRD Event Display - Alpha</title>
+    <title>ALICE TRD Event Display</title>
 
     <link href='./proton/style.min.css' rel='stylesheet' />
     <link href='./components/sector-view.css' rel='stylesheet' />
@@ -127,6 +127,7 @@
         .col3,
         .col4 {
             max-height: 40vh;
+            margin-top: 1em;
         }
 
         .col1 {
@@ -184,6 +185,50 @@
             flex-direction: column;
             justify-content: center;
         }
+
+        @media screen 
+            and (min-width: 1001px)
+            and (max-width: 1400px)  {
+
+            .col1,
+            .col2,
+            .col3,
+            .col4 {
+                flex: 1 1 33%;
+            }
+        }
+
+        @media screen 
+            and (min-width: 769px)
+            and (max-width: 1000px)  {
+
+            .col1,
+            .col2,
+            .col3,
+            .col4 {
+                flex: 1 1 50%;
+            }
+
+            .legend {
+                height: auto;
+            }
+        }
+        
+        @media screen 
+            and (max-width: 768px)  {
+
+            .col1,
+            .col2,
+            .col3,
+            .col4 {
+                flex: 1 1 100%;
+            }
+
+            .legend {
+                height: auto;
+                margin-top: 1em;
+            }
+        }
     </style>
 </head>
 
@@ -223,10 +268,7 @@
                         <input id="resetControls" type="button" value="Reset" />
                     </div>
                 </div>
-            </div>
-            <div style="height: 2vh;">
-            </div>
-            <div class="row">
+            <div style="height: 2vh;"></div>
                 <div id="track-information-container" class="col1">
                     <div class="col-header">Track information</div>
                     <div id="track-information" class="track-information">
