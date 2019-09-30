@@ -160,15 +160,21 @@
         }
 
         .legend {
-            display: flex; 
-            flex-direction: row; 
-            justify-content: center; 
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
             height: 8vh;
         }
 
+        .legend-header {
+            font-weight: bold;
+            font-size: 16px;
+            align-self: center;
+        }
+
         .legend-color {
-            width: 20px; 
-            height: 10px; 
+            width: 20px;
+            height: 10px;
             display: inline-block;
             margin-right: 5px;
             border: 1px darkgray solid;
@@ -178,19 +184,14 @@
             display: inline-block;
         }
 
-        .legend > div {
-            margin: 0 20px;
-        }
-
         .legend-column {
-            display: flex; 
+            display: flex;
             flex-direction: column;
             justify-content: center;
+            padding: 0 20px;
         }
 
-        @media screen 
-            and (min-width: 1001px)
-            and (max-width: 1400px)  {
+        @media screen and (min-width: 1001px) and (max-width: 1400px) {
 
             .col1,
             .col2,
@@ -198,11 +199,14 @@
             .col4 {
                 flex: 1 1 33%;
             }
+
+            #timebin-container,
+            #threejs-container {
+                order: 2;
+            }
         }
 
-        @media screen 
-            and (min-width: 769px)
-            and (max-width: 1000px)  {
+        @media screen and (min-width: 769px) and (max-width: 1000px) {
 
             .col1,
             .col2,
@@ -211,13 +215,24 @@
                 flex: 1 1 50%;
             }
 
-            .legend {
-                height: auto;
+            .col1 {
+                order: 0;
+            } 
+
+            .col2 {
+                order: 1;
+            }
+
+            .col3 {
+                order: 2;
+            }
+
+            .col4 {
+                order: 3;
             }
         }
-        
-        @media screen 
-            and (max-width: 768px)  {
+
+        @media screen and (max-width: 768px) {
 
             .col1,
             .col2,
@@ -226,9 +241,24 @@
                 flex: 1 1 100%;
             }
 
+            .legend-column {
+                flex: 1 1 50%;
+            }
+        }
+
+        @media screen and (max-width: 1400px) {
+
             .legend {
                 height: auto;
                 margin-top: 1em;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .legend-header {
+                flex: 1 1 100%;
+                text-align: center;
+                margin-bottom: 1em;
             }
         }
     </style>
@@ -243,7 +273,7 @@
         </div>
         <div class="content">
             <div class="row">
-                <div class="col1">
+                <div class="col1" id="event-tree-container">
                     <div class="col-header">Available events</div>
                     <div id="dataTree"></div>
                 </div>
@@ -259,7 +289,7 @@
 
                     </svg>
                 </div>
-                <div id="threejs-container" class="col4">
+                <div class="col4" id="threejs-container">
                     <div class="col-header">3D interactive view</div>
                     <canvas id="threejs-view" style="width: 100%; height: 80%;"></canvas>
                     <div style="text-align: center;">
@@ -270,8 +300,8 @@
                         <input id="resetControls" type="button" value="Reset" />
                     </div>
                 </div>
-            <div style="height: 2vh;"></div>
-                <div id="track-information-container" class="col1">
+                <div style="height: 2vh;"></div>
+                <div class="col1" id="track-information-container">
                     <div class="col-header">Track information</div>
                     <div id="track-information" class="track-information">
                         <div class="info-title">Event</div>
@@ -296,7 +326,7 @@
 
                     </svg>
                 </div>
-                <div class="col4">
+                <div class="col4" id="timebin-container">
                     <div class="col-header">Raw data for selected track</div>
                     <div id="timebin-view">
                         <svg id="timebin-view-zoom">
@@ -307,28 +337,56 @@
 
             </div>
             <div class="legend">
-                <div style="font-weight: bold; font-size: 16px; align-self: center;">Legend</div>
+                <div class="legend-header">Legend</div>
                 <div class="legend-column">
-                    <div><div style="border: darkgray 2px solid;" class="legend-color"></div><div class="legend-text">Detector module</div></div>
-                    <div><div style="border-color: lightgray;" class="legend-color"></div><div class="legend-text">Detector pad</div></div>
-                    <div><div style="background-color: #f4f4f4; border: none;" class="legend-color"></div><div class="legend-text">ALICE TPC</div></div>
+                    <div>
+                        <div style="border: darkgray 2px solid;" class="legend-color"></div>
+                        <div class="legend-text">Detector module</div>
+                    </div>
+                    <div>
+                        <div style="border-color: lightgray;" class="legend-color"></div>
+                        <div class="legend-text">Detector pad</div>
+                    </div>
+                    <div>
+                        <div style="background-color: #f4f4f4; border: none;" class="legend-color"></div>
+                        <div class="legend-text">ALICE TPC</div>
+                    </div>
                 </div>
                 <div class="legend-column">
-                    <div><div style="background-color: #3392e3;" class="legend-color"></div><div class="legend-text">Selected TRD track</div></div>
-                    <div><div style="background-color: #b37ce5;" class="legend-color"></div><div class="legend-text">Other TRD track</div></div>
-                    <div><div style="background-color: #cfe9ff;" class="legend-color"></div><div class="legend-text">Background track</div></div>
+                    <div>
+                        <div style="background-color: #3392e3;" class="legend-color"></div>
+                        <div class="legend-text">Selected TRD track</div>
+                    </div>
+                    <div>
+                        <div style="background-color: #b37ce5;" class="legend-color"></div>
+                        <div class="legend-text">Other TRD track</div>
+                    </div>
+                    <div>
+                        <div style="background-color: #cfe9ff;" class="legend-color"></div>
+                        <div class="legend-text">Background track</div>
+                    </div>
                 </div>
                 <div class="legend-column">
-                    <div><div style="background-color: #f03b20;" class="legend-color"></div><div class="legend-text">Selected TRD tracklet</div></div>
-                    <div><div style="background-color: #feb24c;" class="legend-color"></div><div class="legend-text">Matched TRD tracklet</div></div>
-                    <div><div style="background-color: #ffeda0;" class="legend-color"></div><div class="legend-text">Other TRD tracklet</div></div>
+                    <div>
+                        <div style="background-color: #f03b20;" class="legend-color"></div>
+                        <div class="legend-text">Selected TRD tracklet</div>
+                    </div>
+                    <div>
+                        <div style="background-color: #feb24c;" class="legend-color"></div>
+                        <div class="legend-text">Matched TRD tracklet</div>
+                    </div>
+                    <div>
+                        <div style="background-color: #ffeda0;" class="legend-color"></div>
+                        <div class="legend-text">Other TRD tracklet</div>
+                    </div>
                 </div>
                 <div class="legend-column">
                     <div>
                         <svg class="legend-color time-bin-view">
                             <path d="M0,4 L20,4" class="tracklet"></path>
                         </svg>
-                        <div class="legend-text">Lorentz corrected tracklet</div></div>
+                        <div class="legend-text">Lorentz corrected tracklet</div>
+                    </div>
                     <div>
                         <svg class="legend-color time-bin-view">
                             <path d="M0,4 L20,4" class="tracklet lorentz"></path>
@@ -404,7 +462,7 @@
 
         if (true) {
             setTimeout(function () {
-                //$("#dataTree").jstree("select_node", tree.treeData[2].children[1]);
+                $("#dataTree").jstree("select_node", tree.treeData[2].children[1]);
                 // tree.changeSelection();
                 //digitsView.drawDigits();
             }, 1500);
