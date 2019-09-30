@@ -66,8 +66,8 @@
         }
 
         svg {
-            width: 100%;
-            height: 90%;
+            /* width: 100%;
+            height: 90%; */
         }
 
         .page {
@@ -81,7 +81,7 @@
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
-            min-height: 9vh;
+            min-height: 8vh;
         }
 
         .logo {
@@ -128,6 +128,8 @@
         .col4 {
             max-height: 40vh;
             margin-top: 1em;
+            display: flex;
+            flex-direction: column;
         }
 
         .col1 {
@@ -402,7 +404,7 @@
 
         if (true) {
             setTimeout(function () {
-                $("#dataTree").jstree("select_node", tree.treeData[2].children[1]);
+                //$("#dataTree").jstree("select_node", tree.treeData[2].children[1]);
                 // tree.changeSelection();
                 //digitsView.drawDigits();
             }, 1500);
