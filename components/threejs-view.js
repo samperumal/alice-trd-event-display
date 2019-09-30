@@ -3,14 +3,16 @@ import { OrbitControls } from '../js/OrbitControls.js';
 import { geomLayers3D } from '../geometry/geometries3d.js';
 
 class ThreejsComponent {
-    constructor(id, width, height) {
+    constructor(id) {
         try {
             this.detectorMode = 1;
-            this.init(id, width, height);
+            this.init(id);
+            this.canRender = true;
             this.render();
         }
-        catch {
-            
+        catch (err) {
+            console.error(err);
+            this.canRender = false;
         }
     }
 
@@ -19,14 +21,14 @@ class ThreejsComponent {
         const scene = this.scene = new THREE.Scene();
         scene.background = new THREE.Color(0xffffff);
 
+        const canvas = document.getElementById(id);
+
         const renderer = this.renderer = new THREE.WebGLRenderer({
             antialias: true,
-            canvas: document.getElementById(id)
+            canvas: canvas
         });
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(width, height);
 
-        const camera = this.camera = new THREE.PerspectiveCamera(50, width / height, 1, 3000);
+        const camera = this.camera = new THREE.PerspectiveCamera(70, 2, 1, 3000);
         camera.position.set(1100, 1100, 1100);
 
         // controls
@@ -45,7 +47,7 @@ class ThreejsComponent {
         controls.maxDistance = 2000;
 
         controls.autoRotate = true;
-        
+
 
         //controls.maxPolarAngle = Math.PI / 2;
 
@@ -57,19 +59,19 @@ class ThreejsComponent {
         scene.add(sphereObj);
 
         // White directional light at half intensity shining from the top.
-        const directionalLight = this.directionalLight = new THREE.DirectionalLight( 0xffffff, 0.80 );
+        const directionalLight = this.directionalLight = new THREE.DirectionalLight(0xffffff, 0.80);
         //directionalLight.target = camera;
         directionalLight.position.set(0, 1, 0);
-        scene.add( directionalLight );
+        scene.add(directionalLight);
 
-        const ambientLight = new THREE.AmbientLight( 0xffffff, 0.2 );        
-        scene.add( ambientLight );
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+        scene.add(ambientLight);
 
         // TRD Modules
         const detectors = this.detectorGroup = new THREE.Group();
 
         const stackMap = this.stackMap = new Map();
-        
+
         for (let sec = 0; sec < 18; sec++)
             for (let stk = 0; stk < 5; stk++) {
                 const stackObj = new THREE.Group();
@@ -78,10 +80,10 @@ class ThreejsComponent {
             }
 
         const selectedMaterial = new THREE.MeshLambertMaterial({
-                color: new THREE.Color("white"),
-                opacity: 0.75,
-                transparent: true
-            })
+            color: new THREE.Color("white"),
+            opacity: 0.75,
+            transparent: true
+        })
 
         for (const layer of geomLayers3D()) {
             const rotObj = new THREE.Object3D();
@@ -122,7 +124,7 @@ class ThreejsComponent {
 
     animate() {
 
-        requestAnimationFrame( this.animate.bind(this) );
+        requestAnimationFrame(this.animate.bind(this));
 
         this.controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
 
@@ -132,8 +134,25 @@ class ThreejsComponent {
 
     }
 
+    resizeCanvasToDisplaySize() {
+        const canvas = this.renderer.domElement;
+        const width = canvas.clientWidth * window.devicePixelRatio;
+        const height = canvas.clientHeight * window.devicePixelRatio;
+
+        if (canvas.width !== width || canvas.height !== height) {
+            this.renderer.setPixelRatio(window.devicePixelRatio);
+            this.renderer.setSize(width, height, false);
+
+            this.camera.aspect = width / height;
+            this.camera.updateProjectionMatrix();
+        }
+    }
+
     render() {
-        this.renderer.render(this.scene, this.camera);
+        if (this.canRender) {
+            this.resizeCanvasToDisplaySize();
+            this.renderer.render(this.scene, this.camera);
+        }
     }
 
     toggleDetectors() {
@@ -158,8 +177,8 @@ class ThreejsComponent {
             }
             else if (this.detectorMode == 2) {
                 // Show only selected module
-                object.visible = this.selectedTrack == null || (stack == this.selectedTrack.sec * 5 + this.selectedTrack.stk); 
-            }                
+                object.visible = this.selectedTrack == null || (stack == this.selectedTrack.sec * 5 + this.selectedTrack.stk);
+            }
         });
     }
 
@@ -180,7 +199,7 @@ class ThreejsComponent {
     }
 
     draw(eventData) {
-        //if (eventData.type != "select") return;
+        if (!this.canRender) return;
 
         if (this.tracks != null) this.trackGroup.remove(this.tracks);
         if (this.tracklets != null) this.trackletGroup.remove(this.tracklets);
