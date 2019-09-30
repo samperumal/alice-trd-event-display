@@ -29,7 +29,7 @@ class ThreejsComponent {
         });
 
         const camera = this.camera = new THREE.PerspectiveCamera(70, 2, 1, 3000);
-        camera.position.set(1100, 1100, 1100);
+        camera.position.set(0, 0, 1000);
 
         // controls
 
@@ -192,6 +192,10 @@ class ThreejsComponent {
         this.trackGroup.visible = !this.trackGroup.visible;
         this.render();
         return this.trackGroup.visible;
+    }
+
+    toggleRotation() {
+        return this.controls.autoRotate = !this.controls.autoRotate;
     }
 
     resetControls() {

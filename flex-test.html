@@ -158,13 +158,13 @@
                     </svg>
                 </div>
                 <div id="threejs-container" class="col4">
-                    <canvas id="threejs-view" style="width: 100%; height: 100%;"></canvas>
-                    <div
-                        style="display: none; vertical-align: top; padding-bottom: 13px; margin-top:-15px; text-align: center; z-index: 100; position: absolute;">
-                        <input id="toggleDetectors" type="button" value="Toggle detectors" />
-                        <input id="toggleTracklets" type="button" value="Hide tracklets" />
-                        <input id="toggleTracks" type="button" value="Hide tracks" />
-                        <input id="resetControls" type="button" value="Reset camera" />
+                    <canvas id="threejs-view" style="width: 100%; height: 90%;"></canvas>
+                    <div style="text-align: center;">
+                        <input id="toggleDetectors" type="button" value="Modules" />
+                        <input id="toggleTracks" type="button" value="Tracks" />
+                        <input id="toggleTracklets" type="button" value="Tracklets" />
+                        <input id="toggleRotation" type="button" value="Rotate" />
+                        <input id="resetControls" type="button" value="Reset" />
                     </div>
                 </div>
             </div>
@@ -224,22 +224,13 @@
         coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 300, 300));
 
         // ** ThreeJS initialisation
-        const three = new ThreejsComponent("threejs-view", 520, 380, "threejs-container");
+        const three = new ThreejsComponent("threejs-view");
         coordinator.addComponent(three);
-        // document.getElementById("toggleDetectors").addEventListener("click", (button) => {
-        //     const visible = three.toggleDetectors();
-        // });
-        // document.getElementById("toggleTracklets").addEventListener("click", (button) => {
-        //     const visible = three.toggleTracklets();
-        //     button.currentTarget.value = `${visible ? "Hide" : "Show"} tracklets`;
-        // });
-        // document.getElementById("toggleTracks").addEventListener("click", (button) => {
-        //     const visible = three.toggleTracks();
-        //     button.currentTarget.value = `${visible ? "Hide" : "Show"} tracks`;
-        // });
-        // document.getElementById("resetControls").addEventListener("click", (button) => {
-        //     three.resetControls();
-        // });
+        document.getElementById("toggleDetectors").addEventListener("click", three.toggleDetectors.bind(three));
+        document.getElementById("toggleTracklets").addEventListener("click", three.toggleTracklets.bind(three));
+        document.getElementById("toggleTracks").addEventListener("click", three.toggleTracks.bind(three));
+        document.getElementById("toggleRotation").addEventListener("click", three.toggleRotation.bind(three));
+        document.getElementById("resetControls").addEventListener("click", three.resetControls.bind(three));
         // ** ThreeJS initialisation
 
         coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
