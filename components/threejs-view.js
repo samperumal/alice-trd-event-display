@@ -4,9 +4,14 @@ import { geomLayers3D } from '../geometry/geometries3d.js';
 
 class ThreejsComponent {
     constructor(id, width, height) {
-        this.detectorMode = 1;
-        this.init(id, width, height);
-        this.render();
+        try {
+            this.detectorMode = 1;
+            this.init(id, width, height);
+            this.render();
+        }
+        catch {
+            
+        }
     }
 
     init(id, width, height) {
