@@ -161,7 +161,16 @@ class TimebinViewComponent extends ComponentBase {
             }
         }
         catch (err) {
+            this.clearDisplays();
             console.error(err);
+        }
+    }
+
+    clearDisplays() {
+        for (const index of d3.range(6)) {
+            this.layerLabels[index].text(`No data`);
+            this.tbsumSubViews[index].draw(null, null);
+            this.padSubViews[index].draw(null, null, null);
         }
     }
 
