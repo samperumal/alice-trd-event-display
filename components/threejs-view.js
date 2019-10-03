@@ -217,8 +217,8 @@ class ThreejsComponent {
             const esdMaterial = new THREE.LineBasicMaterial({ color: 0xdbebf9, opacity: 0.5, transparent: true });
 
             const selectedTrackletMaterial = new THREE.LineBasicMaterial({ color: 0xf03b20 });
-            const matchedTrackletMaterial = new THREE.LineBasicMaterial({ color: 0xfeb24c });
-            const otherTrackletMaterial = new THREE.LineBasicMaterial({ color: 0xffeda0 });
+            const matchedTrackletMaterial = new THREE.LineBasicMaterial({ color: 0xfaa535 });
+            const otherTrackletMaterial = new THREE.LineBasicMaterial({ color: 0xf5d443 });
 
             const selectedId = (eventData.track != null) ? eventData.track.id : null;
             const selectedStack = (eventData.track != null) ? eventData.track.stk : null;
