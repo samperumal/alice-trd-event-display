@@ -26,7 +26,7 @@
     <script nomodule src="components/component-coordinator.js"></script>
     <script nomodule src="components/track-information.js"></script>
     <script nomodule src="components/display-mapper.js"></script>
-    <!-- <script src="components/timebin-view.js"></script> -->
+    <script nomodule src="components/timebin-view.js"></script>
     
     <script src="data/pPb/script.js"></script>
     
@@ -398,7 +398,7 @@
         </div>
     </div>
     <script type="module">
-        //import { ThreejsComponent } from './components/threejs-view.js';
+        import { ThreejsComponent } from './components/threejs-view.js';
         import { ComponentCoordinator } from './components/component-coordinator.js';
         import { EventTree } from './components/event-tree.js';
         import { TrackInformationComponent } from './components/track-information.js';
@@ -407,6 +407,7 @@
         import { SectorZoomViewComponent } from './components/sector-zoom-view.js';
         import { SupermoduleViewComponent } from './components/supermodule-view.js';
         import { SupermoduleZoomViewComponent } from './components/supermodule-zoom-view.js';
+        import { TimebinViewComponent } from './components/timebin-view.js';
 
         import { mapToDisplayDataFormat } from './components/display-mapper.js';
 
@@ -426,7 +427,7 @@
         coordinator.addComponent(new SectorZoomViewComponent("#sector-zoom-view", 300, 300));
         coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
         coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 300, 300));
-/*
+
         // ** ThreeJS initialisation
         const three = new ThreejsComponent("threejs-view");
         coordinator.addComponent(three);
@@ -439,7 +440,7 @@
 
         coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
             dataLoadUrl: digitsLoadUrl
-        })); */
+        })); 
 
         // const timebinDisplay = $("timebin-display");
         // $("#timebin-slider").slider({
