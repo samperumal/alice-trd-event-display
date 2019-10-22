@@ -70,3 +70,4 @@ class ComponentCoordinator {
     }
 }
 
+export { ComponentCoordinator };

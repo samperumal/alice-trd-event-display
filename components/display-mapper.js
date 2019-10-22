@@ -1,4 +1,6 @@
-function* mapToDisplayDataFormat(data) {
+import { rotate } from './common-functions.js';
+
+export function* mapToDisplayDataFormat(data) {
     const stackedLayerData = getStackedLayerDimensions();
 
     for (const ev of data) {

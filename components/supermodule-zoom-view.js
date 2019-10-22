@@ -1,4 +1,8 @@
-class SupermoduleZoomViewComponent extends ComponentBase {
+import { ComponentBase, marginDef } from './component-base.js';
+import { geomStackZRPlaneModules, geomStackZRPlanePads } from '../geometry/geometries.js';
+import { rotate, rid } from './common-functions.js';
+
+export class SupermoduleZoomViewComponent extends ComponentBase {
     constructor(id, width, height, viewBox, config) {
         super(id, width, height, marginDef(5, 5, 5, 5), viewBox);
 

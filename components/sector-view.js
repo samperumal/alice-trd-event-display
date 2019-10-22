@@ -1,4 +1,8 @@
-class SectorViewComponent extends ComponentBase {
+import { ComponentBase, marginDef } from './component-base.js';
+import { rotateC } from './common-functions.js';
+import { geomSectorXYPlaneTPC, geomSectorXYPlane } from '../geometry/geometries.js';
+
+export class SectorViewComponent extends ComponentBase {
     constructor(id, width, height, viewBox, config) {
         super(id, width, height, marginDef(15, 15, 25, 5));
 

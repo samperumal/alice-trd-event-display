@@ -33,7 +33,7 @@ function eventToJSTreeNode(e) {
     };
 }
 
-class EventTree {
+export class EventTree {
     constructor(id, data, treeSelect) {
         this.treeData = data.map(eventToJSTreeNode);
         this.treeSelect = treeSelect;
@@ -84,3 +84,4 @@ class EventTree {
         window.setTimeout(this.changeSelection.bind(this), 15000);
     }
 }
+
