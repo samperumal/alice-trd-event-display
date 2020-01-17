@@ -102,10 +102,14 @@
             fill: red;
         }
 
-        .supermodule-xy-layer rect {
+        .supermodule-xy {
             fill: none;
             stroke: black;
             shape-rendering: auto;
+        }
+
+        .supermodule-xy circle {
+            fill: red;
         }
 
         .STLC-roc {
@@ -181,18 +185,6 @@
 
                 </svg>
             </div>
-            <div class="component">
-                <p>ZY projection</p>
-                <svg id="trackPathZY" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
-
-                </svg>
-            </div>
-            <div class="component">
-                <p>ZX projection</p>
-                <svg id="trackPathZX" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
-
-                </svg>
-            </div>
         </div>
         <div>
             <div class="component">
@@ -212,7 +204,21 @@
                 <svg id="stackSector" height="300px" width="300px">
 
                 </svg>
-            </div>       
+            </div>    
+        </div>
+        <div>
+            <div class="component">
+                <p>ZY projection</p>
+                <svg id="trackPathZY" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+            </div>
+            <div class="component">
+                <p>ZX projection</p>
+                <svg id="trackPathZX" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+            </div>   
             <div class="component">
                 <p>Z-Azimuth projection</p>
                 <svg id="trackPathZAzi" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
@@ -447,7 +453,7 @@
                 const LAYER_HEIGHT = this.LAYER_HEIGHT = MODULE_HEIGHT / nLAYERS;
 
                 this.layerData = this.trdDimensions
-                    .filter(d => d.module == 2)
+                    .filter(d => d.stack == 2)
                     .sort((x,y) => x.layer - y.layer);
 
                 const xscale = this.xscale = d3.scaleLinear()
@@ -483,9 +489,7 @@
                     .append("g")
                     .attr("class", "supermodule-xy-layer");
 
-                this.tracklets = this.g.selectAll("g.supermodule-xy-tracklets")
-                    .data(this.layerData)
-                    .enter()
+                this.tracklets = this.g
                     .append("g")
                     .attr("class", "supermodule-xy-tracklets");
 
@@ -519,7 +523,7 @@
                     .attr("class", "supermodule-xy-tracklet")
                     .append("circle")
                     .attr("cx", d => xscale(-d.LocalY))
-                    .attr("cy", d => { return yscale(((DetectorToLayer(d.Detector) + 1) * LAYER_HEIGHT + MIN_RADIUS) * 10); })
+                    .attr("cy", d => { return yscale(((DetectorToLayer(d.Detector) + 0.5) * LAYER_HEIGHT + MIN_RADIUS)); })
                     .attr("r", 5);
 
                 if (selectedTrdTrack.TrackMatch != null && selectedTrdTrack.TrackMatch.Path != null) {
