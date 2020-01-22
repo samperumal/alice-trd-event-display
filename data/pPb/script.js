@@ -1,7 +1,10 @@
-function getDigitsLoadUrl(eventNo, sector, stack) { return `data/pPb/${eventNo}.${sector}.${stack}.json`; }
+function getDigitsLoadUrl(eventNo, sector, stack) { 
+    return `data/pPb/${eventNo}.${sector}.${stack}.json`; 
+}
 
 function getData() {
- return [
+ return 
+ [
   {
    "id": "E15",
    "i": {
