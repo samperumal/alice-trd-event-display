@@ -8,12 +8,6 @@
 <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"> -->
 <link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css">
 
-<script type="text/javascript" charset="utf-8">
-  var socket = io();
-  socket.on('connect', function () {
-    console.log('connect event');
-  });
-</script>
 <style>
   .column {
     /* border: 1px solid black; */
@@ -121,6 +115,16 @@
 {% endraw %}
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+  var socket = io();
+  socket.on('connect', function () {
+    console.log('connected to server');
+    if (app != null) {
+      console.log("Return to sessions")
+      app.showSessions()
+    }
+  });
+</script>
 <script>
   Vue.use(Buefy, {
     defaultIconPack: 'mdi',
@@ -162,14 +166,16 @@
       selectedSessionVisible() {
         return this.selectedSession != null
       },
-      selectedSessionSelection() {
+      selectedSessionData() {
         const selection = { 
           sessionId: this.selectedSession != null ? this.selectedSession.id : null, 
           eventId: this.selectedEvent != null ? this.selectedEvent.id : null, 
           trackId: this.selectedTrack != null ? this.selectedTrack.id : null, 
         }
 
-        return selection
+        if (selection.sessionId != null && selection.eventId != null)
+          return selection
+        else return null
       }
     },
     methods: {
@@ -179,7 +185,7 @@
         socket.emit('run-action', action.id)
       },
       selectSession(session) {
-        socket.emit('request-data', 
+        socket.emit('join-session', 
           session.id,
           this.setSessionData
         )
@@ -198,21 +204,35 @@
       },
       createSession() {
         console.log(`Emitting 'create-session' with '${JSON.stringify(this.newSession)}'`)
-        socket.emit("create-session", this.newSession)
+        socket.emit(
+          "create-session", 
+          this.newSession, 
+          this.showSessions
+        )
       },
       emitClientSelection() {
-        const selection = this.selectedSessionSelection
+        const selection = this.selectedSessionData
 
-        socket.emit('update-session-selection', selection)
-        console.log("updating client selection", selection)
+        if (selection != null) {
+          socket.emit('update-session-selection', selection)
+          console.log("updating client selection", selection)
+        }
       },
       updateSessions(sessions) {
         this.sessions = sessions
-        this.showSessions()
+      },
+      applySessionSelection(newSelection) {
+        if (this.selectedSession != null && this.selectedSession.id == newSelection.sessionId) {
+          this.selectedEvent = this.selectedSession.events.find(e => e.id == newSelection.selectedEventId)
+          if (this.selectedEvent != null) {
+            this.selectedTrack = this.selectedEvent.tracks.find(e => e.id == newSelection.selectedTrackId)
+          }
+          console.log(newSelection)
+        }
       }
     },
     watch: {
-      selectedSessionSelection() {
+      selectedSessionData() {
         this.emitClientSelection()
       }
     }
@@ -220,17 +240,18 @@
 </script>
 <script>
 
-  socket.on('state', function (data) {
-    console.log(data)
+  socket.on('session-list', function (data) {
+    console.log("session-list", data)
     app.updateSessions(data)
-    // for (var key in data)
-    //   app[key] = data[key]
-
-    // app["action_output"] = null
   })
 
-  socket.on('cmd-output', function (data) {
-    app["action_output"] = data.stdout
+  socket.on('session-selection-changed', function(newSelection) {
+    console.log("Selection changed: ", newSelection)
+    app.applySessionSelection(newSelection)
+  })
+
+  socket.on('info', function (msg) {
+    console.log(msg)
   })
 </script>
 {% endblock %}

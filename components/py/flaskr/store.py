@@ -89,7 +89,13 @@ class Store():
                 session["selectedTrackId"] = selection["trackId"]
             else: session["selectedTrackId"] = None
 
-        print(session)
+            print(session)
+
+            return {
+                "sessionId": sessionIndex,
+                "selectedEventId": session["selectedEventId"],
+                "selectedTrackId": session["selectedTrackId"]
+            }
 
     def UpdateValue(self, key, value):
         self._cache[key] = value
