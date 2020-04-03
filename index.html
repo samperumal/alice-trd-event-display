@@ -421,8 +421,8 @@
                 coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 300, 300));
 
                 // ** ThreeJS initialisation
-                const three = new ThreejsComponent("threejs-view");
-                coordinator.addComponent(three);
+                // const three = new ThreejsComponent("threejs-view");
+                // coordinator.addComponent(three);
                 document.getElementById("toggleDetectors").addEventListener("click", three.toggleDetectors.bind(three));
                 document.getElementById("toggleTracklets").addEventListener("click", three.toggleTracklets.bind(three));
                 document.getElementById("toggleTracks").addEventListener("click", three.toggleTracks.bind(three));

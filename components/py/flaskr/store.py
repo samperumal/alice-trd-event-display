@@ -77,7 +77,7 @@ class Store():
         }
 
     def update_session_selection(self, selection):
-        if "sessionId" in selection:
+        if "sessionId" in selection and selection["sessionId"] is not None:
             sessionIndex = int(selection["sessionId"])
             session = self.__sessions[sessionIndex]
             

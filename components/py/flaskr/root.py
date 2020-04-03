@@ -8,6 +8,6 @@ from flaskr.db import get_db
 
 bp = Blueprint('index', __name__, url_prefix='')
 
-@bp.route('/')
+@bp.route('/sessions')
 def index():
     return render_template('root/index.html')   
