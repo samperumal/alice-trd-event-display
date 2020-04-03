@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
+  integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+
+<link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css">
+<!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css"> -->
+<link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css">
+
+<script type="text/javascript" charset="utf-8">
+  var socket = io();
+  socket.on('connect', function () {
+    console.log('connect event');
+  });
+</script>
+<style>
+  .column {
+    border: 1px solid black;
+  }
+</style>
+
+{% endblock %}
+
+{% block content %}
+{% raw %}
+<section class="section">
+  <div id="app" class="container"> 
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li><a @click="showSessions">Sessions</a></li>
+        <li v-if="selectedSession != null" class="is-active"><a @click="">{{ selectedSession.name }}</a></li>
+      </ul>
+    </nav>
+    <div v-if="sessionsVisible" class="">      
+      <div><b-button @click="createVisible = true" label="Create new" icon="plus"></b-button></div> 
+      <div v-for="session in sessions" :key="session.id">
+        <a href="#" @click="selectSession(session)">
+        <div class="card">
+          <div class="card-content">
+            <div class="media">
+              <div class="media-left">
+                <figure class="image is-48x48">
+                  <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image">
+                </figure>
+              </div>
+              <div class="media-content">
+                <p class="title is-4">{{ session.name }}</p>
+                <p class="subtitle is-6"></p>
+              </div>
+            </div>
+
+            <div class="content">
+              {{ session.description }}
+              <br>
+              <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
+            </div>
+          </div>
+        </div></a>
+      </div>
+    </div>
+    <div v-if="createVisible">
+      <p class="title is-5">Create new session</p>
+      <form>
+        <b-field label="Session name">
+          <b-input type="input" placeholder="Unique name for this session" v-model="newSession.name">            
+          </b-input>
+        </b-field>
+        <b-field label="Description">
+          <b-input type="input" placeholder="Description for this session" v-model="newSession.description">            
+          </b-input>
+        </b-field>
+        <b-field>
+          <b-button label="Create session" @click="createSession"></b-button>
+        </b-field>
+      </form>
+    </div>
+  </div>
+</section>
+{% endraw %}
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
+<script>
+  Vue.use(Buefy, {
+    defaultIconPack: 'mdi',
+    defaultContainerElement: '#content'
+  })
+
+  var app = new Vue({
+    el: '#app',
+    data: {
+      selectedSession: null,
+      sessions: [],
+      createVisible: true,
+
+      newSession: {
+        name: "",
+        description: ""
+      },
+
+      available_actions: [],
+      action_output: null
+    },
+    computed: {
+      actions() {
+        result = []
+        for (const action of this.available_actions) {
+          result.push({
+            id: action,
+            text: action
+          })
+        }
+
+        return result
+      },
+      sessionsVisible() {
+        return this.selectedSession == null && !this.createVisible;
+      }
+    },
+    methods: {
+      submit_action: function (action) {
+        //console.log(action)
+        app["action_output"] = `Running action: ${action.id}`
+        socket.emit('run-action', action.id)
+      },
+      selectSession(session) {
+        this.selectedSession = session
+      },
+      showSessions() {
+        this.selectedSession = null
+        this.createVisible = false
+      },
+      createSession() {
+        console.log(`Emitting 'create-session' with '${JSON.stringify(this.newSession)}'`)
+        socket.emit("create-session", this.newSession)
+      },
+      updateSessions(sessions) {
+        this.sessions = sessions
+        this.showSessions()
+      }
+    }
+  })
+</script>
+<script>
+
+  socket.on('state', function (data) {
+    console.log(data)
+    app.updateSessions(data)
+    // for (var key in data)
+    //   app[key] = data[key]
+
+    // app["action_output"] = null
+  })
+
+  socket.on('cmd-output', function (data) {
+    app["action_output"] = data.stdout
+  })
+</script>
+{% endblock %}

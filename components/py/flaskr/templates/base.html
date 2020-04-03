@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+<head>  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{% endblock %} - TRD Event Display Control</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+{% block head %}
+{% endblock %}
+</head>
+<body class="layout-default">
+<nav style="text-align: center;" class="navbar has-shadow is-spaced">
+  <h1>TRD Event Display Control</h1>
+</nav>
+{% block content %}{% endblock %}
+</body>
+</html>
