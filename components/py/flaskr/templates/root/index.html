@@ -139,14 +139,13 @@
       selectedTrack: null,
       sessions: [],
       createVisible: false,
+      skipEmitClientSelection: false,
 
       newSession: {
         name: "",
         description: ""
-      },
-
-      available_actions: [],
-      action_output: null
+      }
+      
     },
     computed: {
       actions() {
@@ -210,7 +209,12 @@
           this.showSessions
         )
       },
+      updateSessions(sessions) {
+        this.sessions = sessions
+      },
       emitClientSelection() {
+        if (this.skipEmitClientSelection) return
+
         const selection = this.selectedSessionData
 
         if (selection != null) {
@@ -218,16 +222,17 @@
           console.log("updating client selection", selection)
         }
       },
-      updateSessions(sessions) {
-        this.sessions = sessions
-      },
       applySessionSelection(newSelection) {
         if (this.selectedSession != null && this.selectedSession.id == newSelection.sessionId) {
+          this.skipEmitClientSelection = true
           this.selectedEvent = this.selectedSession.events.find(e => e.id == newSelection.selectedEventId)
           if (this.selectedEvent != null) {
             this.selectedTrack = this.selectedEvent.tracks.find(e => e.id == newSelection.selectedTrackId)
           }
           console.log(newSelection)
+          // The next line ensures the flag is reset *after* the watch
+          // selectedSessionData() method below is called
+          this.$nextTick(() => this.skipEmitClientSelection = false)
         }
       }
     },
