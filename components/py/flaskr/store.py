@@ -55,10 +55,41 @@ class Store():
     def add_session(self, session):
         session["id"] = len(self.__sessions)
         session["start"] = str(datetime.now())
+        session["selectedEventId"] = None
+        session["selectedTrackId"] = None
         self.__sessions.append(session)
 
     def get_sessions(self):
         return self.__sessions
+
+    def get_summary(self, session_id):
+        index = int(session_id)
+        session = self.__sessions[index]
+
+        return {
+            "id": session["id"],
+            "name": session["name"],
+            "events": [
+                { "id": "E15", "tracks": [{"id": "E15_T1"}], "trklts": []},
+                { "id": "E20", "tracks": [], "trklts": []},
+                { "id": "E98", "tracks": [], "trklts": []}
+            ]
+        }
+
+    def update_session_selection(self, selection):
+        if "sessionId" in selection:
+            sessionIndex = int(selection["sessionId"])
+            session = self.__sessions[sessionIndex]
+            
+            if "eventId" in selection:
+                session["selectedEventId"] = selection["eventId"]
+            else: session["selectedEventId"] = None
+
+            if "trackId" in selection:
+                session["selectedTrackId"] = selection["trackId"]
+            else: session["selectedTrackId"] = None
+
+        print(session)
 
     def UpdateValue(self, key, value):
         self._cache[key] = value

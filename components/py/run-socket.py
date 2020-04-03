@@ -18,6 +18,16 @@ if __name__ == '__main__':
     def create_session(session):
         store.Store().add_session(session)
         update_clients()
+
+    @socketio.on('request-data')
+    def request_data(session_id):
+        return store.Store().get_summary(session_id)
+
+    @socketio.on('update-session-selection')
+    def update_session_selection(selection):
+        print(selection)
+        if selection is not None:
+            store.Store().update_session_selection(selection)
     
     host = sys.argv[1] if len(sys.argv) > 1 else 'localhost'
     port = sys.argv[2] if len(sys.argv) > 2 else 5001
