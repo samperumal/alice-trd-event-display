@@ -11,3 +11,8 @@ bp = Blueprint('index', __name__, url_prefix='')
 @bp.route('/sessions')
 def index():
     return render_template('root/index.html')   
+
+@bp.route('/upload-file', methods=['POST'])
+def upload_file():
+    print(request.form, request.files)
+    raise Exception()

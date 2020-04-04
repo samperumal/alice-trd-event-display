@@ -19,49 +19,52 @@
 {% block content %}
 {% raw %}
 <section class="section">
-  <div id="app" class="container"> 
+  <div id="app" class="container">
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
         <li><a @click="showSessions">Sessions</a></li>
         <li v-if="selectedSession != null" class="is-active"><a @click="">{{ selectedSession.name }}</a></li>
       </ul>
     </nav>
-    <div v-if="sessionsVisible" class="">      
-      <div><b-button @click="createVisible = true" label="Create new" icon="plus"></b-button></div> 
+    <div v-if="sessionsVisible" class="">
+      <div>
+        <b-button @click="createVisible = true" label="Create new" icon="plus"></b-button>
+      </div>
       <div v-for="session in sessions" :key="session.id">
         <a href="#" @click="selectSession(session)">
-        <div class="card">
-          <div class="card-content">
-            <div class="media">
-              <div class="media-left">
-                <figure class="image is-48x48">
-                  <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image">
-                </figure>
+          <div class="card">
+            <div class="card-content">
+              <div class="media">
+                <div class="media-left">
+                  <figure class="image is-48x48">
+                    <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image">
+                  </figure>
+                </div>
+                <div class="media-content">
+                  <p class="title is-4">{{ session.name }}</p>
+                  <p class="subtitle is-6"></p>
+                </div>
               </div>
-              <div class="media-content">
-                <p class="title is-4">{{ session.name }}</p>
-                <p class="subtitle is-6"></p>
-              </div>
-            </div>
 
-            <div class="content">
-              {{ session.description }}
-              <br>
-              <time datetime="2016-1-1">{{ session.start }}</time>
+              <div class="content">
+                {{ session.description }}
+                <br>
+                <time datetime="2016-1-1">{{ session.start }}</time>
+              </div>
             </div>
           </div>
-        </div></a>
+        </a>
       </div>
     </div>
     <div v-if="createVisible">
       <p class="title is-5">Create new session</p>
       <form>
         <b-field label="Session name">
-          <b-input type="input" placeholder="Unique name for this session" v-model="newSession.name">            
+          <b-input type="input" placeholder="Unique name for this session" v-model="newSession.name">
           </b-input>
         </b-field>
         <b-field label="Description">
-          <b-input type="input" placeholder="Description for this session" v-model="newSession.description">            
+          <b-input type="input" placeholder="Description for this session" v-model="newSession.description">
           </b-input>
         </b-field>
         <b-field>
@@ -74,15 +77,35 @@
         No data loaded
       </div>
       <div v-else>
+        <div class="level">
+          <div class="level-item">
+            <b-field>
+              <b-upload v-model="dropFile" drag-drop
+                accept="application/json"
+              >
+                <section class="section">
+                  <div class="content has-text-centered">
+                    <p>
+                      <b-icon icon="upload" size="is-large">
+                      </b-icon>
+                    </p>
+                    <p>{{ dropFile == null ? "Drop your files here or click to upload" : dropFile.name }}</p>
+                  </div>
+                </section>
+              </b-upload>
+            </b-field>
+          </div>
+          <div class="level-item">
+            <b-field>
+              <b-button label="Upload file" @click="uploadFile"></b-button>
+            </b-field>
+          </div>
+        </div>
         <div class="columns">
           <div class="column">
             <b-field label="Events"></b-field>
-            <b-table
-              :data="selectedSession.events"
-              :selected.sync="selectedEvent"
-              @select="selectedTrack = null"
-              focusable
-            >
+            <b-table :data="selectedSession.events" :selected.sync="selectedEvent" @select="selectedTrack = null"
+              focusable>
               <template slot-scope="props">
                 <b-table-column field="id" label="ID" width="40">
                   {{ props.row.id }}
@@ -90,15 +113,11 @@
               </template>
             </b-table>
           </div>
-          <div class="column">            
+          <div class="column">
             <b-field label="Tracks"></b-field>
-            
-            <b-table
-              v-if="selectedEvent != null && selectedEvent.tracks != null"
-              :data="selectedEvent.tracks"
-              :selected.sync="selectedTrack"
-              focusable
-            >
+
+            <b-table v-if="selectedEvent != null && selectedEvent.tracks != null" :data="selectedEvent.tracks"
+              :selected.sync="selectedTrack" focusable>
               <template slot-scope="props">
                 <b-table-column field="id" label="ID" width="40">
                   {{ props.row.id }}
@@ -115,6 +134,7 @@
 {% endraw %}
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script type="text/javascript" charset="utf-8">
   var socket = io();
   socket.on('connect', function () {
@@ -140,12 +160,13 @@
       sessions: [],
       createVisible: false,
       skipEmitClientSelection: false,
+      dropFile: null,
 
       newSession: {
         name: "",
         description: ""
       }
-      
+
     },
     computed: {
       actions() {
@@ -166,10 +187,10 @@
         return this.selectedSession != null
       },
       selectedSessionData() {
-        const selection = { 
-          sessionId: this.selectedSession != null ? this.selectedSession.id : null, 
-          eventId: this.selectedEvent != null ? this.selectedEvent.id : null, 
-          trackId: this.selectedTrack != null ? this.selectedTrack.id : null, 
+        const selection = {
+          sessionId: this.selectedSession != null ? this.selectedSession.id : null,
+          eventId: this.selectedEvent != null ? this.selectedEvent.id : null,
+          trackId: this.selectedTrack != null ? this.selectedTrack.id : null,
         }
 
         if (selection.sessionId != null && selection.eventId != null)
@@ -184,7 +205,7 @@
         socket.emit('run-action', action.id)
       },
       selectSession(session) {
-        socket.emit('join-session', 
+        socket.emit('join-session',
           session.id,
           this.setSessionData
         )
@@ -204,8 +225,8 @@
       createSession() {
         console.log(`Emitting 'create-session' with '${JSON.stringify(this.newSession)}'`)
         socket.emit(
-          "create-session", 
-          this.newSession, 
+          "create-session",
+          this.newSession,
           this.showSessions
         )
       },
@@ -234,6 +255,25 @@
           // selectedSessionData() method below is called
           this.$nextTick(() => this.skipEmitClientSelection = false)
         }
+      },
+      uploadFile() {
+        let formData = new FormData()
+        formData.append('file', this.dropFile)
+        formData.append('sessionId',this.selectedSession.id);
+
+        axios
+          .post( '/upload-file',
+            formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            })
+          .then(function() {
+            console.log('SUCCESS!!');
+          })
+          .catch(function(){
+            console.log('FAILURE!!');
+          })
       }
     },
     watch: {
@@ -248,9 +288,10 @@
   socket.on('session-list', function (data) {
     console.log("session-list", data)
     app.updateSessions(data)
+    app.selectSession(data[0])
   })
 
-  socket.on('session-selection-changed', function(newSelection) {
+  socket.on('session-selection-changed', function (newSelection) {
     console.log("Selection changed: ", newSelection)
     app.applySessionSelection(newSelection)
   })
