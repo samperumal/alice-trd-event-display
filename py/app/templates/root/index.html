@@ -203,7 +203,6 @@
         console.log(event)
       },
       setSessionSummary(sessionSummary) {
-        console.log(sessionSummary)
         this.selectedSession = sessionSummary
         this.selectedEvent = null
       },
@@ -250,6 +249,7 @@
         formData.append('file', this.dropFile)
         formData.append('sessionId', this.selectedSession.id);
 
+        console.log("Uploading file")
         axios
           .post('/upload-file',
             formData, {

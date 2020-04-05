@@ -69,14 +69,19 @@ class Store():
     def get_summary(self, session_id):
         session = self.get_session(session_id)
 
-        return {
-            "id": session["id"],
-            "name": session["name"],
-            "events": [
+        events = [
                 { "id": "E15", "tracks": [{"id": "E15_T1"}], "trklts": []},
                 { "id": "E20", "tracks": [], "trklts": []},
                 { "id": "E98", "tracks": [], "trklts": []}
             ]
+
+        if "events" in session:
+            events = session["events"]
+
+        return {
+            "id": session["id"],
+            "name": session["name"],
+            "events": events
         }
 
     def update_session_selection(self, selection):
@@ -94,7 +99,7 @@ class Store():
             print(session)
 
             return {
-                "sessionId": sessionIndex,
+                "sessionId": session["id"],
                 "selectedEventId": session["selectedEventId"],
                 "selectedTrackId": session["selectedTrackId"]
             }

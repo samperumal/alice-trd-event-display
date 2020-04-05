@@ -1,6 +1,8 @@
+from flask import Flask, g, jsonify, redirect, url_for
+from flask_socketio import SocketIO, emit, join_room, leave_room
 import os
 
-from flask import Flask, g, jsonify, redirect, url_for
+socketio = SocketIO()
 
 def create_app(test_config=None):
     # create and configure the app
@@ -17,18 +19,9 @@ def create_app(test_config=None):
         # load the test config if passed in
         app.config.from_mapping(test_config)
 
-    # ensure the instance folder exists
-    try:
-        os.makedirs(app.instance_path)
-    except OSError:
-        pass
-
-    from . import db
-    db.init_app(app)
-
-    from . import root
+    from . import root, events
     app.register_blueprint(root.bp)
-    #app.register_blueprint(root.alice_js)
 
+    socketio.init_app(app)
     return app
 

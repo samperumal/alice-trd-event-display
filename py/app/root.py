@@ -5,8 +5,7 @@ from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, jsonify
 )
 
-from flaskr.db import get_db
-from flaskr import store
+from . import store, socketio
 
 bp = Blueprint('index', __name__, url_prefix='')
 
@@ -16,7 +15,7 @@ def index():
 
 @bp.route('/upload-file', methods=['POST'])
 def upload_file():
-    print(request.form, request.files)
+    print("Uploaded file: ", request.form, request.files)
     if "file" in request.files and "sessionId" in request.form:
         session_id = request.form["sessionId"]
         data = json.load(request.files["file"])
