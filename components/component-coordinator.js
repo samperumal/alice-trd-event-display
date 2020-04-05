@@ -1,11 +1,17 @@
 class ComponentCoordinator {
     constructor(data) {
-        this.data = data;
-        this.dataMap = this.mapData(this.data);
         this.components = [];
 
         this.event = null;
         this.track = null;
+
+        if (data != null)
+            this.setData(data)
+    }
+
+    setData(data) {
+        this.data = data;
+        this.dataMap = this.mapData(this.data);        
     }
 
     mapData(data) {
