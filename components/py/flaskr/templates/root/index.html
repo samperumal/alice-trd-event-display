@@ -79,26 +79,21 @@
       <div v-else>
         <div class="level">
           <div class="level-item">
-            <b-field>
-              <b-upload v-model="dropFile" drag-drop
-                accept="application/json"
-              >
-                <section class="section">
+            <div class="field is-grouped">
+              <div class="control">
+                <b-upload v-model="dropFile" drag-drop accept="application/json">
                   <div class="content has-text-centered">
-                    <p>
-                      <b-icon icon="upload" size="is-large">
+                    
+                      <b-icon icon="upload" size="is-medium">
                       </b-icon>
-                    </p>
-                    <p>{{ dropFile == null ? "Drop your files here or click to upload" : dropFile.name }}</p>
+                    <span>{{ dropFile == null ? "Drop your files here or click to upload" : dropFile.name }}</span>
                   </div>
-                </section>
-              </b-upload>
-            </b-field>
-          </div>
-          <div class="level-item">
-            <b-field>
-              <b-button label="Upload file" @click="uploadFile"></b-button>
-            </b-field>
+                </b-upload>
+              </div>
+              <div class="control">
+                <b-button label="Upload file" @click="uploadFile"></b-button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="columns">
@@ -199,23 +194,17 @@
       }
     },
     methods: {
-      submit_action: function (action) {
-        //console.log(action)
-        app["action_output"] = `Running action: ${action.id}`
-        socket.emit('run-action', action.id)
-      },
       selectSession(session) {
         socket.emit('join-session',
-          session.id,
-          this.setSessionData
+          session.id
         )
       },
       selectEvent(event) {
         console.log(event)
       },
-      setSessionData(sessionData) {
-        console.log(sessionData)
-        this.selectedSession = sessionData
+      setSessionSummary(sessionSummary) {
+        console.log(sessionSummary)
+        this.selectedSession = sessionSummary
         this.selectedEvent = null
       },
       showSessions() {
@@ -259,19 +248,19 @@
       uploadFile() {
         let formData = new FormData()
         formData.append('file', this.dropFile)
-        formData.append('sessionId',this.selectedSession.id);
+        formData.append('sessionId', this.selectedSession.id);
 
         axios
-          .post( '/upload-file',
+          .post('/upload-file',
             formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data'
-              }
-            })
-          .then(function() {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          })
+          .then(function () {
             console.log('SUCCESS!!');
           })
-          .catch(function(){
+          .catch(function () {
             console.log('FAILURE!!');
           })
       }
@@ -294,6 +283,11 @@
   socket.on('session-selection-changed', function (newSelection) {
     console.log("Selection changed: ", newSelection)
     app.applySessionSelection(newSelection)
+  })
+
+  socket.on('session-summary-changed', function (summary) {
+    console.log("Summary changed: ", summary)
+    app.setSessionSummary(summary)
   })
 
   socket.on('info', function (msg) {

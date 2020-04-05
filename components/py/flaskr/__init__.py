@@ -2,8 +2,6 @@ import os
 
 from flask import Flask, g, jsonify, redirect, url_for
 
-updateState = None
-
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True, static_url_path="", static_folder="../../..")
@@ -24,14 +22,6 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
-
-    @app.route('/test/<state>')
-    def test(state):
-        if state is None:
-            import random
-            state = random.randrange(0, 100)
-        updateGenericInt("state")(state)
-        return str(state)
 
     from . import db
     db.init_app(app)

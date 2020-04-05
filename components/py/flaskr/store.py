@@ -62,9 +62,12 @@ class Store():
     def get_sessions(self):
         return self.__sessions
 
-    def get_summary(self, session_id):
+    def get_session(self, session_id):
         index = int(session_id)
-        session = self.__sessions[index]
+        return self.__sessions[index]
+
+    def get_summary(self, session_id):
+        session = self.get_session(session_id)
 
         return {
             "id": session["id"],
@@ -78,8 +81,7 @@ class Store():
 
     def update_session_selection(self, selection):
         if "sessionId" in selection and selection["sessionId"] is not None:
-            sessionIndex = int(selection["sessionId"])
-            session = self.__sessions[sessionIndex]
+            session = self.get_session(selection["sessionId"])
             
             if "eventId" in selection:
                 session["selectedEventId"] = selection["eventId"]
@@ -96,6 +98,25 @@ class Store():
                 "selectedEventId": session["selectedEventId"],
                 "selectedTrackId": session["selectedTrackId"]
             }
+
+    def track_map(self, tr):
+        return {
+            "id": tr["id"],
+            "stk": tr["stk"],
+            "sec": tr["sec"]
+        }
+
+    def event_map(self, ev):
+        return {
+            "id": ev["id"],
+            "tracks": list(map(self.track_map, filter(lambda tr: tr["typ"] == "Trd", ev["tracks"])))
+        }
+
+    def set_session_data(self, session_id, data):
+        session = self.get_session(session_id)
+        summary = list(map(self.event_map, data))
+        session["events"] = summary
+        pass
 
     def UpdateValue(self, key, value):
         self._cache[key] = value

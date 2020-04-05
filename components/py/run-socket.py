@@ -1,8 +1,9 @@
 from flask import Flask, g, jsonify, redirect, url_for, request
 from flask_socketio import SocketIO, emit, join_room, leave_room
-from flaskr import store, create_app, updateState
+from flaskr import store, create_app
 import sys
 
+socketio = None
 if __name__ == '__main__':
     app = create_app()
     socketio = SocketIO(app)
@@ -27,8 +28,7 @@ if __name__ == '__main__':
         print("Client [", request.sid, "] joined session ", session_id)
         join_room(session_id)
         emit('info', '{} joined session {}'.format(request.sid, session_id), room = session_id)
-        return store.Store().get_summary(session_id)
-        pass
+        emit('session-summary-changed', store.Store().get_summary(session_id))        
 
     @socketio.on('leave-sessions')
     def leave_session(session_id):
