@@ -127,6 +127,7 @@ class SectorViewComponent extends ComponentBase {
     }
 
     draw(eventData) {
+        console.log("Drawing sector view")
         const xscale = this.xscale, yscale = this.yscale;
         const line = this.line;
         const layerData = this.layerData;

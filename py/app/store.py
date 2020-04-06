@@ -86,10 +86,16 @@ class Store():
 
 	def get_session_selection(self, session_id):
 		session = self.get_session(session_id)
+		selectedEventId = session["selectedEventId"]
+		selectedEvent = None
+		if "events" in session:
+			selectedEvent = next(ev for ev in session["data"] if ev["id"] == selectedEventId)
+
 		return {
 				"sessionId": session["id"],
-				"selectedEventId": session["selectedEventId"],
-				"selectedTrackId": session["selectedTrackId"]
+				"selectedEventId": selectedEventId,
+				"selectedTrackId": session["selectedTrackId"],
+				"selectedEvent"  : selectedEvent
 			}
 
 	def update_session_selection(self, selection):
@@ -116,7 +122,8 @@ class Store():
 	def event_map(self, ev):
 		return {
 			"id": ev["id"],
-			"tracks": list(map(self.track_map, filter(lambda tr: tr["typ"] == "Trd", ev["tracks"])))
+			"tracks": list(map(self.track_map, filter(lambda tr: tr["typ"] == "Trd", ev["tracks"]))),
+			"trklts": []
 		}
 
 	def set_session_data(self, session_id, data):

@@ -68,6 +68,21 @@ class ComponentCoordinator {
         }
     }
 
+    showEvent(eventData, eventId, trackId) {
+        const event = this.event = eventData
+        const track = this.track = eventData != null ? eventData.tracks.find(d => d.id == trackId) : null
+
+        const drawData = {
+            event,
+            track,
+            type: "select"
+        };
+
+        for (const component of this.components) {
+            component.draw(drawData);
+        }
+    }
+
     padSelect(data) {
         for (const component of this.components) {
             if (component.updatePad != null)
