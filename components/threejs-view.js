@@ -5,14 +5,15 @@ import { geomLayers3D } from '../geometry/geometries3d.js';
 class ThreejsComponent {
     constructor(id) {
         try {
-            this.detectorMode = 1;
-            this.init(id);
-            this.canRender = true;
-            this.render();
+            this.detectorMode = 1
+            this.animateLoop = true
+            this.init(id)
+            this.canRender = true
+            this.render()
         }
         catch (err) {
-            console.error(err);
-            this.canRender = false;
+            console.error(err)
+            this.canRender = false
         }
     }
 
@@ -124,14 +125,14 @@ class ThreejsComponent {
 
     animate() {
 
-        requestAnimationFrame(this.animate.bind(this));
-
         this.controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
 
         this.directionalLight.position.set(this.camera.position.x, this.camera.position.y, this.camera.position.z).normalize();
 
         this.render();
 
+        if (this.animateLoop)
+            requestAnimationFrame(this.animate.bind(this));
     }
 
     resizeCanvasToDisplaySize() {
@@ -200,6 +201,16 @@ class ThreejsComponent {
 
     resetControls() {
         this.controls.reset();
+    }
+
+    toggleComponent() {
+        if (this.animateLoop) {
+            this.animateLoop = false            
+        }
+        else {
+            this.animateLoop = true
+            this.animate()
+        }
     }
 
     draw(eventData) {

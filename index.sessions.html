@@ -548,13 +548,14 @@
 		coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 300, 300));
 
 		// ** ThreeJS initialisation
-		// const three = new ThreejsComponent("threejs-view");
-		// coordinator.addComponent(three);
-		// document.getElementById("toggleDetectors").addEventListener("click", three.toggleDetectors.bind(three));
-		// document.getElementById("toggleTracklets").addEventListener("click", three.toggleTracklets.bind(three));
-		// document.getElementById("toggleTracks").addEventListener("click", three.toggleTracks.bind(three));
-		// document.getElementById("toggleRotation").addEventListener("click", three.toggleRotation.bind(three));
-		// document.getElementById("resetControls").addEventListener("click", three.resetControls.bind(three));
+		const three = new ThreejsComponent("threejs-view");
+		coordinator.addComponent(three);
+		three.toggleComponent();
+		document.getElementById("toggleDetectors").addEventListener("click", three.toggleDetectors.bind(three));
+		document.getElementById("toggleTracklets").addEventListener("click", three.toggleTracklets.bind(three));
+		document.getElementById("toggleTracks").addEventListener("click", three.toggleTracks.bind(three));
+		document.getElementById("toggleRotation").addEventListener("click", three.toggleRotation.bind(three));
+		document.getElementById("resetControls").addEventListener("click", three.resetControls.bind(three));
 		// ** ThreeJS initialisation
 
 		// coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
