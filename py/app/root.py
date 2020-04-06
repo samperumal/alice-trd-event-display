@@ -2,15 +2,20 @@ import functools
 import json
 from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for, jsonify
+    Blueprint, flash, g, redirect, render_template, 
+    request, session, url_for, jsonify, send_file
 )
 
 from . import store, socketio
 
 bp = Blueprint('index', __name__, url_prefix='')
 
-@bp.route('/sessions')
+@bp.route('/')
 def index():
+    return send_file("../../index.sessions.html")
+
+@bp.route('/sessions')
+def sessions():
     return render_template('root/index.html')   
 
 @bp.route('/upload-file', methods=['POST'])

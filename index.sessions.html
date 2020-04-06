@@ -292,7 +292,7 @@
 							</b-field>
 							<b-field label="Event" v-if="selectedSessionSummary != null">
 								<b-select placeholder="Select an event"
-									v-model="selectedEvent"
+									v-model="selectedEventId"
 								>
 									<option v-for="event in selectedSessionSummary.events" 
 										:key="event.id" 
@@ -301,10 +301,18 @@
 									</option>
 								</b-select>
 							</b-field>
-						</div>
-						<div v-if="selectedSessionSummary != null">
-							{{ selectedSessionSummary.events.length }} Events
-						</div>
+							<b-field label="Track" v-if="selectedEvent != null">
+								<b-select placeholder="Select a track"
+									v-model="selectedTrackId"
+								>
+									<option v-for="track in selectedEvent.tracks" 
+										:key="track.id" 
+										:value="track.id">
+										{{ track.id }}
+									</option>
+								</b-select>
+							</b-field>
+						</div>						
 					</div>
 				</div>
 				<div class="col2">
@@ -451,7 +459,8 @@
 				sessions: [],
 				selectedSession: null,
 				selectedSessionSummary: null,
-				selectedEvent: null
+				selectedEventId: null,
+				selectedTrackId: null
 			},
 			methods: {
 				updateSessions(sessions) {
@@ -464,6 +473,18 @@
 				},
 				updateSessionEventSelection(newSelection) {
 					//this.selectedSessionEventSelection = newSelection
+					this.selectedEventId = newSelection.selectedEventId
+					this.selectedTrackId = newSelection.selectedTrackId
+				}
+			},
+			computed: {
+				selectedEvent() {
+					if (this.selectedSessionSummary != null
+						&& this.selectedEventId != null
+						&& this.selectedSessionSummary.events != null						
+					) {
+						return this.selectedSessionSummary.events.find(e => e.id == this.selectedEventId)
+					}
 				}
 			},
 			watch: {
