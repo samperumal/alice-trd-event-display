@@ -255,8 +255,12 @@
 				order: 3
 			}
 
+			#event-tree-container {
+				flex-basis: 100%;
+			}
+
 			.event-controls {
-				flex-direction: row; 
+				flex-direction: row; 				
 			}
 		}
 
@@ -340,13 +344,13 @@
 								</b-select>
 							</b-field>
 							<b-field label="Tracklet" v-if="selectedEvent != null">
-								<b-select placeholder="Select a track"
-									v-model="selectedTrackId"
+								<b-select placeholder="Select a tracklet"
+									v-model="selectedTrackletId"
 								>
-									<option v-for="track in selectedEvent.tracks" 
-										:key="track.id" 
-										:value="track.id">
-										{{ track.id }}
+									<option v-for="tracklet in selectedEvent.trklts" 
+										:key="tracklet.id" 
+										:value="tracklet.id">
+										{{ tracklet.id }}
 									</option>
 								</b-select>
 							</b-field>
@@ -500,15 +504,21 @@
 				selectedSessionId: null,
 				selectedEventId: null,
 				selectedTrackId: null,
+				selectedTrackletId: null,
 
 				processingServerEvent: false
 			},
 			methods: {
 				updateSessions(sessions) {
 					this.sessions = sessions
+					this.processingServerEvent = true
+					this.selectedEventId = null
+					this.selectedTrackId = null
+					this.selectedTrackletId = null
+
 					// Code for DEBUG only
 					this.selectedSessionId = null
-					this.selectedSessionId = sessions[0].id 
+					this.$nextTick(() => this.selectedSessionId = sessions[0].id)
 				},
 				updateSessionSummary(summary) {
 					this.selectedSessionSummary = summary
@@ -520,6 +530,7 @@
 					) {
 						this.selectedEventId = newSelection.selectedEventId
 						this.selectedTrackId = newSelection.selectedTrackId
+						this.selectedTrackletId = newSelection.selectedTrkltId
 
 						if (newSelection.selectedEvent != null)
 							coordinator.showEvent(
@@ -531,12 +542,14 @@
 				emitSelectionChange(
 					selectedSessionId,
 					selectedEventId,
-					selectedTrackId
+					selectedTrackId,
+					selectedTrackletId
 				) {
 					const selection = {
-						sessionId: selectedSessionId != null ? selectedSessionId : null,
-						eventId: selectedEventId != null ? selectedEventId : null,
-						trackId: selectedTrackId != null ? selectedTrackId : null,
+						sessionId: selectedSessionId,
+						eventId: selectedEventId,
+						trackId: selectedTrackId,
+						trkltId: selectedTrackletId
 					}
 
 					if (selection.sessionId != null && selection.eventId != null) {
@@ -571,6 +584,7 @@
 						this.emitSelectionChange(
 							this.selectedSessionId,
 							newVal,
+							null,
 							null
 						)
 					}
@@ -585,6 +599,22 @@
 						this.emitSelectionChange(
 							this.selectedSessionId,
 							this.selectedEventId,
+							newVal,
+							null
+						)
+					}
+				},
+				selectedTrackletId(newVal, oldVal) {
+					if (!this.processingServerEvent
+						&& this.selectedEventId != null
+						&& this.selectedEventId != ""
+						&& newVal != null 
+						&& newVal != oldVal
+					) {
+						this.emitSelectionChange(
+							this.selectedSessionId,
+							this.selectedEventId,
+							null, 
 							newVal
 						)
 					}

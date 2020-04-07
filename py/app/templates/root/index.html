@@ -117,7 +117,18 @@
               </template>
             </b-table>
           </div>
-          <div class="column"></div>
+          <div class="column">
+            <b-field label="Tracklets"></b-field>
+
+            <b-table v-if="selectedEvent != null && selectedEvent.tracks != null" :data="selectedEvent.trklts"
+              :selected.sync="selectedTrklt" focusable>
+              <template slot-scope="props">
+                <b-table-column field="id" label="ID" width="40">
+                  {{ props.row.id }}
+                </b-table-column>
+              </template>
+            </b-table>
+          </div>
         </div>
       </div>
     </div>
@@ -153,6 +164,7 @@
       selectedSession: null,
       selectedEvent: null,
       selectedTrack: null,
+      selectedTrklt: null,
       sessions: [],
       createVisible: false,
       skipEmitClientSelection: false,
@@ -187,6 +199,7 @@
           sessionId: this.selectedSession != null ? this.selectedSession.id : null,
           eventId: this.selectedEvent != null ? this.selectedEvent.id : null,
           trackId: this.selectedTrack != null ? this.selectedTrack.id : null,
+          trkltId: this.selectedTrklt != null ? this.selectedTrklt.id : null,
         }
 
         if (selection.sessionId != null && selection.eventId != null)
@@ -238,6 +251,7 @@
           this.selectedEvent = this.selectedSession.events.find(e => e.id == newSelection.selectedEventId)
           if (this.selectedEvent != null) {
             this.selectedTrack = this.selectedEvent.tracks.find(e => e.id == newSelection.selectedTrackId)
+            this.selectedTrklt = this.selectedEvent.trklts.find(e => e.id == newSelection.selectedTrkltId)
           }
           console.log(newSelection)
           // The next line ensures the flag is reset *after* the watch

@@ -57,6 +57,8 @@ class Store():
 		session["start"] = str(datetime.now())
 		session["selectedEventId"] = None
 		session["selectedTrackId"] = None
+		session["selectedTrkltId"] = None
+		
 		self.__sessions.append(session)
 
 	def get_sessions(self):
@@ -95,6 +97,7 @@ class Store():
 				"sessionId": session["id"],
 				"selectedEventId": selectedEventId,
 				"selectedTrackId": session["selectedTrackId"],
+				"selectedTrkltId": session["selectedTrkltId"],
 				"selectedEvent"  : selectedEvent
 			}
 
@@ -110,20 +113,22 @@ class Store():
 				session["selectedTrackId"] = selection["trackId"]
 			else: session["selectedTrackId"] = None
 
+			if "trkltId" in selection:
+				session["selectedTrkltId"] = selection["trkltId"]
+			else: session["selectedTrkltId"] = None
+
 			return self.get_session_selection(session["id"])
 
 	def track_map(self, tr):
 		return {
-			"id": tr["id"],
-			"stk": tr["stk"],
-			"sec": tr["sec"]
+			"id": tr["id"]
 		}
 
 	def event_map(self, ev):
 		return {
 			"id": ev["id"],
 			"tracks": list(map(self.track_map, filter(lambda tr: tr["typ"] == "Trd", ev["tracks"]))),
-			"trklts": []
+			"trklts": list(map(self.track_map, ev["trklts"])),
 		}
 
 	def set_session_data(self, session_id, data):
