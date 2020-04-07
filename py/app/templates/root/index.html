@@ -76,7 +76,10 @@
       <div v-else>
         <div class="level">
           <div class="level-item">
-            <div class="field is-grouped">
+            <a href="/">Event Display</a>
+          </div>
+          <div class="level-item">
+            <div class="field is-grouped" style="align-items: center;">
               <div class="control">
                 <b-upload v-model="dropFile" drag-drop accept="application/json">
                   <div class="content has-text-centered">
@@ -92,7 +95,11 @@
               </div>
             </div>
           </div>
+          <div class="level-item">
+            Session ID: {{ selectedSession.id }}
+          </div>
         </div>
+        <hr />
         <div class="columns">
           <div class="column">
             <b-field label="Events"></b-field>

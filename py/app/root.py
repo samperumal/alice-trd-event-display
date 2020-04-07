@@ -30,3 +30,20 @@ def upload_file():
         socketio.emit('session-summary-changed', store.Store().get_summary(session_id), room=session_id)
         return "success"
     else: raise Exception()
+
+def update_session_selection(selection):
+    if selection is not None and "sessionId" in selection and selection["sessionId"] is not None:
+        new_selection = store.Store().update_session_selection(selection)
+        socketio.emit('session-selection-changed', new_selection, room = str(selection["sessionId"]))
+
+@bp.route('/set-selection', methods=["POST"])
+def update_session_selection_post():
+    print("Selection changed for session {} by {} to {}".format(str(request.json["sessionId"]), request.host_url, request.json))
+    update_session_selection(request.json)
+    return "success"
+
+@socketio.on('update-session-selection')
+def update_session_selection_socketio(selection):
+    print("Selection changed for session {} by {} to {}".format(str(selection["sessionId"]), request.sid, selection))
+    update_session_selection(selection)
+    
