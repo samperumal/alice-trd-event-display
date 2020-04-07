@@ -1,17 +1,18 @@
 class ComponentCoordinator {
     constructor(data) {
-        this.components = [];
+        this.components = []
 
-        this.event = null;
-        this.track = null;
+        this.event = null
+        this.track = null
+        this.trklt = null
 
         if (data != null)
             this.setData(data)
     }
 
     setData(data) {
-        this.data = data;
-        this.dataMap = this.mapData(this.data);        
+        this.data = data
+        this.dataMap = this.mapData(this.data)
     }
 
     mapData(data) {
@@ -68,13 +69,15 @@ class ComponentCoordinator {
         }
     }
 
-    showEvent(eventData, eventId, trackId) {
+    showEvent(eventData, eventId, trackId, trkltId) {
         const event = this.event = eventData
         const track = this.track = eventData != null ? eventData.tracks.find(d => d.id == trackId) : null
+        const trklt = this.trklt = eventData != null ? eventData.trklts.find(d => d.id == trkltId) : null
 
         const drawData = {
             event,
             track,
+            trklt,
             type: "select"
         };
 

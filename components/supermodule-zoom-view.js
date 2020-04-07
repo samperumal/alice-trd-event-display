@@ -135,6 +135,49 @@ class SupermoduleZoomViewComponent extends ComponentBase {
 
             this.stackText.text(`Sector ${eventData.track.sec}, Stack ${eventData.track.stk}`);
         }
+        else if (eventData.trklt != null) {
+            const trklt = eventData.trklt;
+
+            const stackbb = this.stackDimensionData[trklt.stk];
+
+            this.xscale.domain(stackbb.bbZ);
+            this.yscale.domain(stackbb.bbR);
+
+            this.pads.attr("d", this.stackPaths.get(trklt.stk).padPath);
+
+            this.modules.attr("d", this.stackPaths.get(trklt.stk).modulePath);
+
+            this.selectedTrack.attr("d", null);
+
+            const filteredOtherTracks = eventData.event.tracks.filter(d => d.typ == "Trd" && d.id != trklt.id && d.sec == trklt.sec && d.stk == trklt.stk); 
+            this.otherTracks.attr("d", filteredOtherTracks.map(d => line(rotateToSector(d))));
+
+            const padRowDimensionData = geomStackZRPlanePads();
+
+            this.selectedTracklets.attr("d", [trklt]
+                .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
+                .map(d => this.line(d.d) + " Z ")
+                .join(" ")
+            );
+
+            const otherTracklets = eventData.event.trklts.filter(t => t.stk == trklt.stk && t.sec == trklt.sec);
+
+            this.otherTracklets.attr("d", otherTracklets
+                .filter(d => d.trk == null)    
+                .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
+                .map(d => this.line(d.d) + " Z ")
+                .join(" ")
+            );
+
+            this.matchedTracklets.attr("d", otherTracklets
+                .filter(d => d.trk != null)    
+                .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
+                .map(d => this.line(d.d) + " Z ")
+                .join(" ")
+            );
+
+            this.stackText.text(`Sector ${eventData.trklt.sec}, Stack ${eventData.trklt.stk}`);
+        }
         else {
             this.selectedTrack.attr("d", null);
             this.otherTracks.attr("d", null);

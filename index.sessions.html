@@ -455,7 +455,7 @@
 						<div class="legend-text">Matched TRD tracklet</div>
 					</div>
 					<div>
-						<div style="background-color: #ffeda0;" class="legend-color"></div>
+						<div style="background-color: #ffe05d;" class="legend-color"></div>
 						<div class="legend-text">Other TRD tracklet</div>
 					</div>
 				</div>
@@ -536,7 +536,8 @@
 							coordinator.showEvent(
 								mapEventToDisplayDataFormat(newSelection.selectedEvent), 
 								this.selectedEventId, 
-								this.selectedTrackId)
+								this.selectedTrackId,
+								this.selectedTrackletId)
 					}
 				},
 				emitSelectionChange(

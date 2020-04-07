@@ -117,6 +117,7 @@ class SupermoduleViewComponent extends ComponentBase {
         }
 
         const track = eventData.track;
+        const trklt = eventData.trklt;
 
         if (track != null) {
             this.allTracks.classed("other", true);
@@ -130,6 +131,19 @@ class SupermoduleViewComponent extends ComponentBase {
             );
 
             this.setViewBox(this.stackDimensionData[track.stk]);
+        }
+        else if (trklt != null) {
+            this.allTracks.classed("other", true);
+            this.otherTracklets.classed("other", true);
+            this.selectedTrack.attr("d", null);
+
+            this.selectedTracklets.attr("d", [trklt]
+                .map(d => padRowDimensionData[rid(d.stk, d.lyr, d.row)])
+                .map(d => this.line(d.d))
+                .join(" ")
+            );
+
+            this.setViewBox(this.stackDimensionData[trklt.stk]);
         }
         else {
             this.allTracks.classed("other", false);

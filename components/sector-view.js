@@ -114,8 +114,7 @@ class SectorViewComponent extends ComponentBase {
             .attr("method", "stretch")
             .text("Sectors");
 
-        if (viewBox != null)
-            this.transitionViewBox(viewBox, 750);
+        this.setViewBox(4)
     }
 
     zoomed() {
@@ -128,13 +127,11 @@ class SectorViewComponent extends ComponentBase {
 
     draw(eventData) {
         console.log("Drawing sector view")
-        const xscale = this.xscale, yscale = this.yscale;
         const line = this.line;
         const layerData = this.layerData;
 
         const sectorToRotationAngle = this.sectorToRotationAngle;
-        const transitionDuration = 500;
-
+        
         const selectedTrack = eventData.track != null ? eventData.track.id : null;
 
         if (eventData.event == null) {
@@ -159,11 +156,16 @@ class SectorViewComponent extends ComponentBase {
             this.selectedTrack.attr("d", line(eventData.track.path));
             this.selectedTracklet.attr("d", eventData.track.trklts.map(d => line(d.path)).join(" "));
 
-            const sector = eventData.track.sec;
+            this.setViewBox(eventData.track.sec)
+        }
+        else if (eventData.trklt != null) {
+            this.allTracks.classed("other", true);
+            this.allTracklets.classed("other", true);
 
-            this.zoomBox
-                .transition().duration(transitionDuration)
-                .attr("transform", `rotate(${-sector * 20} ${xscale(0)} ${yscale(0)})`);
+            this.selectedTrack.attr("d", null);
+            this.selectedTracklet.attr("d", line(eventData.trklt.path));
+
+            this.setViewBox(eventData.trklt.sec)
         }
         else {
             this.allTracks.classed("other", false);
@@ -172,10 +174,17 @@ class SectorViewComponent extends ComponentBase {
             this.selectedTrack.attr("d", null);
             this.selectedTracklet.attr("d", null);
 
-            this.zoomBox
-                .transition().duration(transitionDuration)
-                .attr("transform", `rotate(${-4 * 20} ${xscale(0)} ${yscale(0)})`);
+            this.setViewBox(4)
         }
+    }
+
+    setViewBox(sector) {
+        const transitionDuration = 500
+        const xscale = this.xscale, yscale = this.yscale
+        
+        this.zoomBox
+            .transition().duration(transitionDuration)
+            .attr("transform", `rotate(${-sector * 20} ${xscale(0)} ${yscale(0)})`)
     }
 
     layerNumberPosition(sector, d) {
