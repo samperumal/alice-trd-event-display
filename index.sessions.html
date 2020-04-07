@@ -191,6 +191,26 @@
 			padding: 0 20px;
 		}
 
+		#timebin-container {
+			display: inherit;
+		}
+
+		#event-tree-container select {
+			min-width: 10rem;
+			text-align: center;
+		}
+
+		.event-controls {
+			display: flex; 
+			flex-direction: column; 
+			text-align: center;
+			justify-content: space-around;
+		}
+
+		.event-controls .field {
+			margin: 0.5rem 0;
+		}
+
 		@media screen and (min-width: 1001px) and (max-width: 1400px) {
 
 			.col1,
@@ -229,6 +249,14 @@
 
 			.col4 {
 				order: 3;
+			}
+
+			#track-information-container.col1 {
+				order: 3
+			}
+
+			.event-controls {
+				flex-direction: row; 
 			}
 		}
 
@@ -276,8 +304,7 @@
 				<div class="col1" id="event-tree-container">
 					<div class="col-header">Available events</div>
 					<div id="dataTree"></div>
-					<div id="app" style="display: flex; flex-direction: column; text-align: center;">
-						<div>
+					<div id="app" class="event-controls">
 							<b-field label="Session">
 								<b-select placeholder="Select a session"
 									v-model="selectedSessionId"
@@ -312,7 +339,17 @@
 									</option>
 								</b-select>
 							</b-field>
-						</div>						
+							<b-field label="Tracklet" v-if="selectedEvent != null">
+								<b-select placeholder="Select a track"
+									v-model="selectedTrackId"
+								>
+									<option v-for="track in selectedEvent.tracks" 
+										:key="track.id" 
+										:value="track.id">
+										{{ track.id }}
+									</option>
+								</b-select>
+							</b-field>
 					</div>
 				</div>
 				<div class="col2">
