@@ -37,5 +37,5 @@ def leave_session(session_id):
 def update_session_selection(selection):
     if selection is not None and "sessionId" in selection and selection["sessionId"] is not None:
         new_selection = store.Store().update_session_selection(selection)
-        print(str(selection["sessionId"]))
+        print("Selection changed for session {} by {}".format(str(selection["sessionId"]), request.sid))
         socketio.emit('session-selection-changed', new_selection, room = str(selection["sessionId"]))

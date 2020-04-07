@@ -462,7 +462,9 @@
 				
 				selectedSessionId: null,
 				selectedEventId: null,
-				selectedTrackId: null
+				selectedTrackId: null,
+
+				processingServerEvent: false
 			},
 			methods: {
 				updateSessions(sessions) {
@@ -488,6 +490,22 @@
 								this.selectedEventId, 
 								this.selectedTrackId)
 					}
+				},
+				emitSelectionChange(
+					selectedSessionId,
+					selectedEventId,
+					selectedTrackId
+				) {
+					const selection = {
+						sessionId: selectedSessionId != null ? selectedSessionId : null,
+						eventId: selectedEventId != null ? selectedEventId : null,
+						trackId: selectedTrackId != null ? selectedTrackId : null,
+					}
+
+					if (selection.sessionId != null && selection.eventId != null) {
+						socket.emit('update-session-selection', selection)
+						console.log("updating session selection", selection)
+					}
 				}
 			},
 			computed: {
@@ -507,6 +525,32 @@
 					if (newVal != null) {
 						socket.emit("join-session", newVal)
 					}
+				}, 
+				selectedEventId(newVal, oldVal) {
+					if (!this.processingServerEvent
+						&& newVal != null 
+						&& newVal != oldVal
+					) {
+						this.emitSelectionChange(
+							this.selectedSessionId,
+							newVal,
+							null
+						)
+					}
+				},
+				selectedTrackId(newVal, oldVal) {
+					if (!this.processingServerEvent
+						&& this.selectedEventId != null
+						&& this.selectedEventId != ""
+						&& newVal != null 
+						&& newVal != oldVal
+					) {
+						this.emitSelectionChange(
+							this.selectedSessionId,
+							this.selectedEventId,
+							newVal
+						)
+					}
 				}
 			}
 		})
@@ -518,13 +562,13 @@
 		socket.on("session-list", function (data) {
 			console.log("session-list", data)
 			app.updateSessions(data)
-
-			// socket.emit("join-session", data[0].id)
 		})
 
 		socket.on('session-selection-changed', function (newSelection) {
 			console.log("Selection changed: ", newSelection)
+			app.processingServerEvent = true
 			app.updateSessionEventSelection(newSelection)
+			app.processingServerEvent = false
 		})
 
 		socket.on('session-summary-changed', function (summary) {
