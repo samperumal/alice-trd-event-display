@@ -172,6 +172,10 @@
       selectedEvent: null,
       selectedTrack: null,
       selectedTrklt: null,
+
+      useTrack: true,
+      isCascadeChange: false,
+
       sessions: [],
       createVisible: false,
       skipEmitClientSelection: false,
@@ -191,12 +195,38 @@
         return this.selectedSession != null
       },
       selectedSessionData() {
+        if (this.isCascadeChange) {
+          console.log("enter - cascade")
+        
+          this.isCascadeChange = false
+        }
+        else {
+          console.log("enter - normal")
+        
+          if (this.useTrack) {
+            if (this.selectedTrklt != null) {
+              this.selectedTrack = null
+              this.useTrack = false
+              this.isCascadeChange = true
+            }
+          }
+          else {
+            if (this.selectedTrack != null) {
+              this.selectedTrklt = null
+              this.useTrack = true
+              this.isCascadeChange = true
+            }
+          }
+        }
+          
         const selection = {
           sessionId: this.selectedSession != null ? this.selectedSession.id : null,
           eventId: this.selectedEvent != null ? this.selectedEvent.id : null,
           trackId: this.selectedTrack != null ? this.selectedTrack.id : null,
           trkltId: this.selectedTrklt != null ? this.selectedTrklt.id : null,
         }
+
+        console.log("leave - ", selection)
 
         if (selection.sessionId != null && selection.eventId != null)
           return selection
