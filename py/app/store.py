@@ -48,8 +48,8 @@ class Store():
 	def __new__(cls):
 		if Store.__instance is None:
 			Store.__instance = object.__new__(cls)
-			Store.__instance.add_session(session = { "name": "Sam's session", "id": 1, "description": "A Test description" })
-			Store.__instance.add_session(session = { "name": "Sean's session", "id": 2, "description": "A Test description" })
+			Store.__instance.add_session(session = { "name": "Default session", "id": 0, "description": "Default session for viewing data" })
+			
 		return Store.__instance
 
 	def add_session(self, session):
@@ -71,11 +71,7 @@ class Store():
 	def get_summary(self, session_id):
 		session = self.get_session(session_id)
 
-		events = [
-				{ "id": "E15", "tracks": [{"id": "E15_T1"}], "trklts": []},
-				{ "id": "E20", "tracks": [], "trklts": []},
-				{ "id": "E98", "tracks": [], "trklts": []}
-			]
+		events = []
 
 		if "events" in session:
 			events = session["events"]

@@ -198,6 +198,7 @@
 		#event-tree-container select {
 			min-width: 10rem;
 			text-align: center;
+			padding: 0.25rem;
 		}
 
 		.event-controls {
@@ -353,6 +354,9 @@
 										{{ tracklet.id }}
 									</option>
 								</b-select>
+							</b-field>
+							<b-field>
+								<a href="/sessions">View all sessions</a>
 							</b-field>
 					</div>
 				</div>
@@ -516,9 +520,14 @@
 					this.selectedTrackId = null
 					this.selectedTrackletId = null
 
+					if (sessions != null && sessions.length == 1) {
+						this.selectedSessionId = null
+						this.$nextTick(() => this.selectedSessionId = sessions[0].id)
+					}
+
 					// Code for DEBUG only
-					this.selectedSessionId = null
-					this.$nextTick(() => this.selectedSessionId = sessions[0].id)
+					// this.selectedSessionId = null
+					// this.$nextTick(() => this.selectedSessionId = sessions[0].id)
 				},
 				updateSessionSummary(summary) {
 					this.selectedSessionSummary = summary
@@ -582,6 +591,7 @@
 						&& newVal != null 
 						&& newVal != oldVal
 					) {
+						console.log("Event changed")
 						this.emitSelectionChange(
 							this.selectedSessionId,
 							newVal,
@@ -597,6 +607,7 @@
 						&& newVal != null 
 						&& newVal != oldVal
 					) {
+						console.log("Track changed")
 						this.emitSelectionChange(
 							this.selectedSessionId,
 							this.selectedEventId,
@@ -612,6 +623,7 @@
 						&& newVal != null 
 						&& newVal != oldVal
 					) {
+						console.log("Tracklet changed")
 						this.emitSelectionChange(
 							this.selectedSessionId,
 							this.selectedEventId,
@@ -629,19 +641,28 @@
 
 		socket.on("session-list", function (data) {
 			console.log("session-list", data)
+			app.processingServerEvent = true
 			app.updateSessions(data)
+			// Ensure flag is only unset after all updates for this event are processed
+			app.$nextTick(() => app.processingServerEvent = false)
 		})
 
 		socket.on('session-selection-changed', function (newSelection) {
 			console.log("Selection changed: ", newSelection)
 			app.processingServerEvent = true
 			app.updateSessionEventSelection(newSelection)
-			app.processingServerEvent = false
+			// Ensure flag is only unset after all updates for this event are processed
+			app.$nextTick(() => app.processingServerEvent = false)
+			console.log("Selection changed - exit")
 		})
 
 		socket.on('session-summary-changed', function (summary) {
 			console.log("Summary changed: ", summary)
+			app.processingServerEvent = true
 			app.updateSessionSummary(summary)
+			// Ensure flag is only unset after all updates for this event are processed
+			app.$nextTick(() => app.processingServerEvent = false)
+			console.log("Summary changed - exit")
 		})
 
 		// const data = [...mapToDisplayDataFormat(rawData)];

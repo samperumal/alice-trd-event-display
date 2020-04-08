@@ -69,37 +69,37 @@
         </b-field>
       </form>
     </div>
-    <div v-if="selectedSessionVisible" class="">
+    <div v-if="selectedSessionVisible">
+      <div class="level">
+        <div class="level-item">
+          <a href="/">Event Display</a>
+        </div>
+        <div class="level-item">
+          <div class="field is-grouped" style="align-items: center;">
+            <div class="control">
+              <b-upload v-model="dropFile" drag-drop accept="application/json">
+                <div class="content has-text-centered">
+                  
+                    <b-icon icon="upload" size="is-medium">
+                    </b-icon>
+                  <span>{{ dropFile == null ? "Drop your files here or click to upload" : dropFile.name }}</span>
+                </div>
+              </b-upload>
+            </div>
+            <div class="control">
+              <b-button label="Upload file" @click="uploadFile"></b-button>
+            </div>
+          </div>
+        </div>
+        <div class="level-item">
+          Session ID: {{ selectedSession.id }}
+        </div>
+      </div>
+      <hr />
       <div v-if="selectedSession.events == null || selectedSession.events.length == 0">
         No data loaded
       </div>
       <div v-else>
-        <div class="level">
-          <div class="level-item">
-            <a href="/">Event Display</a>
-          </div>
-          <div class="level-item">
-            <div class="field is-grouped" style="align-items: center;">
-              <div class="control">
-                <b-upload v-model="dropFile" drag-drop accept="application/json">
-                  <div class="content has-text-centered">
-                    
-                      <b-icon icon="upload" size="is-medium">
-                      </b-icon>
-                    <span>{{ dropFile == null ? "Drop your files here or click to upload" : dropFile.name }}</span>
-                  </div>
-                </b-upload>
-              </div>
-              <div class="control">
-                <b-button label="Upload file" @click="uploadFile"></b-button>
-              </div>
-            </div>
-          </div>
-          <div class="level-item">
-            Session ID: {{ selectedSession.id }}
-          </div>
-        </div>
-        <hr />
         <div class="columns">
           <div class="column">
             <b-field label="Events"></b-field>
@@ -184,17 +184,6 @@
 
     },
     computed: {
-      actions() {
-        result = []
-        for (const action of this.available_actions) {
-          result.push({
-            id: action,
-            text: action
-          })
-        }
-
-        return result
-      },
       sessionsVisible() {
         return this.selectedSession == null && !this.createVisible;
       },
@@ -299,7 +288,8 @@
   socket.on('session-list', function (data) {
     console.log("session-list", data)
     app.updateSessions(data)
-    app.selectSession(data[0])
+    // DEBUG only
+    // app.selectSession(data[0])
   })
 
   socket.on('session-selection-changed', function (newSelection) {
