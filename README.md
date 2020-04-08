@@ -74,3 +74,21 @@ Once the server is running, you can access it from any other machine via ssh por
 ```
 ssh -L 5001:localhost:5001 hep02.phy.uct.ac.za
 ```
+
+## CURL commands
+You can use CURL to control the session data and selection
+
+### Upload data
+```
+curl -F "file=@sample.json" -F "sessionId=0" http://localhost:5001/upload-file
+```
+
+### Change selection - Track
+```
+curl --header "Content-Type: application/json" --request POST --data '{ "sessionId": 0, "eventId": "E20", "trackId": "E20_T1" }' http://localhost:5001/set-selection
+```
+
+### Change selection - Tracklet
+```
+curl --header "Content-Type: application/json" --request POST --data '{ "sessionId": 0, "eventId": "E20", "trkltId": "E20_L192" }' http://localhost:5001/set-selection
+```
