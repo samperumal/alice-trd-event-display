@@ -1,0 +1,1 @@
+curl --header "Content-Type: application/json" --request POST --data '{ "sessionId": 0, "eventId": "E20" }' http://localhost:5001/set-selection

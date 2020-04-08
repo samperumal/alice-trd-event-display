@@ -83,7 +83,7 @@ class TimebinViewComponent extends ComponentBase {
     }
 
     draw(eventData) {
-        if (eventData.track != null) {
+        if (eventData.track != null || eventData.rawData != null) {
             this.drawDigits(eventData);
             this.container.style("display", "inherit");
         }
@@ -93,23 +93,28 @@ class TimebinViewComponent extends ComponentBase {
     }
 
     async drawDigits(eventData) {
-        const eventNo = eventData.event.id;
-        const sector = eventData.track.sec;
-        const stack = eventData.track.stk;
-
         try {
-            //console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}`);
-            const data = await d3.json(this.dataLoadUrl(eventNo, sector, stack));
+            let data = eventData.rawData
+            if (data == null) {
+                const eventNo = eventData.event.id;
+                const sector = eventData.track.sec;
+                const stack = eventData.track.stk;
+        
+                //console.log(`Loading digits for Event: ${eventNo} Sector: ${sector} Stack ${stack}`);
+                data = await d3.json(this.dataLoadUrl(eventNo, sector, stack));
+            }
 
             const allPads = geomZoomSectorXYPlanePads();
 
-            let sortedLayers = eventData.track.trklts.map(t => t.lyr);
+            let trklts = eventData.track != null ? eventData.track.trklts : [eventData.trklt]
+
+            let sortedLayers = trklts.map(t => t.lyr);
             sortedLayers = d3.range(6).filter(l => !sortedLayers.includes(l)).concat(sortedLayers);
 
             for (const index of d3.range(6)) {
                 const layer = sortedLayers[index];
 
-                const trackletData = eventData.track.trklts.find(t => t.lyr == layer);
+                const trackletData = trklts.find(t => t.lyr == layer);
                 let location = null;
                 if (trackletData != null) {
                     this.layerLabels[index].text(`Layer ${layer} Padrow ${trackletData.row}`);

@@ -8,13 +8,13 @@ def connect():
     print("Client connection: ", request.sid)
     #update_client()
     # When a client connects, send a list of current sessions only to them
-    emit('session-list', store.Store().get_sessions())
+    emit('session-list', store.Store().get_session_summaries())
 
 @socketio.on('create-session')
 def create_session(session):
     store.Store().add_session(session)
     # When a session is created, send a list of current sessions to all clients
-    socketio.emit('session-list', store.Store().get_sessions())
+    socketio.emit('session-list', store.Store().get_session_summaries())
 
 @socketio.on('join-session')
 def join_session(session_id):
@@ -32,10 +32,3 @@ def join_session(session_id):
 def leave_session(session_id):
     # Remove 
     pass
-
-# @socketio.on('update-session-selection')
-# def update_session_selection(selection):
-#     if selection is not None and "sessionId" in selection and selection["sessionId"] is not None:
-#         new_selection = store.Store().update_session_selection(selection)
-#         print("Selection changed for session {} by {} to {}".format(str(selection["sessionId"]), request.sid, selection))
-#         socketio.emit('session-selection-changed', new_selection, room = str(selection["sessionId"]))

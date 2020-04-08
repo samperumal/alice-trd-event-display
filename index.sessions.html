@@ -546,7 +546,8 @@
 								mapEventToDisplayDataFormat(newSelection.selectedEvent), 
 								this.selectedEventId, 
 								this.selectedTrackId,
-								this.selectedTrackletId)
+								this.selectedTrackletId,
+								newSelection.rawData)
 					}
 				},
 				emitSelectionChange(
@@ -667,7 +668,7 @@
 
 		// const data = [...mapToDisplayDataFormat(rawData)];
 
-		// const digitsLoadUrl = getDigitsLoadUrl;
+		const digitsLoadUrl = getDigitsLoadUrl;
 
 		//coordinator.setData(data);
 
@@ -691,9 +692,9 @@
 		document.getElementById("resetControls").addEventListener("click", three.resetControls.bind(three));
 		// ** ThreeJS initialisation
 
-		// coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
-		// 	dataLoadUrl: digitsLoadUrl
-		// }));
+		coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
+			dataLoadUrl: digitsLoadUrl
+		}));
 
 	</script>
 </body>

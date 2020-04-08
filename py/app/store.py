@@ -1,6 +1,6 @@
 from threading import Lock, Thread
 from typing import Optional
-from datetime import datetime 
+from . import session
 
 class SingletonMeta(type):
 	"""
@@ -48,21 +48,16 @@ class Store():
 	def __new__(cls):
 		if Store.__instance is None:
 			Store.__instance = object.__new__(cls)
-			Store.__instance.add_session(session = { "name": "Default session", "id": 0, "description": "Default session for viewing data" })
+			Store.__instance.add_session("Default session", "Default session for viewing data")
 			
 		return Store.__instance
 
-	def add_session(self, session):
-		session["id"] = len(self.__sessions)
-		session["start"] = str(datetime.now())
-		session["selectedEventId"] = None
-		session["selectedTrackId"] = None
-		session["selectedTrkltId"] = None
+	def add_session(self, name, description):
 		
-		self.__sessions.append(session)
+		self.__sessions.append(session.Session(len(self.__sessions), name, description))
 
-	def get_sessions(self):
-		return self.__sessions
+	def get_session_summaries(self):
+		return list(map(lambda s: s.summary(), self.__sessions))
 
 	def get_session(self, session_id):
 		index = int(session_id)
@@ -70,65 +65,30 @@ class Store():
 
 	def get_summary(self, session_id):
 		session = self.get_session(session_id)
-
-		events = []
-
-		if "events" in session:
-			events = session["events"]
-
-		return {
-			"id": session["id"],
-			"name": session["name"],
-			"events": events
-		}
+		return session.event_summary()
 
 	def get_session_selection(self, session_id):
 		session = self.get_session(session_id)
-		selectedEventId = session["selectedEventId"]
-		selectedEvent = None
-		if "events" in session:
-			selectedEvent = next(ev for ev in session["data"] if ev["id"] == selectedEventId)
-
-		return {
-				"sessionId": session["id"],
-				"selectedEventId": selectedEventId,
-				"selectedTrackId": session["selectedTrackId"],
-				"selectedTrkltId": session["selectedTrkltId"],
-				"selectedEvent"  : selectedEvent
-			}
+		return session.get_selection()
 
 	def update_session_selection(self, selection):
 		if "sessionId" in selection and selection["sessionId"] is not None:
 			session = self.get_session(selection["sessionId"])
 			
 			if "eventId" in selection:
-				session["selectedEventId"] = selection["eventId"]
-			else: session["selectedEventId"] = None
+				session.selectedEventId = selection["eventId"]
+			else: session.selectedEventId = None
 
 			if "trackId" in selection:
-				session["selectedTrackId"] = selection["trackId"]
-			else: session["selectedTrackId"] = None
+				session.selectedTrackId = selection["trackId"]
+			else: session.selectedTrackId = None
 
 			if "trkltId" in selection:
-				session["selectedTrkltId"] = selection["trkltId"]
-			else: session["selectedTrkltId"] = None
+				session.selectedTrkltId = selection["trkltId"]
+			else: session.selectedTrkltId = None
 
-			return self.get_session_selection(session["id"])
-
-	def track_map(self, tr):
-		return {
-			"id": tr["id"]
-		}
-
-	def event_map(self, ev):
-		return {
-			"id": ev["id"],
-			"tracks": list(map(self.track_map, filter(lambda tr: tr["typ"] == "Trd", ev["tracks"]))),
-			"trklts": list(map(self.track_map, ev["trklts"])),
-		}
+			return session.get_selection()
 
 	def set_session_data(self, session_id, data):
 		session = self.get_session(session_id)
-		summary = list(map(self.event_map, data))
-		session["events"] = summary
-		session["data"] = data
+		session.set_data(data)

@@ -69,7 +69,7 @@ class ComponentCoordinator {
         }
     }
 
-    showEvent(eventData, eventId, trackId, trkltId) {
+    showEvent(eventData, eventId, trackId, trkltId, rawData) {
         const event = this.event = eventData
         const track = this.track = eventData != null ? eventData.tracks.find(d => d.id == trackId) : null
         const trklt = this.trklt = eventData != null ? eventData.trklts.find(d => d.id == trkltId) : null
@@ -78,6 +78,7 @@ class ComponentCoordinator {
             event,
             track,
             trklt,
+            rawData,
             type: "select"
         };
 

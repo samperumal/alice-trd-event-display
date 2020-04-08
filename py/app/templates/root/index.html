@@ -196,13 +196,9 @@
       },
       selectedSessionData() {
         if (this.isCascadeChange) {
-          console.log("enter - cascade")
-        
           this.isCascadeChange = false
         }
         else {
-          console.log("enter - normal")
-        
           if (this.useTrack) {
             if (this.selectedTrklt != null) {
               this.selectedTrack = null
@@ -225,8 +221,6 @@
           trackId: this.selectedTrack != null ? this.selectedTrack.id : null,
           trkltId: this.selectedTrklt != null ? this.selectedTrklt.id : null,
         }
-
-        console.log("leave - ", selection)
 
         if (selection.sessionId != null && selection.eventId != null)
           return selection
