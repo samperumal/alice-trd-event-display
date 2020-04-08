@@ -1,6 +1,7 @@
 from flask import Flask, g, jsonify, redirect, url_for
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import os
+from . import session
 
 socketio = SocketIO()
 
@@ -25,5 +26,6 @@ def create_app(test_config=None):
     app.register_blueprint(root.bp)
 
     socketio.init_app(app)
+    session.Session.raw_data_path = "..\\data\\pPb"
     return app
 

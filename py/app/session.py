@@ -4,21 +4,19 @@ import json
 from datetime import datetime 
 
 class Session:
-	id = None
-	name = None
-	description = None
-	start = None
-	selectedEventId = None
-	selectedTrackId = None
-	selectedTrkltId = None
-	data = []
-	event_summaries = []
+	raw_data_path = ""
 
 	def __init__(self, id, name, description):
 		self.id = id 
 		self.name = name
 		self.description = description
 		self.start = str(datetime.now())
+		
+		self.selectedEventId = None
+		self.selectedTrackId = None
+		self.selectedTrkltId = None
+		self.data = []
+		self.event_summaries = []
 
 	def summary(self):
 		return {
@@ -62,23 +60,31 @@ class Session:
 		}
 
 	def _get_raw_data(self, selected_event):
+		print("get raw data")
 		if selected_event is not None:
 			json_path = None
 
 			if self.selectedTrackId is not None:
 				track_iterator = (tr for tr in selected_event["tracks"] if "id" in tr and tr["id"] == self.selectedTrackId)
 				selected_track = next(track_iterator, None)
-				json_path = "..\\data\\pPb\\{0}.{1}.{2}.json".format(selected_event["id"], selected_track["sec"], selected_track["stk"])
+				filename = "{0}.{1}.{2}.json".format(selected_event["id"], selected_track["sec"], selected_track["stk"])
 
 			elif self.selectedTrkltId is not None:
 				trklt_iterator = (tr for tr in selected_event["trklts"] if "id" in tr and tr["id"] == self.selectedTrkltId)
 				selected_trklt = next(trklt_iterator, None)
-				json_path = "..\\data\\pPb\\{0}.{1}.{2}.json".format(selected_event["id"], selected_trklt["sec"], selected_trklt["stk"])
-				print(json_path)
+				filename = "{0}.{1}.{2}.json".format(selected_event["id"], selected_trklt["sec"], selected_trklt["stk"])
 
+			json_path = os.path.join(self.raw_data_path, filename)
+			print(json_path)
+					
 			if json_path is not None:				
 				if os.path.exists(json_path):
 					with open(json_path, "r") as json_file:
 						return json.load(json_file)
-				
-		return {}
+				else: 
+					print("Path does not exist: ", json_path)
+			else:
+				print("No json path")
+		else: 
+			print("No selected event")
+		return None
