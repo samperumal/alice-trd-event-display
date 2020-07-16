@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css"> -->
+    <link href='bootstrap.min.css' rel='stylesheet' />
+    <link href='./proton/style.min.css' rel='stylesheet' />
+    <script src="d3.min.js"></script>
+    <script src="jquery.min.js"></script>
+    <script src="jstree.min.js"></script>
+    <script src="data.js"></script>
+    <script src="trd-dimensions.js"></script>
+    <style>
+        div.navigation {
+            width: 400px; 
+            max-height: 800px; 
+            display: inline-block;
+            overflow: auto; 
+            vertical-align: top;
+        }
+
+        div.component {
+            display: inline-block;
+            margin-right: 0.5em;
+            margin-bottom: 1.5em;
+        }
+
+        div.component p {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 0.25em;
+        }
+
+        svg {
+            border: 1px solid black;
+        }
+
+        .SSC-stack-text {
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+
+        .SSC-stack-index {
+            text-anchor: middle;
+            dominant-baseline: central;
+            font-size: xx-small;
+            fill: #555;
+        }
+
+        .SSC-sector-text {
+            text-anchor: middle;
+            dominant-baseline: central;
+
+        }
+
+        .SSC-sector-index {
+            text-anchor: middle;
+            dominant-baseline: central;
+            font-size: xx-small;
+            fill: #555;
+        }
+
+        .SSC-LinearStack {
+            fill: none;
+            stroke: black;
+        }
+
+        .SSC-LinearStack.SSC-hit {
+            fill: lightslategray;
+        }
+
+        .SSC-LinearStack.SSC-hit.SSC-selected {
+            fill: red;
+        }
+
+        .SLC-sector-index {
+            text-anchor: start;
+            dominant-baseline: central;
+            font-size: xx-small;
+            fill: #555;
+        }
+
+        .SLC-Supermodule {
+            fill: none;
+            stroke: black;
+        }
+
+        .SLC-supermodule-header {
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+
+        .SLC-Supermodule.SLC-hit {
+            fill: lightslategray;
+        }
+
+        .SLC-Supermodule.SLC-hit.SLC-selected {
+            fill: red;
+        }
+
+        .supermodule-xy {
+            fill: none;
+            stroke: black;
+            shape-rendering: auto;
+        }
+
+        .supermodule-xy circle {
+            fill: red;
+        }
+
+        .STLC-roc {
+            stroke: black;
+            fill: none;
+        }
+
+        .STLC-roc.STLC-hit {
+            fill: lightslategray;
+        }
+
+        .STLC-roc.STLC-hit.STLC-selected {
+            fill: red;
+        }
+
+        path.TP {
+            stroke: darkgray;
+            fill: none;
+            stroke-dasharray: 4;
+        }
+
+        path.TP.TP-selected {
+            stroke: red;
+            stroke-width: 4px;
+            fill: none;
+            stroke-dasharray: none;
+        }
+
+        path.TPR-detector {
+            stroke: black;
+            fill: lightblue;
+        }
+
+        circle.TPA-detector-outer {
+            stroke: black;
+            fill: lightblue;
+        }
+
+        circle.TPA-detector-inner {
+            stroke: black;
+            fill: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navigation">
+        <div>
+            <img src="alice-coord.png" style="width: 400px;" />
+        </div>
+        <div id="dataTree">
+
+        </div>
+    </div>
+
+    <div style="display:inline-block;">
+        <div>
+            <div class="component">
+                <p>Sector view - XY plane</p>
+                <svg id="sectorLayer" width="300px">
+
+                </svg>
+            </div>
+            <div class="component">
+                <p>Supermodule view - Z axis</p>
+                <svg id="supermoduleZ" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+            </div>
+            <div class="component">
+                <p>Cylinder circumference view</p>
+                <svg id="stackSector" height="300px" width="300px">
+
+                </svg>
+            </div>    
+        </div>
+        <div>
+            <div class="component">
+                <p>XY projection</p>
+                <svg id="trackPathXY" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+            </div>
+            <div class="component">
+                <p>ZR projection (R^2 = X^2 + Y^2)</p>
+                <svg id="trackPathZR" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+            </div>
+            <div class="component">
+                <p>Supermodule view - XY plane</p>
+                <svg id="supermoduleXY" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+            </div>
+        </div>
+        <div>
+            <div class="component">
+                <p>ZY projection</p>
+                <svg id="trackPathZY" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+            </div>
+            <div class="component">
+                <p>ZX projection</p>
+                <svg id="trackPathZX" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+            </div>   
+            <div class="component">
+                <p>Z-Azimuth projection</p>
+                <svg id="trackPathZAzi" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+            </div>
+            <div class="component">
+                <p>Z-Polar projection</p>
+                <svg id="trackPathZPolar" width="300px" height="300px" preserveAspectRatio="xMidYMid meet">
+
+                </svg>
+            </div>
+        </div>
+    </div>
+    <script src="common-functions.js"></script>
+    <script>
+        // Data conversions
+        function parseTrdTracklet(t) {
+            return {
+                Stack: DetectorToStack(t.Detector),
+                Sector: DetectorToSector(t.Detector),
+                Layer: DetectorToLayer(t.Detector),
+                LinearStackIndex: DetectorToLinearStackIndex(t.Detector),
+                Chamber: t.HCId % 2,
+                Detector: t.Detector,
+                HCId: t.HCId,
+                Index: t.index
+            };
+        }
+        function parseTrdTrack(d) {
+            return {
+                Stack: d.Stack,
+                Sector: d.Sector,
+                LinearStackIndex: StackSectorToLinearStackIndex(d.Stack, d.Sector),
+                Index: d.index,
+                Tracklets: d.TrdTracklets.map(parseTrdTracklet)
+            };
+        }
+        function getTrdTracks(event) {
+            return event.TrdTracks.map(parseTrdTrack);
+        }
+    </script>
+    <script>
+        // D3 components
+        class BaseComponent {
+            constructor(width, height, margin) {
+                this.height = height;
+                this.width = width;
+
+                if (margin != null) {
+                    this.height -= +margin.vert;
+                    this.width -= +margin.horiz;
+                }
+            }
+        }
+
+        class SectorXYComponent extends BaseComponent {
+            constructor(width, height, parent) {
+                super(width, height);
+
+                const componentWidth = this.componentWidth = this.width / nSTACKS;
+                const componentHeight = this.componentHeight = this.height / nSECTORS;
+
+                const minRadius = 30;
+                const layerHeight = 10;
+
+                parent.append("text")
+                    .text("Supermodules")
+                    .attr("class", "SLC-supermodule-header")
+                    .attr("x", this.width / 2)
+                    .attr("y", 15);
+
+                this.g = parent.append("g").attr("class", "stackSector")
+                    .attr("transform", "translate(15,30)");
+
+                this.sectorLayerData = d3.range(nSECTORS * nLAYERS)
+                    .map(d => {
+                        const layer = d % nLAYERS;
+                        const height = 10 + layer * 3.6;
+                        return {
+                            index: d,
+                            sector: Math.floor(d / nLAYERS),
+                            layer: layer,
+                            tracks: [],
+                            x: minRadius + layerHeight * layer,
+                            y: -height / 2,
+                            width: layerHeight,
+                            height: height
+                        };
+                    });
+
+                this.sectorLayers = this.g.selectAll("g.SLC-Supermodule")
+                    .data(this.sectorLayerData)
+                    .enter()
+                    .append("g")
+                    .attr("class", "SLC-Supermodule ")
+                    .attr("transform", d => "translate(" + (this.width / 2) + "," + (this.height / 2) + ")rotate(" + (-10 - d.sector / nSECTORS * 360) + ")");
+
+                this.g.selectAll("text.SLC-sector-index")
+                    .data(d3.range(nSECTORS))
+                    .enter()
+                    .append("text")
+                    .attr("class", "SLC-sector-index")
+                    .text(d => d)
+                    .attr("x", minRadius + (layerHeight + 0.5) * nLAYERS)
+                    .attr("transform", d => "translate(" + (this.width / 2) + "," + (this.height / 2) + ")rotate(" + (-10 - d / nSECTORS * 360) + ")");
+
+                this.sectorLayers.append("rect")
+                    .attr("x", d => d.x)
+                    .attr("y", d => d.y)
+                    .attr("width", d => d.width)
+                    .attr("height", d => d.height);
+            }
+
+            draw(event, selectedTracklets) {
+                const trdTracklets = event.TrdTracklets.map(parseTrdTracklet);
+
+                for (const sld of this.sectorLayerData) {
+                    sld.tracks = [];
+                    sld.selected = false;
+                }
+
+                for (const trdTracklet of trdTracklets) {
+                    const sld = this.sectorLayerData[trdTracklet.Sector * nLAYERS + trdTracklet.Layer];
+                    sld.tracks.push(trdTracklet);
+                    for (const selTracklet of selectedTracklets)
+                        if (trdTracklet.Index == selTracklet.index)
+                            sld.selected = true;
+                }
+
+                this.g.selectAll("g.SLC-Supermodule")
+                    .classed("SLC-hit", d => d.tracks.length > 0)
+                    .classed("SLC-selected", d => d.selected);
+            }
+        }
+
+        const STACK_LAYER_WIDTHS = [
+            [70, 65, 60, 65, 70],
+            [70, 65, 60, 65, 70],
+            [80, 70, 60, 70, 80],
+            [90, 75, 60, 75, 90],
+            [100, 80, 60, 80, 100],
+            [110, 85, 60, 85, 110],
+        ];
+
+        class SupermoduleZAxisComponent extends BaseComponent {
+            constructor(width, height, parent) {
+                super(width, height);
+
+                const componentWidth = this.componentWidth = this.width / nSTACKS;
+                const componentHeight = this.componentHeight = this.height / nLAYERS;
+
+                const layerHeight = 30;
+
+                this.g = parent.append("g").attr("class", "stackLayer");
+
+                this.stackLayerData = d3.range(nSTACKS * nLAYERS)
+                    .map(d => {
+                        const layer = d % nLAYERS;
+                        const stack = Math.floor(d / nLAYERS);
+                        let x = -STACK_LAYER_WIDTHS[layer].reduce((a, b) => a + b) / 2;
+
+                        let stackIndex = 0, width = 0;
+                        while (stackIndex < stack)
+                            x += STACK_LAYER_WIDTHS[layer][stackIndex++];
+                        width = STACK_LAYER_WIDTHS[layer][stackIndex];
+
+                        return {
+                            index: d,
+                            stack: stack,
+                            layer: layer,
+                            x: x,
+                            y: (2 - layer) * layerHeight,
+                            width: width,
+                            height: layerHeight,
+                            tracks: [],
+                            selected: false
+                        };
+                    });
+
+                this.stackLayers = this.g.selectAll("g.STLC-roc")
+                    .data(this.stackLayerData)
+                    .enter()
+                    .append("g")
+                    .attr("class", "STLC-roc")
+                    .attr("transform", d => "translate(" + (this.width / 2) + "," + (this.height / 2) + ")");
+
+                this.stackLayers.append("rect")
+                    .attr("x", d => d.x)
+                    .attr("y", d => d.y)
+                    .attr("width", d => d.width)
+                    .attr("height", d => d.height);
+            }
+
+            draw(event, selectedTracklets) {
+                const trdTracklets = event.TrdTracklets.map(parseTrdTracklet);
+
+                for (const sld of this.stackLayerData) {
+                    sld.tracks = [];
+                    sld.selected = false;
+                }
+
+                for (const trdTracklet of trdTracklets) {
+                    const sld = this.stackLayerData[trdTracklet.Stack * nLAYERS + trdTracklet.Layer];
+                    sld.tracks.push(trdTracklet);
+                    for (const selTracklet of selectedTracklets)
+                        if (trdTracklet.Index == selTracklet.index)
+                            sld.selected = true;
+                }
+
+                this.g.selectAll("g.STLC-roc")
+                    .classed("STLC-hit", d => d.tracks.length > 0)
+                    .classed("STLC-selected", d => d.selected);
+            }
+        }
+
+        class SupermoduleXYPlaneComponent extends BaseComponent {
+            constructor(width, height, parent, trdDimensions) {
+                const margin = {};
+                margin.vert = 2 * height / 10;
+                margin.horiz = 2 * width / 10;
+                margin.n = margin.s = margin.vert / 2;
+                margin.e = margin.w = margin.horiz / 2;
+
+                super(width, height, margin);
+
+                this.trdDimensions = trdDimensions;
+                
+                const MIN_RADIUS = this.MIN_RADIUS = 294.5; // cm
+                const MAX_RADIUS = MIN_RADIUS + 74.5; // cm
+                const MODULE_HEIGHT = MAX_RADIUS - MIN_RADIUS;
+                const LAYER_HEIGHT = this.LAYER_HEIGHT = MODULE_HEIGHT / nLAYERS;
+
+                this.layerData = this.trdDimensions
+                    .filter(d => d.stack == 2)
+                    .sort((x,y) => x.layer - y.layer);
+
+                const xscale = this.xscale = d3.scaleLinear()
+                    .domain([d3.min(this.layerData, d => d.minLocalY), d3.max(this.layerData, d => d.maxLocalY)])
+                    .range([0, this.width]);
+
+                const yscale = this.yscale = d3.scaleLinear()
+                    .domain([d3.min(this.layerData, d => d.minR), d3.max(this.layerData, d => d.maxR)])
+                    .range([this.height, 0]);
+
+                this.layerData
+                    .forEach(d => {
+                        const r = MIN_RADIUS + d.layer * LAYER_HEIGHT;
+                        
+                        d.index = d.layer;
+                        d.x = Math.floor(xscale(d.minLocalY));
+                        d.width = Math.ceil(xscale(d.maxLocalY) - d.x);
+                        d.y = Math.ceil(yscale(d.maxR));
+                        d.height = Math.floor(yscale(d.minR)) - Math.ceil(yscale(d.maxR));
+                    }); 
+                    
+                console.log(this.layerData);
+
+                this.g = parent
+                    .attr("viewBox", "0 0 " + width + " " + height)
+                    .append("g")
+                    .attr("class", "supermodule-xy")
+                    .attr("transform", d => "translate(" + (margin.w) + "," + (margin.n) + ")");
+
+                this.layers = this.g.selectAll("g.supermodule-xy-layer")
+                    .data(this.layerData)
+                    .enter()
+                    .append("g")
+                    .attr("class", "supermodule-xy-layer");
+
+                this.tracklets = this.g
+                    .append("g")
+                    .attr("class", "supermodule-xy-tracklets");
+
+                this.layers.append("rect")
+                    .attr("x", d => d.x)
+                    .attr("width", d => d.width)
+                    .attr("y", d => d.y)
+                    .attr("height", d => d.height);
+
+                    this.track = this.g.append("path")
+                    .attr("class", "supermodule-xy-path");
+
+                this.line = d3.line().x(d => xscale(d[0])).y(d => yscale(d[1]));
+            }
+
+            draw(event, selectedTrdTrack) {
+                this.tracklets.selectAll("g.supermodule-xy-tracklet").remove();
+                this.track.attr("d", "");
+
+                if (selectedTrdTrack == null || selectedTrdTrack.TrdTracklets == null) return;
+                
+                //console.log(selectedTrdTrack.TrdTracklets);
+                const xscale = this.xscale, yscale = this.yscale;
+                const LAYER_HEIGHT = this.LAYER_HEIGHT;
+                const MIN_RADIUS = this.MIN_RADIUS;
+
+                const trackletSelection= this.tracklets.selectAll("g.supermodule-xy-tracklet")
+                    .data(selectedTrdTrack.TrdTracklets)
+                    .enter()
+                    .append("g")
+                    .attr("class", "supermodule-xy-tracklet")
+                    .append("circle")
+                    .attr("cx", d => xscale(-d.LocalY))
+                    .attr("cy", d => { return yscale(((DetectorToLayer(d.Detector) + 0.5) * LAYER_HEIGHT + MIN_RADIUS)); })
+                    .attr("r", 5);
+
+                if (selectedTrdTrack.TrackMatch != null && selectedTrdTrack.TrackMatch.Path != null) {
+                    const path = selectedTrdTrack.TrackMatch.Path.map(d => ({x: xscale(d[0]), x0: d[0], y0: d[1]}));
+                    console.log(path);
+                    this.track.attr("d", this.line(selectedTrdTrack.TrackMatch.Path));                    
+                }
+            }
+        }
+
+        class CylinderComponent extends BaseComponent {
+            constructor(width, height, parent) {
+                const margin = { n: 30, s: 10, e: 30, w: 5 };
+                margin.vert = margin.n + margin.s;
+                margin.horiz = margin.e + margin.w;
+
+                super(width, height, margin);
+
+                const componentWidth = this.componentWidth = this.width / nSTACKS;
+                const componentHeight = this.componentHeight = this.height / nSECTORS;
+
+                this.componentg = parent.append("g").attr("class", "stackSector");
+
+                this.headerg = this.componentg.append("g");
+
+                this.headerg.append("text")
+                    .text("Stack")
+                    .attr("class", "SSC-stack-text")
+                    .attr("transform", "translate(" + (margin.e + this.width / 2) + "," + (margin.n / 3) + ")");
+
+                this.headerg.append("text")
+                    .text("Sector")
+                    .attr("class", "SSC-sector-text")
+                    .attr("transform", "translate(" + (margin.e / 3) + "," + (margin.n + this.height / 2) + ")rotate(-90)");
+
+                this.headerg.selectAll("text.SSC-stack-index")
+                    .data(d3.range(nSTACKS))
+                    .enter()
+                    .append("text")
+                    .attr("class", "SSC-stack-index")
+                    .text(d => d)
+                    .attr("transform", d => "translate(" + (margin.e + (d + 0.5) * componentWidth) + "," + (margin.n * 4 / 5) + ")");
+
+                this.headerg.selectAll("text.SSC-sector-index")
+                    .data(d3.range(nSECTORS))
+                    .enter()
+                    .append("text")
+                    .attr("class", "SSC-sector-index")
+                    .text(d => d)
+                    .attr("transform", d => "translate(" + (margin.e * 4 / 5) + "," + (margin.n + (d + 0.5) * componentHeight) + ")");
+
+                this.g = this.componentg.append("g")
+                    .attr("transform", "translate(" + margin.e + "," + margin.n + ")");
+
+                this.linearStackData = d3.range(nLINEARSTACKS)
+                    .map(d => ({ index: d, selected: false, tracks: [] }));
+
+                this.linearStacks = this.g.selectAll("g.SSC-LinearStack")
+                    .data(this.linearStackData)
+                    .enter()
+                    .append("g")
+                    .attr("class", "SSC-LinearStack")
+                    .attr("transform", d => "translate(" + ((d.index % nSTACKS) * componentWidth) + "," + (Math.floor(d.index / nSTACKS) * componentHeight) + ")");
+
+                this.linearStacks.append("circle")
+                    .attr("cx", componentWidth / 2)
+                    .attr("cy", componentHeight / 2)
+                    .attr("r", Math.min(componentWidth, componentHeight) * 1 / 3);
+            }
+
+            draw(event, selectedTracklets) {
+                
+                const trdTracklets = event.TrdTracklets.map(parseTrdTracklet);
+
+                for (const sld of this.linearStackData) {
+                    sld.tracks = [];
+                    sld.selected = false;
+                }
+
+                for (const trdTracklet of trdTracklets) {
+                    const sld = this.linearStackData[trdTracklet.LinearStackIndex];
+                    sld.tracks.push(trdTracklet);
+                    for (const selTracklet of selectedTracklets)
+                        if (trdTracklet.Index == selTracklet.index)
+                            sld.selected = true;
+                }
+
+                this.g.selectAll("g.SSC-LinearStack")
+                    .classed("SSC-hit", d => d.tracks.length > 0)
+                    .classed("SSC-selected", d => d.selected);
+            }
+        }
+
+        class TrackPathComponent extends BaseComponent {
+            constructor(width, height, parent, xlab, ylab, xSel, ySel, xsign = 1, ysign = 1, xmax = 400, ymax = 400) {
+                super(width, height);
+
+                this.container = parent.append("g").attr("class", "trackPath")
+                    .attr("transform", "translate(" + this.width / 2 + "," + this.height / 2 + ")");
+
+                this.background = this.container.append("g");
+                this.g = this.container.append("g");
+
+                const minDim = 0.9 * Math.min(this.width, this.height) / 2;
+
+                const xscale = this.xscale = d3.scaleLinear()
+                    .range([-minDim * xsign, minDim * xsign])
+                    .domain([-xmax, xmax]);
+
+                const yscale = this.yscale = d3.scaleLinear()
+                    .range([minDim * ysign, -minDim * ysign])
+                    .domain([-ymax, ymax]);
+
+                this.line = d3.line().x(d => xscale(xSel(d))).y(d => yscale(ySel(d)));
+
+                this.xaxis = d3.axisBottom(this.xscale);
+                this.yaxis = d3.axisLeft(this.yscale);
+
+                this.g.append("g")
+                    .attr("class", "x-axis")
+                    .call(this.xaxis);
+
+                this.g.append("g")
+                    .attr("class", "y-axis")
+                    .call(this.yaxis);
+
+                this.paths = this.g.append("g")
+                    .attr("class", "paths");
+
+                this.g.append("text")
+                    .attr("class", "y-label")
+                    .attr("y", this.yscale.range()[1])
+                    .attr("x", 10)
+                    .text(ylab);
+
+                this.g.append("text")
+                    .attr("class", "x-label")
+                    .attr("x", this.xscale.range()[1])
+                    .attr("y", -10)
+                    .text(xlab);
+            }
+
+            draw(event, selectedTrack) {
+                const trackPaths = event.TrdTracks.filter(d => d.TrackMatch != null && d.TrackMatch.Path != null);
+                const line = this.line;
+
+                const selection = this.paths.selectAll("path.TP")
+                    .data(trackPaths)
+                    .join(
+                        enter => enter.append("path").attr("class", "TP"),
+                        null,
+                        exit => exit.remove()
+                    )
+                    .attr("data-track-ref", d => d.Ref)
+                    .attr("d", d => line(d.TrackMatch.Path))
+                    .classed("TP-selected", d => selectedTrack != null && d.index == selectedTrack.index)
+                    ;
+            }
+        }
+
+        class TrackPathXYComponent extends TrackPathComponent {
+            constructor(width, height, parent, xlab, ylab, xSel, ySel, xsign = 1, ysign = 1) {
+                super(width, height, parent, xlab, ylab, xSel, ySel, xsign, ysign);
+
+                const xscale = this.xscale, yscale = this.yscale;
+
+                this.background.append("circle")
+                    .attr("class", "TPA-detector-outer")
+                    .attr("r", xscale(368));
+
+                this.background.append("circle")
+                    .attr("class", "TPA-detector-inner")
+                    .attr("r", xscale(290));
+            }
+        }
+
+        class TrackPathRadialComponent extends TrackPathComponent {
+            constructor(width, height, parent, xlab, ylab, xSel, ySel, xsign = 1, ysign = 1, xmax, ymax) {
+                super(width, height, parent, xlab, ylab, xSel, ySel, xsign, ysign, xmax, ymax);
+
+                const xscale = this.xscale, yscale = this.yscale;
+                const detectorPoints = [
+                    [-301, 368],
+                    [301, 368],
+                    [301, 290],
+                    [-301, 290],
+                    [-301, 368]
+                ].map(d => [xscale(d[0]), yscale(d[1])]);
+
+                this.background.append("path")
+                    .attr("class", "TPR-detector")
+                    .attr("d", d3.line()(detectorPoints));
+            }
+        }
+    </script>
+    <script>
+        // JSTree conversion functions
+        function trdTrackletToJseTreeNode(parentId, t) {
+            return {
+                id: parentId + "_L" + t.index,
+                text: "Stack: " + DetectorToStack(t.Detector) + " Sector: " + DetectorToSector(t.Detector) + " Layer: " + DetectorToLayer(t.Detector),
+                data: t,
+                type: "TrdTracklet"
+            };
+        }
+
+        function trdTrackToJSTreeNode(parentId, t) {
+            return {
+                id: parentId + "_T" + t.index,
+                text: "TrdTrack " + t.Id + " Stack: " + t.Stack + " Sector: " + t.Sector,
+                data: t,
+                type: "TrdTrack",
+                children: t.TrdTracklets.map(tlt => trdTrackletToJseTreeNode(parentId + "_T" + t.index, tlt))
+            };
+        }
+
+        function eventToJSTreeNode(e, index) {
+            const id = "E" + index;
+            return {
+                id: id,
+                text: "Event " + e.Event,
+                type: "Event",
+                data: e,
+                state: {
+                    opened: false,
+                },
+                children:
+                    e.TrdTracks.map(tr => trdTrackToJSTreeNode(id, tr))
+                        .concat([{
+                            id: id + "_CTracklets",
+                            text: "Tracklets",
+                            children: e.TrdTracklets.map(tlt => trdTrackletToJseTreeNode(id, tlt))
+                        }])
+            };
+        }
+    </script>
+    <script>
+        function r(xyz) {
+            return Math.sqrt(Math.pow(xyz[0], 2) + Math.pow(xyz[1], 2) + Math.pow(xyz[2], 2));
+        }
+
+        function polar(xyz) {
+            return Math.acos(xyz[2] / r(xyz)) * 180 / Math.PI;
+        }
+
+        function azimuth(xyz) {
+            return Math.atan2(xyz[1], xyz[0]) * 180 / Math.PI;
+        }
+
+        // Event Display
+        const sectorLayer = new SectorXYComponent(200, 200, d3.select("#sectorLayer")
+            .attr("viewBox", "0 0 250 250"));
+        const stackLayer = new SupermoduleZAxisComponent(600, 300, d3.select("#supermoduleZ")
+            .attr("viewBox", "0 0 600 300"));
+        
+        const trdDimensions = getDimensions();
+        const supermoduleXYPlane = new SupermoduleXYPlaneComponent(300, 300, d3.select("#supermoduleXY"), trdDimensions);
+
+        const stackSector = new CylinderComponent(100, 200, d3.select("#stackSector")
+            .attr("viewBox", "0 0 100 200"));
+        const trackPathXY = new TrackPathXYComponent(300, 300, d3.select("#trackPathXY")
+            .attr("viewBox", "0 0 300 300"), "X", "Y", d => d[0], d => d[1]);
+        const trackPathZR = new TrackPathRadialComponent(300, 300, d3.select("#trackPathZR")
+            .attr("viewBox", "0 0 300 300"), "Z", "R", d => d[2], d => Math.sqrt(Math.pow(d[1], 2) + Math.pow(d[0], 2)), -1, 1);
+        const trackPathZAzi = new TrackPathRadialComponent(300, 300, d3.select("#trackPathZAzi")
+            .attr("viewBox", "0 0 300 300"), "Z", "Azimuth", d => d[2], azimuth, -1, 1, 400, 180);
+        const trackPathZPolar = new TrackPathRadialComponent(300, 300, d3.select("#trackPathZPolar")
+            .attr("viewBox", "0 0 300 300"), "Z", "Polar", d => d[2], polar, -1, 1, 400, 180);
+        const trackPathZY = new TrackPathComponent(300, 300, d3.select("#trackPathZY")
+            .attr("viewBox", "0 0 300 300"), "Z", "Y", d => d[2], d => d[1], -1, 1);
+        const trackPathZX = new TrackPathComponent(300, 300, d3.select("#trackPathZX")
+            .attr("viewBox", "0 0 300 300"), "Z", "X", d => d[2], d => d[0], -1, 1);
+        const data = getData();
+
+        for (const event of data) {
+            for (let index = 0; index < event.TrdTracklets.length; index++) {
+                event.TrdTracklets[index].index = index;
+            }
+
+            for (let trdTrackIndex = 0; trdTrackIndex < event.TrdTracks.length; trdTrackIndex++) {
+                event.TrdTracks[trdTrackIndex].index = trdTrackIndex;
+
+                for (const trackTracklet of event.TrdTracks[trdTrackIndex].TrdTracklets) {
+                    for (const trdTracklet of event.TrdTracklets)
+                        if (trdTracklet.Ref === trackTracklet.Ref)
+                            trackTracklet.index = trdTracklet.index;
+                }
+            }
+        }
+
+        const treeData = data.map(eventToJSTreeNode);
+
+        function treeSelect(event, eventData) {
+            const ids = eventData.node.id.split("_").map(d => [d[0], d.slice(1)]);
+            var event = null, trdTrack = null, trdTracklets = [];
+            for (const id of ids) {
+                const prefix = id[0];
+                const index = id[1];
+                //console.log(prefix, index);
+                if (prefix == "E")
+                    event = data[+index];
+
+                if (prefix == "T" && event != null) {
+                    trdTrack = event.TrdTracks[+index];
+                    trdTracklets = trdTrack.TrdTracklets;
+                }
+
+                if (prefix == "L" && event != null) {
+                    trdTracklets = [event.TrdTracklets[+index]];
+                }
+            }
+
+            if (event != null) {
+                stackSector.draw(event, trdTracklets);
+                sectorLayer.draw(event, trdTracklets);
+                stackLayer.draw(event, trdTracklets);
+                supermoduleXYPlane.draw(event, trdTrack);
+                trackPathXY.draw(event, trdTrack);
+                trackPathZR.draw(event, trdTrack);
+                trackPathZAzi.draw(event, trdTrack);
+                trackPathZPolar.draw(event, trdTrack);
+                trackPathZY.draw(event, trdTrack);
+                trackPathZX.draw(event, trdTrack);
+            }
+        }
+
+        $("#dataTree")
+            .on("hover_node.jstree", treeSelect)
+            .on("select_node.jstree", treeSelect)
+            .jstree({
+                'core': {
+                    'themes': {
+                        'name': 'proton',
+                        'responsive': true
+                    },
+                    'data': treeData
+                }
+            });
+
+        setTimeout(() => $("#dataTree").jstree("select_node", treeData[2].children[0]), 500);
+    </script>
+</body>
+
+</html>
