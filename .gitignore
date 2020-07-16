@@ -1,2 +1,9 @@
 ~*.xlsx
 data/old/
+openday/
+.vscode/
+data/*
+data/data*.js
+geometry/*.json
+js/
+py/

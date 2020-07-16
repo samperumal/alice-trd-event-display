@@ -1,0 +1,43 @@
+.supermodule-view-component rect.detector {
+    fill: none;
+    stroke: darkgray;
+}
+
+.supermodule-view-component .detector.not-selected, .supermodule-view-component g.track.not-selected {
+    stroke: #ffdddd;
+}
+
+.supermodule-view-component .track path {
+    fill: none;
+    stroke: #3392e3;
+    stroke-dasharray: 5;
+    stroke-width: 2px;
+}
+
+.supermodule-view-component .track.not-selected path {
+    stroke: #a9d7ff;
+    stroke-width: 0.3;
+}
+
+.supermodule-view-component rect.bin {
+    stroke: rgb(233, 233, 233);   
+    fill: none; 
+}
+
+.supermodule-view-component rect.tracklet {
+    fill: #f99997;
+}
+
+.supermodule-view-component rect.tracklet.selected {
+    fill: rgb(209, 39, 39); 
+}
+
+.supermodule-view-component rect.tracklet.not-selected {
+    fill: #fdf4f4;
+}
+
+.supermodule-view-component rect.zoom-box {
+    fill: rgb(250, 250, 250);
+    stroke: darkgray;
+    
+}
