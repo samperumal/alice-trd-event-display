@@ -3,8 +3,7 @@ function getDigitsLoadUrl(eventNo, sector, stack) {
 }
 
 function getData() {
- return 
- [
+ return [
   {
    "id": "E15",
    "i": {

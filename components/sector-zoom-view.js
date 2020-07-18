@@ -1,4 +1,8 @@
-class SectorZoomViewComponent extends ComponentBase {
+import { ComponentBase, marginDef } from './component-base.js';
+import { rotate } from './common-functions.js';
+import { geomZoomSectorXYPlanePads, geomZoomSectorXYPlaneModules } from '../geometry/geometries.js';
+
+export class SectorZoomViewComponent extends ComponentBase {
     constructor(id, width, height, viewBox, config) {
         super(id, width, height, marginDef(5, 5, 5, 5), viewBox);
 

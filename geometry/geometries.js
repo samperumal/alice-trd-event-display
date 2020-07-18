@@ -1,4 +1,4 @@
-function geomSectorXYPlane() { const dims = [
+export function geomSectorXYPlane() { const dims = [
     {
         "sec": 0,
         "lyr": 0,
@@ -3676,7 +3676,7 @@ function geomSectorXYPlane() { const dims = [
 	return dims;
 }
 
-function geomZoomSectorXYPlaneModules() { const dims = [
+export function geomZoomSectorXYPlaneModules() { const dims = [
     {
         "lyr": 0,
         "d": [
@@ -3808,7 +3808,7 @@ function geomZoomSectorXYPlaneModules() { const dims = [
 	return dims;
 }
 
-function geomZoomSectorXYPlanePads() { const dims = [
+export function geomZoomSectorXYPlanePads() { const dims = [
     {
         "l": 0,
         "c": 0,
@@ -22822,7 +22822,7 @@ function geomZoomSectorXYPlanePads() { const dims = [
 	return dims;
 }
 
-function geomStackZRPlaneModules() { const dims = [
+export function geomStackZRPlaneModules() { const dims = [
     {
         "stk": 0,
         "lyr": 0,
@@ -23488,7 +23488,7 @@ function geomStackZRPlaneModules() { const dims = [
 	return dims;
 }
 
-function geomStackZRPlanePads() { const dims = [
+export function geomStackZRPlanePads() { const dims = [
     {
         "rid": 0,
         "s": 0,
@@ -34606,7 +34606,7 @@ function geomStackZRPlanePads() { const dims = [
 	return dims;
 }
 
-function geomSectorXYPlaneTPC() { const dims = [
+export function geomSectorXYPlaneTPC() { const dims = [
     [
         {
             "x": 0.0,
@@ -34912,7 +34912,7 @@ function geomSectorXYPlaneTPC() { const dims = [
 	return dims;
 }
 
-function geomSectorZRPlaneTPC() { const dims = [
+export function geomSectorZRPlaneTPC() { const dims = [
     {
         "x": -250.0,
         "y": 250.0

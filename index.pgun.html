@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <script src="d3.min.js"></script>
+
+    <script src="jquery.min.js"></script>
+    <script src="jquery-ui.js"></script>
+    <script src="jstree.min.js"></script>
+
+    <script src="common-functions.js"></script>
+    <script src="geometry/geometries.js"></script>
+    <script src="components/trd-dimensions.js"></script>
+    <script src="components/padrow-dimensions.js"></script>
+    <script src="components/component-base.js"></script>
+    <script src="components/sector-view.js"></script>
+    <script src="components/sector-zoom-view.js"></script>
+    <script src="components/supermodule-view.js"></script>
+    <script src="components/supermodule-zoom-view.js"></script>
+    <script src="components/digits-view.js"></script>
+    <script src="components/event-tree.js"></script>
+    <script src="components/component-coordinator.js"></script>
+    <script src="components/track-information.js"></script>
+    <script src="components/timebin-view.js"></script>
+    <script src="components/display-mapper.js"></script>
+
+    <script src="data/pgun/script.js"></script>
+
+    <title>ALICE TRD Event Display</title>
+
+    <link href='./proton/style.min.css' rel='stylesheet' />
+    <link href='./components/sector-view.css' rel='stylesheet' />
+    <link href='./components/supermodule-view.css' rel='stylesheet' />
+    <link href='./components/digits-view.css' rel='stylesheet' />
+    <link href='./components/timebin-view.css' rel='stylesheet' />
+    <link href='./components/track-information.css' rel='stylesheet' />
+
+    <link rel="stylesheet" href="jquery-ui.css">
+
+    <style>
+        *,
+        *:before,
+        *:after {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.428571429;
+            /* background-color: #6d6d6d; */
+
+            margin: 0px;
+            padding: 0px;
+        }
+
+        div {
+            /* border: 1px solid black; */
+            box-sizing: border-box;
+        }
+
+        svg {
+            /* width: 100%;
+            height: 90%; */
+        }
+
+        .page {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            flex: 1 1;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 8vh;
+        }
+
+        .logo {
+            background-image: url("img/alice_logo.png");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            width: 7vh;
+            height: 7.3vh;
+            display: inline-block;
+            margin-left: 1em;
+            margin-right: 1em;
+        }
+
+        .header-text {
+            display: inline-block;
+            vertical-align: bottom;
+            margin-left: 0.5em;
+            margin-right: 1em;
+            color: #b7412d;
+            font-size: 2.5em;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .content {
+            flex: 1 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .row {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-content: stretch;
+            align-items: stretch;
+            justify-content: space-evenly;
+        }
+
+        .col1,
+        .col2,
+        .col3,
+        .col4 {
+            max-height: 40vh;
+            margin-top: 1em;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .col1 {
+            flex: 1 1 20%;
+        }
+
+        .col2,
+        .col3 {
+            flex: 1 1 25%;
+        }
+
+        .col4 {
+            flex: 1 1 30%;
+        }
+
+        .col-header {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 0.25em;
+            color: darkslategray;
+        }
+
+        #timebin-view,
+        #track-information,
+        #dataTree {
+            overflow-y: auto;
+            max-height: 36vh;
+        }
+
+        .legend {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            height: 8vh;
+        }
+
+        .legend-header {
+            font-weight: bold;
+            font-size: 16px;
+            align-self: center;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 10px;
+            display: inline-block;
+            margin-right: 5px;
+            border: 1px darkgray solid;
+        }
+
+        .legend-text {
+            display: inline-block;
+        }
+
+        .legend-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 20px;
+        }
+
+        @media screen and (min-width: 1001px) and (max-width: 1400px) {
+
+            .col1,
+            .col2,
+            .col3,
+            .col4 {
+                flex: 1 1 33%;
+            }
+
+            #timebin-container,
+            #threejs-container {
+                order: 2;
+            }
+        }
+
+        @media screen and (min-width: 769px) and (max-width: 1000px) {
+
+            .col1,
+            .col2,
+            .col3,
+            .col4 {
+                flex: 1 1 50%;
+            }
+
+            .col1 {
+                order: 0;
+            } 
+
+            .col2 {
+                order: 1;
+            }
+
+            .col3 {
+                order: 2;
+            }
+
+            .col4 {
+                order: 3;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+
+            .col1,
+            .col2,
+            .col3,
+            .col4 {
+                flex: 1 1 100%;
+            }
+
+            .legend-column {
+                flex: 1 1 50%;
+            }
+        }
+
+        @media screen and (max-width: 1400px) {
+
+            .legend {
+                height: auto;
+                margin-top: 1em;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .legend-header {
+                flex: 1 1 100%;
+                text-align: center;
+                margin-bottom: 1em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <div class="header">
+            <div class="logo"></div>
+            <div class="header-text">TRD Event Display</div>
+            <div class="logo"></div>
+        </div>
+        <div class="content">
+            <div class="row">
+                <div class="col1" id="event-tree-container">
+                    <div class="col-header">Available events</div>
+                    <div id="dataTree"></div>
+                </div>
+                <div class="col2">
+                    <div class="col-header">Beampipe view - XY plane</div>
+                    <svg id="sector-view">
+
+                    </svg>
+                </div>
+                <div class="col3">
+                    <div class="col-header">Supermodule view - ZY plane</div>
+                    <svg id="supermodule-view">
+
+                    </svg>
+                </div>
+                <div class="col4" id="threejs-container">
+                    <div class="col-header">3D interactive view</div>
+                    <canvas id="threejs-view" style="width: 100%; height: 80%;"></canvas>
+                    <div style="text-align: center;">
+                        <input id="toggleDetectors" type="button" value="Modules" />
+                        <input id="toggleTracks" type="button" value="Tracks" />
+                        <input id="toggleTracklets" type="button" value="Tracklets" />
+                        <input id="toggleRotation" type="button" value="Rotate" />
+                        <input id="resetControls" type="button" value="Reset" />
+                    </div>
+                </div>
+                <div style="height: 2vh;"></div>
+                <div class="col1" id="track-information-container">
+                    <div class="col-header">Track information</div>
+                    <div id="track-information" class="track-information">
+                        <div class="info-title">Event</div>
+                        <div style="text-align: center;" class="info-event"></div>
+                        <div class="info-title info-track">Track</div>
+                        <div style="text-align: center;" class="info-track info-track-text"></div>
+                        <div class="info-title info-tracklets">Tracklets</div>
+                        <div style="text-align: center;" class="info-tracklets info-tracklets-text"></div>
+                        <div class="info-title">Triggers</div>
+                        <div style="text-align: center;" class="info-triggers"></div>
+                    </div>
+                </div>
+                <div class="col2">
+                    <div class="col-header">Module detail - front</div>
+                    <svg id="sector-zoom-view">
+
+                    </svg>
+                </div>
+                <div class="col3">
+                    <div class="col-header">Module detail - side</div>
+                    <svg id="supermodule-zoom-view">
+
+                    </svg>
+                </div>
+                <div class="col4" id="timebin-container">
+                    <div class="col-header">Raw data for selected track</div>
+                    <div id="timebin-view">
+                        <svg id="timebin-view-zoom">
+
+                        </svg>
+                    </div>
+                </div>
+
+            </div>
+            <div class="legend">
+                <div class="legend-header">Legend</div>
+                <div class="legend-column">
+                    <div>
+                        <div style="border: darkgray 2px solid;" class="legend-color"></div>
+                        <div class="legend-text">Detector module</div>
+                    </div>
+                    <div>
+                        <div style="border-color: lightgray;" class="legend-color"></div>
+                        <div class="legend-text">Detector pad</div>
+                    </div>
+                    <div>
+                        <div style="background-color: #f4f4f4; border: none;" class="legend-color"></div>
+                        <div class="legend-text">ALICE TPC</div>
+                    </div>
+                </div>
+                <div class="legend-column">
+                    <div>
+                        <div style="background-color: #3392e3;" class="legend-color"></div>
+                        <div class="legend-text">Selected TRD track</div>
+                    </div>
+                    <div>
+                        <div style="background-color: #b37ce5;" class="legend-color"></div>
+                        <div class="legend-text">Other TRD track</div>
+                    </div>
+                    <div>
+                        <div style="background-color: #cfe9ff;" class="legend-color"></div>
+                        <div class="legend-text">Background track</div>
+                    </div>
+                </div>
+                <div class="legend-column">
+                    <div>
+                        <div style="background-color: #f03b20;" class="legend-color"></div>
+                        <div class="legend-text">Selected TRD tracklet</div>
+                    </div>
+                    <div>
+                        <div style="background-color: #feb24c;" class="legend-color"></div>
+                        <div class="legend-text">Matched TRD tracklet</div>
+                    </div>
+                    <div>
+                        <div style="background-color: #ffeda0;" class="legend-color"></div>
+                        <div class="legend-text">Other TRD tracklet</div>
+                    </div>
+                </div>
+                <div class="legend-column">
+                    <div>
+                        <svg class="legend-color time-bin-view">
+                            <path d="M0,4 L20,4" class="tracklet"></path>
+                        </svg>
+                        <div class="legend-text">Lorentz corrected tracklet</div>
+                    </div>
+                    <div>
+                        <svg class="legend-color time-bin-view">
+                            <path d="M0,4 L20,4" class="tracklet lorentz"></path>
+                        </svg>
+                        <div class="legend-text">Raw reconstructed tracklet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="module">
+        import { ThreejsComponent } from './components/threejs-view.js';
+
+        function ajoin(a, b) { return a.concat(b); }
+
+        const data = [...mapToDisplayDataFormat(getData())];
+
+        const digitsLoadUrl = getDigitsLoadUrl;
+
+        const coordinator = new ComponentCoordinator(data);
+
+        const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
+
+        coordinator.addComponent(new TrackInformationComponent("#track-information"));
+
+        coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
+        coordinator.addComponent(new SectorZoomViewComponent("#sector-zoom-view", 300, 300));
+        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
+        coordinator.addComponent(new SupermoduleZoomViewComponent("#supermodule-zoom-view", 300, 300));
+
+        // ** ThreeJS initialisation
+        const three = new ThreejsComponent("threejs-view");
+        coordinator.addComponent(three);
+        document.getElementById("toggleDetectors").addEventListener("click", three.toggleDetectors.bind(three));
+        document.getElementById("toggleTracklets").addEventListener("click", three.toggleTracklets.bind(three));
+        document.getElementById("toggleTracks").addEventListener("click", three.toggleTracks.bind(three));
+        document.getElementById("toggleRotation").addEventListener("click", three.toggleRotation.bind(three));
+        document.getElementById("resetControls").addEventListener("click", three.resetControls.bind(three));
+        // ** ThreeJS initialisation
+
+        coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
+            dataLoadUrl: digitsLoadUrl
+        }));
+
+        // const timebinDisplay = $("timebin-display");
+        // $("#timebin-slider").slider({
+        //     value: 0,
+        //     min: 0,
+        //     max: 29,
+        //     step: 1,
+        //     change: function (event, ui) {
+        //         $("#timebin-display").val(ui.value);
+        //     }
+        // });
+
+        // const digitsView = new DigitsViewComponent("#digits-view", 1480, 650, null, {
+        //     eventInput: "#event-input",
+        //     sectorInput: "#sector-input",
+        //     stackInput: "#stack-input",
+        //     maxCsumInput: "#max-csum-input",
+        //     buttons: ["#load-digits"],
+        //     dataLoadUrl: digitsLoadUrl,
+        //     padClick: coordinator.padSelect.bind(coordinator),
+        //     timeBinChange: (timebin) => { $("#timebin-slider").slider("option", "value", timebin); }
+        // });
+
+        // $("#timebin-slider").on("slide", function (event, ui) {
+        //     digitsView.drawPads(ui.value);
+        //     $("#timebin-display").val(ui.value);
+        // });
+
+        // coordinator.addComponent(digitsView);
+
+        if (true) {
+            setTimeout(function () {
+                //$("#dataTree").jstree("select_node", tree.treeData[2].children[1]);
+                // tree.changeSelection();
+                //digitsView.drawDigits();
+            }, 1500);
+        }
+
+    </script>
+</body>
+
+</html>

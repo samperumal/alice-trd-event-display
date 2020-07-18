@@ -6,3 +6,4 @@ data/*
 data/data*.js
 geometry/*.json
 js/
+py/

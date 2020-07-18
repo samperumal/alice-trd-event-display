@@ -1,4 +1,8 @@
-class TimebinViewComponent extends ComponentBase {
+import { ComponentBase, marginDef, dist } from './component-base.js';
+import { rotate, rid } from './common-functions.js';
+import { geomZoomSectorXYPlanePads } from '../geometry/geometries.js';
+
+export class TimebinViewComponent extends ComponentBase {
     constructor(id, width, height, viewBox, config) {
         super(id, width, height, marginDef(5, 5, 5, 5), `0 0 ${width} ${height}`);
 

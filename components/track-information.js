@@ -1,4 +1,4 @@
-class TrackInformationComponent {
+export class TrackInformationComponent {
     constructor(id, config) {
         const div = this.div = d3.select(id);
         this.info_event = div.select("div.info-event");

@@ -1,8 +1,8 @@
-function dist(a, b, scale) {
+export function dist(a, b, scale) {
     return Math.abs(scale(a) - scale(b));
 }
 
-function marginDef(left, right, top, bottom) {
+export function marginDef(left, right, top, bottom) {
     return {
         left: left,
         right: right,
@@ -13,7 +13,7 @@ function marginDef(left, right, top, bottom) {
     };
 }
 
-class ComponentBase {
+export class ComponentBase {
     constructor(id, width, height, margin, viewBox) {
         let container = d3.select(id);
 

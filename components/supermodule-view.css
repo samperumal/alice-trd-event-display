@@ -33,13 +33,13 @@
 .supermodule-view-component path.tracklet.other {
     stroke: lightgray;
     stroke-width: 0.2px;
-    fill: #ffeda0;
+    fill: #f5d443;
 }
 
 .supermodule-view-component path.tracklet.matched {
     stroke: lightgray;
     stroke-width: 0.2px;
-    fill: #feb24c;
+    fill: #faa535;
 }
 
 .supermodule-view-component path.tracklet.selected, .supermodule-view-component path.tracklet {

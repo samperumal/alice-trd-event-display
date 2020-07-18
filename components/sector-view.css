@@ -40,11 +40,12 @@
 }
 
 .sector-view-component path.tracklet.other {
-    stroke:#ffeda0;
+    stroke:#f5d443;
+    fill: black;
 }
 
 .sector-view-component path.tracklet.matched {
-    stroke: #feb24c;
+    stroke: #faa535;
 }
 
 .sector-view-component path.tracklet.selected {

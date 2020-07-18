@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="d3.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="jstree.min.js"></script>
+
+    <script src="components/trd-dimensions.js"></script>
+    <script src="components/component-base.js"></script>
+    <script src="components/sector-view.js"></script>
+    <script src="components/supermodule-view.js"></script>
+    <script src="components/digits-view.js"></script>
+    <script src="components/event-tree.js"></script>
+    <script src="components/component-coordinator.js"></script>
+    <script src="components/track-information.js"></script>
+    <script src="components/timebin-view.js"></script>
+
+    <script src="data.min.js"></script>
+
+    <title>ALICE TRD Event Display - version 2</title>
+
+    <link href='./proton/style.min.css' rel='stylesheet' />
+    <link href='./components/sector-view.css' rel='stylesheet' />
+    <link href='./components/supermodule-view.css' rel='stylesheet' />
+    <link href='./components/digits-view.css' rel='stylesheet' />
+    <link href='./components/timebin-view.css' rel='stylesheet' />
+
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <style>
+        *,
+        *:before,
+        *:after {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.428571429;
+            /* background-color: #6d6d6d; */
+        }
+
+        .ui-draggable,
+        .ui-droppable {
+            background-position: top;
+        }
+
+        svg {
+            border: 1px solid black;
+        }
+
+        p {
+            margin: 0 0 10px;
+        }
+
+        div.navigation {
+            
+        }
+
+        div.row {}
+
+        div.column {}
+
+        div.column.main-content {}
+
+        #tree-container {
+            height: 300px;
+            overflow: auto;
+        }
+
+        div.component-container {
+        }
+
+        div.component {
+            margin-right: 0.5em;
+            margin-bottom: 1.5em;
+        }
+
+        div.component p {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 0.25em;
+        }
+
+        div.time-bin-view {
+            max-height: 650px;
+            overflow-y: scroll;
+        }
+
+        #sector-view-zoom {
+            stroke-width: 0.1;
+            font-size: 5px;
+        }
+
+        #sector-view-zoom g.tracklet-plane {
+            stroke-width: 0.3;
+        }
+
+        #supermodule-view-zoom {
+            stroke-width: 0.3;
+            font-size: x-small;
+        }
+
+        #sector-view .sector-view-component text.layer-number {
+            display: none;
+        }
+
+        #sector-view-zoom .sector-view-component text.layer-number {
+            font-size: 2px;
+        }
+
+        #sector-view-zoom .zoom-box {
+            display: none;
+        }
+
+        #sector-view-zoom .sector-view-component path.track {
+            stroke-dasharray: 1;
+            stroke-width: 0.3px;
+        }
+
+        #sector-view-zoom .sector-view-component path.track.not-selected {
+            stroke-dasharray: 1;
+            stroke-width: 0.1px;
+        }
+
+        #supermodule-view-zoom .supermodule-view-component .track path {
+            stroke-dasharray: 2;
+            stroke-width: 0.8px;
+        }
+
+        #supermodule-view-zoom .supermodule-view-component .track.not-selected path {
+            stroke-dasharray: 1;
+            stroke-width: 0.3px;
+        }
+
+        input[type=number] {
+            width: 4em;
+            text-align: center;
+            margin-right: 1em;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="display: flex; flex-direction: column; ">
+        <div style="display: flex; flex-direction: row; justify-content: flex-start; flex-wrap: wrap; width: 100%;">
+            <div id="navigation-col">
+                <div class="component">
+                    <p >Available events</p>
+                    <div id="tree-container" style="border: 1px solid black;">
+                        <div id="dataTree">
+                        </div>
+                    </div>
+                </div>
+                <div class="component" style="vertical-align: top; padding-top: 0.4em;">
+                    <p>Track Information</p>
+                    <div style="width: 300px; height: 300px; padding: 1em; border: 1px solid black;">
+                        <table>
+                            <tbody id="track-information">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="sector-col">
+                <div class="component">
+                    <p>Sector view - XY plane</p>
+                    <svg id="sector-view" style="width: 300px; height: 300px;" preserveAspectRatio="xMidYMid"></svg>
+                </div>
+                <div class="component">
+                    <p>Sector detail view - XY plane</p>
+                    <svg id="sector-view-zoom" style="width: 300px; height: 300px;"
+                        preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+
+            </div>
+            <div id="stack-col">
+                <div class="component">
+                    <p>Supermodule view - ZY plane</p>
+                    <svg id="supermodule-view" style="width: 300px; height: 300px;"
+                        preserveAspectRatio="xMidYMid"></svg>
+                </div>
+                <div class="component">
+                    <p>Supermodule detail view - ZY plane</p>
+                    <svg id="supermodule-view-zoom" style="width: 300px; height: 300px;"
+                        preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+            </div>
+            <div id="time-bin-col" style="flex-grow: 1;">
+                <div class="component">
+                    <p>Time-bin view</p>
+                    <div class="time-bin-view" style="border: 1px solid black; text-align: center;">
+                        <svg id="timebin-view-zoom" style="width: 500px; height: 1600px; border: none;"
+                            preserveAspectRatio="xMidYMid meet"></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="display: flex; flex-direction: row;">
+            <div class="column">
+                <div class="component">
+                    <p>Digits detail view</p>
+                    <p>
+                        <span><label for="event-input">Event: </label><input type="number" value="11" id="event-input"
+                                min="0" /></span>
+                        <span><label for="sector-input">Sector: </label><input type="number" value="0" id="sector-input"
+                                min="0" /></span>
+                        <span><label for="stack-input">Stack: </label><input type="number" value="0" id="stack-input"
+                                min="0" /></span>
+                        <span><label for="max-csum-input">Max Cum. Sum: </label><input type="number" value="5000"
+                                id="max-csum-input" min="0" style="width: 6em;" /></span>
+                        <span><input type="button" value="Load" id="load-digits" /></span>
+                    </p>
+                    <div style="text-align: center;">
+                        <div style="display: inline-block; margin: 1em 2em; width: 50%; text-align: center;">
+                            <div>
+                                <label for="amount">Timebin: </label>
+                                <input type="text" id="timebin-display" readonly value="0"
+                                    style="border:0; color:#f6931f; font-weight:bold; width: 2em;">
+                            </div>
+                            <div id="timebin-slider" style="margin: 0 0;">
+                            </div>
+                        </div>
+                    </div>
+                    <canvas id="digits-view" width="1480" height="580" style="background: inherit;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const stackedLayerData = getStackedLayerDimensions();
+
+        function ajoin(a, b) { return a.concat(b); }
+
+        const data = getData();
+
+        data.forEach(ev => {
+            ev.trdTracks = ev.trdTracks
+                .filter(t => t.track != null && t.track.path != null && t.track.path.length > 0)
+
+                // Performance filtering
+                .slice(0, 25);
+            const usedTracklets = ev.trdTracks.map(t => t.trdTracklets.map(tl => tl.id)).reduce(ajoin);
+            ev.trdTracklets = ev.trdTracklets.filter(tl => usedTracklets.includes(tl.id) || Math.random() < 0.1);
+
+            ev.trdTracklets
+                .forEach(trklt => {
+                    trklt.layerDim = stackedLayerData.get(trklt.stack).get(trklt.layer);
+                })
+        });
+
+        const coordinator = new ComponentCoordinator(data);
+
+        const tree = new EventTree("#dataTree", data, coordinator.treeSelect.bind(coordinator));
+
+        coordinator.addComponent(new SectorViewComponent("#sector-view", 300, 300));
+        coordinator.addComponent(new SectorViewComponent("#sector-view-zoom", 300, 300, "-22 -129 44 44", { r: 0.75, rotate: true }));
+        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view", 300, 300));
+        coordinator.addComponent(new SupermoduleViewComponent("#supermodule-view-zoom", 300, 300, null, { zoom: true }));
+        coordinator.addComponent(new TimebinViewComponent("#timebin-view-zoom", 500, 1600, null, {
+            dataLoadUrl: "data/"
+        }));
+
+        coordinator.addComponent(new TrackInformationComponent("#track-information"));
+
+        const timebinDisplay = $("timebin-display");
+        $("#timebin-slider").slider({
+            value: 0,
+            min: 0,
+            max: 29,
+            step: 1,
+            change: function (event, ui) {
+                $("#timebin-display").val(ui.value);
+            }
+        });
+
+        const digitsView = new DigitsViewComponent("#digits-view", 1480, 650, null, {
+            eventInput: "#event-input",
+            sectorInput: "#sector-input",
+            stackInput: "#stack-input",
+            maxCsumInput: "#max-csum-input",
+            buttons: ["#load-digits"],
+            dataLoadUrl: "data/",
+            padClick: coordinator.padSelect.bind(coordinator),
+            timeBinChange: (timebin) => { $("#timebin-slider").slider("option", "value", timebin); }
+        });
+
+        $("#timebin-slider").on("slide", function (event, ui) {
+            digitsView.drawPads(ui.value);
+            $("#timebin-display").val(ui.value);
+        });
+
+        coordinator.addComponent(digitsView);
+
+        if (false) {
+            setTimeout(function () {
+                $("#dataTree").jstree("select_node", tree.treeData[1].children[1]);
+                digitsView.drawDigits();
+            }, 500);
+        }
+
+    </script>
+</body>
+
+</html>
