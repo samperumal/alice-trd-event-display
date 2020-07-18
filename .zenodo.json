@@ -1,0 +1,26 @@
+{
+    "description": "<p>Initial version demonstrated to UCT ALICE and ATLAS collaborations.</p>", 
+    "license": "other-open", 
+    "title": "ALICE TRD Event Display: v0.1-alpha", 
+    "version": "v0.1-alpha", 
+    "upload_type": "software", 
+    "publication_date": "2019-07-18", 
+    "creators": [
+        {
+            "name": "Sameshan Perumal"
+        }
+    ], 
+    "access_right": "open", 
+    "related_identifiers": [
+        {
+            "scheme": "url", 
+            "identifier": "https://github.com/samperumal/alice-trd-event-display/tree/version-1", 
+            "relation": "isSupplementTo"
+        }, 
+        {
+            "scheme": "doi", 
+            "identifier": "10.5281/zenodo.3951147", 
+            "relation": "isVersionOf"
+        }
+    ]
+}
