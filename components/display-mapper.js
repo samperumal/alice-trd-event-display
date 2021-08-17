@@ -14,7 +14,7 @@ export function* mapToDisplayDataFormat(data) {
                 
                 const x1l = layerDim.maxR;
                 const x2l = layerDim.minR;
-                const xr = Math.abs(layerDim.maxR - layerDim.minR);
+                const xr = 3;   // distance over which dy is measured (drift height)
 
                 const y1l = -t.lY;
                 const y2l = -t.lY + (t.dyDx * xr);
@@ -33,10 +33,11 @@ export function* mapToDisplayDataFormat(data) {
                     x1, -y1, z2,
                     x1, -y1, z1
                 ];
-                t.y1 = y1l;
-                t.y2 = y2l;
-                t.y2p = -t.lY + (t.dyDxAP * xr);
-                t.y2n = -t.lY + (t.dyDxAN * xr);
+                t.y1 = y1l;     // both tracklets' start point (top of display)
+                t.y2 = y2l;     // calibrated tracklet end point (bottom of display)
+                t.y2n = -t.lY + (t.dyDxAN * xr);    // raw tracklet end point (bottom)
+
+                t.y2p = -t.lY + (t.dyDxAP * xr);    // not used
 
                 trackletMap.set(t.id, t);
 
