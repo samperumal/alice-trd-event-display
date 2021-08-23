@@ -7,3 +7,4 @@ data/data*.js
 geometry/*.json
 js/
 py/
+node_modules/
