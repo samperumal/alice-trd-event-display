@@ -113,6 +113,17 @@ export class TimebinViewComponent extends ComponentBase {
             for (const index of d3.range(6)) {
                 const layer = sortedLayers[index];
 
+                // Find corresponding layer, if any, in digits data
+                const layerData = data.lyrs.find(l => l.lyr == layer);
+
+                // Determine number of timebins to display
+                let nBins = 30;
+                if (layerData != null && layerData.pads != null) {
+                    nBins = layerData.pads.reduce((acc, pad) => Math.max(pad.tbins != null ? pad.tbins.length : 0, acc), 0)
+                }
+
+                nBins += 1;
+
                 const trackletData = eventData.track.trklts.find(t => t.lyr == layer);
                 let location = null;
                 if (trackletData != null) {
@@ -138,7 +149,7 @@ export class TimebinViewComponent extends ComponentBase {
 
                     const ydomain = d3.extent(padBounds);
 
-                    const binydomain = d3.range(30);
+                    const binydomain = d3.range(nBins);
 
                     location = {
                         stack: trackletData.stk,
@@ -156,9 +167,6 @@ export class TimebinViewComponent extends ComponentBase {
                     }
                 }
                 else this.layerLabels[index].text(`No data`);
-
-                // Find corresponding layer, if any, in digits data
-                const layerData = data.lyrs.find(l => l.lyr == layer);
 
                 this.tbsumSubViews[index].draw(location, layerData);
                 this.padSubViews[index].draw(location, layerData, this.colourScale);
@@ -273,7 +281,7 @@ class TbsumSubView {
         this.xaxis.call(d3.axisBottom(this.xscale).ticks(5, "s"));
         
         this.binyscale.domain(location.binydomain);
-        this.yaxis.call(d3.axisRight(this.binyscale).tickValues(d3.range(0, d3.max(location.binydomain) + 1, 3)));
+        this.yaxis.call(d3.axisLeft(this.binyscale).tickValues(d3.range(0, d3.max(location.binydomain) + 1, 5)));
 
         const allRects = this.content.selectAll("rect.tbsum")
             .data(tbinSum);
@@ -373,7 +381,7 @@ class PadSubView {
             this.xscale.domain(padIndices);
             this.tscale.domain(location.ydomain);
             this.binyscale.domain(location.binydomain);
-            this.yaxis.call(d3.axisRight(this.binyscale).tickValues(d3.range(0, d3.max(location.binydomain) + 1, 3)));
+            this.yaxis.call(d3.axisRight(this.binyscale).tickValues(d3.range(0, d3.max(location.binydomain) + 1, 5)));
         }
         else {
             const minPad = Math.max(location.col - 2, 0);
@@ -405,7 +413,7 @@ class PadSubView {
 
         this.colourAxisGroup.call(d3.axisLeft(zscale));
 
-        this.colourAxisGroup.selectAll("text").style("fill", this.midColour);
+        // this.colourAxisGroup.selectAll("text").style("fill", this.midColour);
 
         const allPads = this.content.selectAll("rect.tbin")
             .data(pads)
@@ -418,9 +426,8 @@ class PadSubView {
             .attr("height", binyscale.bandwidth())
             .style("fill", d => colourScale(d.val));
 
-        this.trackletPath.attr("d", this.tline([[location.y1, 0], [location.y2, 29]]));
-        //this.trackletPathPos.attr("d", this.tline([[location.y1, 5], [location.y2p, 25]]));
-        this.trackletPathNeg.attr("d", this.tline([[location.y1, 0], [location.y2n, 29]]));
+        this.trackletPath.attr("d", this.tline([[location.y1, 0], [location.y2, location.binydomain.length - 1]]));
+        this.trackletPathNeg.attr("d", this.tline([[location.y1, 0], [location.y2n, location.binydomain.length - 1]]));
     }
 }
 
