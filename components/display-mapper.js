@@ -17,8 +17,14 @@ export function* mapToDisplayDataFormat(data) {
                 const xr = 3;   // distance over which dy is measured (drift height)
 
                 const y1l = -t.lY;
-                const y2l = -t.lY + (t.dyDx * xr);
 
+                // dy (in O2) is given over 3cm drift height. This is not 30 time bins. Currently it is fixed
+                // to ~20 time bins which is determined by vDrift. The event display draws 30 time bins, 
+                // therefore, the slope must be scaled accordingly.
+                const tbScaleFactor = 30 / 20;
+                
+                const y2l = -t.lY + (t.dyDx * tbScaleFactor * xr);
+                
                 const z1 = -(layerDim.minZ + layerDim.zsize * t.row);
                 const z2 = -(layerDim.minZ + layerDim.zsize * (t.row + 1));
                 
@@ -35,7 +41,7 @@ export function* mapToDisplayDataFormat(data) {
                 ];
                 t.y1 = y1l;     // both tracklets' start point (top of display)
                 t.y2 = y2l;     // calibrated tracklet end point (bottom of display)
-                t.y2n = -t.lY + (t.dyDxAN * xr);    // raw tracklet end point (bottom)
+                t.y2n = -t.lY + (t.dyDxAN * tbScaleFactor * xr);    // raw tracklet end point (bottom)
 
                 t.y2p = -t.lY + (t.dyDxAP * xr);    // not used
 
