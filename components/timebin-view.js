@@ -138,7 +138,7 @@ export class TimebinViewComponent extends ComponentBase {
 
                     const ydomain = d3.extent(padBounds);
 
-                    const binydomain = d3.range(25);
+                    const binydomain = d3.range(30);
 
                     location = {
                         stack: trackletData.stk,
@@ -418,9 +418,9 @@ class PadSubView {
             .attr("height", binyscale.bandwidth())
             .style("fill", d => colourScale(d.val));
 
-        this.trackletPath.attr("d", this.tline([[location.y1, 0], [location.y2, 24]]));
+        this.trackletPath.attr("d", this.tline([[location.y1, 0], [location.y2, 29]]));
         //this.trackletPathPos.attr("d", this.tline([[location.y1, 5], [location.y2p, 25]]));
-        this.trackletPathNeg.attr("d", this.tline([[location.y1, 0], [location.y2n, 24]]));
+        this.trackletPathNeg.attr("d", this.tline([[location.y1, 0], [location.y2n, 29]]));
     }
 }
 
