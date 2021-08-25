@@ -1,13 +1,13 @@
 <template>
   <div class="app-content">
-    <event-tree-component></event-tree-component>
-    <sector-view-component></sector-view-component>
-    <supermodule-view-component></supermodule-view-component>
-    <view-3-d-component></view-3-d-component>
-    <track-information-component></track-information-component>
-    <sector-zoom-view-component></sector-zoom-view-component>
-    <supermodule-zoom-view-component></supermodule-zoom-view-component>
-    <timebin-view-component></timebin-view-component>
+    <event-tree-component :data="data"></event-tree-component>
+    <sector-view-component :data="data"></sector-view-component>
+    <supermodule-view-component :data="data"></supermodule-view-component>
+    <view-3-d-component :data="data"></view-3-d-component>
+    <track-information-component :data="data"></track-information-component>
+    <sector-zoom-view-component :data="data"></sector-zoom-view-component>
+    <supermodule-zoom-view-component :data="data"></supermodule-zoom-view-component>
+    <timebin-view-component :data="data"></timebin-view-component>
   </div>
 </template>
 
@@ -33,6 +33,7 @@ export default defineComponent({
     TimebinViewComponent,
     SupermoduleZoomViewComponent,
   },
+  props: ["data"],
   setup() {},
 });
 </script>
@@ -46,5 +47,6 @@ export default defineComponent({
   /* This is better for small screens, once min() is better supported */
   /* grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr)); */
   gap: 0.5rem;
+  overflow-y: auto;
 }
 </style>
