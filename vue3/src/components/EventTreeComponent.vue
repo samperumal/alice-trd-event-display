@@ -1,16 +1,21 @@
 <template>
-  <div>
+  <div class="tree-container">
+    <div>Event Tree</div>
     <div v-if="data.loading">Loading</div>
-    <div v-else>Event Tree</div>
-    <div>{{ test }}</div>
+    <div v-else>
+      <div v-for="event in this.data.treeData" :key="event.id">
+        <div>{{ event.label }}</div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, isReactive } from "vue";
+import { defineComponent, isReactive, PropType } from "vue";
+import { DisplayData } from "../lib/types";
 
 export default defineComponent({
-  props: ["data"],
+  props: { data: { type: Object as PropType<DisplayData>, required: true } },
   setup() {},
   computed: {
     test() {
@@ -21,4 +26,8 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.tree-container {
+  background-color: coral;
+  overflow-y: auto;
+}
 </style>

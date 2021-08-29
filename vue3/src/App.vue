@@ -11,25 +11,33 @@ import AppFooter from "./components/AppFooter.vue";
 import AppHeader from "./components/AppHeader.vue";
 import axios from "axios";
 
+import { createEventTree } from "./lib/displayMap";
+import { PromiseTimeout } from "./lib/utils"
+
 export default defineComponent({
   components: { AppHeader, AppFooter, AppContent },
   setup() {
     const rawData = markRaw({});
     const data = reactive({
-      loading: true,
+      loading: false,
       treeData: {},
-      rawData
+      rawData,
     });
 
     return { data };
   },
   methods: {
     load() {
+      this.data.loading = true;
       axios
         .get("data/o2/data.json")
         .then((resp) => {
-          this.data.loading = false;
           this.data.rawData = markRaw(resp.data);
+          return PromiseTimeout(2 * 1000, resp)
+        })
+        .then((resp) => {
+          this.data.treeData = createEventTree(resp.data)
+          this.data.loading = false;
         })
         .catch((err) => console.error(err));
     },
