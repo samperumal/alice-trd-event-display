@@ -1,16 +1,25 @@
 export type DisplayData = {
-  loading: false,
-  treeData: EventTreeData,
-  rawData: EventData
+  loading: boolean,
+  treeData: SelectionTreeData,
+  rawData: EventData,
+  selectedEvent: SelectionTreeEvent | null,
+  selectedTrack: SelectionTreeEventTrack | null
 }
 
-export type EventTreeData = Array<{
+export type SelectionTreeData = Array<SelectionTreeEvent>
+
+export type SelectionTreeEvent = {
   id: string,
   label: string,
-  tracks: Array<{
-    label: string
-  }>
-}>
+  selected: boolean,
+  tracks: Array<SelectionTreeEventTrack>
+}
+
+export type SelectionTreeEventTrack = {
+  id: string,
+  label: string,
+  selected: boolean
+}
 
 export type EventData = Array<Event>
 
