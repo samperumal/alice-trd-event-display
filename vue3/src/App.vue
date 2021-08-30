@@ -5,50 +5,50 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, markRaw } from "@vue/runtime-core";
-import AppContent from "./components/AppContent.vue";
-import AppFooter from "./components/AppFooter.vue";
-import AppHeader from "./components/AppHeader.vue";
-import axios from "axios";
+import { defineComponent, reactive, markRaw } from '@vue/runtime-core'
+import AppContent from './components/AppContent.vue'
+import AppFooter from './components/AppFooter.vue'
+import AppHeader from './components/AppHeader.vue'
+import axios from 'axios'
 
-import { createEventTree } from "./lib/displayMap";
-import { PromiseTimeout } from "./lib/utils"
-import { DisplayData, EventData } from "./lib/types"
+import { createEventTree } from './lib/displayMap'
+import { PromiseTimeout } from './lib/utils'
+import { DisplayData, EventData } from './lib/types'
 
 export default defineComponent({
   components: { AppHeader, AppFooter, AppContent },
   setup() {
-    const rawData = markRaw([]);
-    const data : DisplayData = reactive<DisplayData>({
+    const rawData = markRaw([])
+    const data: DisplayData = reactive<DisplayData>({
       loading: false,
       treeData: [],
       rawData,
       selectedEvent: null,
       selectedTrack: null
-    });
+    })
 
-    return { data };
+    return { data }
   },
   mounted() {
     this.load()
   },
   methods: {
     load() {
-      this.data.loading = true;
+      this.data.loading = true
       axios
-        .get("data/o2/data.json")
+        .get('data/o2/data.json')
         .then((resp) => {
-          this.data.rawData = markRaw(resp.data);
+          this.data.rawData = markRaw(resp.data)
           return PromiseTimeout(0 * 1000, resp)
         })
-        .then((resp : { data: EventData }) => {
+        .then((resp: { data: EventData }) => {
           this.data.treeData = createEventTree(resp.data)
-          this.data.loading = false;
+          this.data.loading = false
         })
-        .catch((err) => console.error(err));
-    },
-  },
-});
+        .catch((err) => console.error(err))
+    }
+  }
+})
 </script>
 
 <style>
