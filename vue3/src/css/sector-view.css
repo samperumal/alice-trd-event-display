@@ -1,0 +1,85 @@
+.sector-view-component path.module {
+    fill: none;
+    stroke: darkgray;
+}
+
+.sector-view-component path.pad {
+    fill: none;
+    stroke: lightgray;
+    stroke-width: 0.2px;
+}
+
+.sector-view-component path.track {
+    fill: none;
+    stroke: #3392e3;
+    stroke-dasharray: 1;
+    stroke-width: 1px;
+}
+
+.sector-view-component path.track.other {
+    stroke: #b37ce5;
+}
+
+.sector-view-component path.track.esd {
+    stroke: #cfe9ff;
+}
+
+.sector-view-component path.track.selected {
+    stroke: #3392e3;
+    stroke-width: 3px;
+    stroke-dasharray: 2 1;
+}
+
+.sector-view-component path.tracklet {
+    stroke: #f03b20;
+    stroke-width: 1px;
+}
+
+.sector-view-component path.tracklet.zoom {
+    stroke-width: 3px;
+}
+
+.sector-view-component path.tracklet.other {
+    stroke:#f5d443;
+    fill: black;
+}
+
+.sector-view-component path.tracklet.matched {
+    stroke: #faa535;
+}
+
+.sector-view-component path.tracklet.selected {
+    stroke: #f03b20;
+    stroke-width: 3px;
+}
+
+.sector-view-component .zoom {
+    fill: transparent;
+}
+
+.sector-view-component text.sector-number {
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+
+.sector-view-component text.sector-number-title {
+    text-anchor: start;
+    dominant-baseline: central;
+    font-weight: bold;
+}
+
+.sector-view-component text.layer-number {
+    text-anchor: end;
+    dominant-baseline: text-after-edge;
+    font-size: 3px;
+}
+
+.sector-view-component .zoom-box {
+    fill: none;
+    stroke: darkgray;
+}
+
+.sector-view-component path.module.tpc {
+    fill: #f4f4f4;
+    stroke: none;
+}
