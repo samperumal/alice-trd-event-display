@@ -69,6 +69,11 @@ export class TrackInformationComponent {
             }
 
             tracklet_text = `${num_tracks} of the ${eventData.event.trklts.length} tracklets detected by the TRD have been matched to this track.`;
+            
+            tracklet_text += "<br/><br/> Tracklet64 words:"
+            for (var trklt of eventData.track.trklts){
+                tracklet_text += `<br/>Layer ${trklt.lyr}: ${trklt["64word"]}`;
+            }
         }
         this.info_track_text.html(track_text);
         this.info_track.style("display", track_text == "" ? "none" : "inherit");

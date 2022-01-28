@@ -13,40 +13,40 @@
     <meta property="og:image" content="https://datacartographer.com/alice-js/img/summary.png">
     <meta property="og:url" content="https://datacartographer.com/alice-js/">
 
-    <script src="d3.min.js"></script>
+    <script src="/d3.min.js"></script>
 
-    <script src="jquery.min.js"></script>
-    <script src="jquery-ui.js"></script>
-    <script src="jstree.min.js"></script>
+    <script src="/jquery.min.js"></script>
+    <script src="/jquery-ui.js"></script>
+    <script src="/jstree.min.js"></script>
 
-    <script nomodule src="components/common-functions.js"></script>
-    <script nomodule src="geometry/geometries.js"></script>
-    <script src="components/trd-dimensions.js"></script>
-    <script src="components/padrow-dimensions.js"></script>
-    <script nomodule src="components/component-base.js"></script>
-    <script nomodule src="components/sector-view.js"></script>
-    <script nomodule src="components/sector-zoom-view.js"></script>
-    <script nomodule src="components/supermodule-view.js"></script>
-    <script nomodule src="components/supermodule-zoom-view.js"></script>
+    <script nomodule src="/components/common-functions.js"></script>
+    <script nomodule src="/geometry/geometries.js"></script>
+    <script src="/components/trd-dimensions.js"></script>
+    <script src="/components/padrow-dimensions.js"></script>
+    <script nomodule src="/components/component-base.js"></script>
+    <script nomodule src="/components/sector-view.js"></script>
+    <script nomodule src="/components/sector-zoom-view.js"></script>
+    <script nomodule src="/components/supermodule-view.js"></script>
+    <script nomodule src="/components/supermodule-zoom-view.js"></script>
     <!-- <script src="components/digits-view.js"></script> -->
-    <script nomodule src="components/event-tree.js"></script>
-    <script nomodule src="components/component-coordinator.js"></script>
-    <script nomodule src="components/track-information.js"></script>
-    <script nomodule src="components/display-mapper.js"></script>
-    <script nomodule src="components/timebin-view.js"></script>
+    <script nomodule src="/components/event-tree.js"></script>
+    <script nomodule src="/components/component-coordinator.js"></script>
+    <script nomodule src="/components/track-information.js"></script>
+    <script nomodule src="/components/display-mapper.js"></script>
+    <script nomodule src="/components/timebin-view.js"></script>
     
-    <script src="data/cosmics/script.js"></script>
+    <script src="/data/pgun/script.js"></script>
     
     <title>ALICE TRD Event Display - final version</title>
 
-    <link href='./proton/style.min.css' rel='stylesheet' />
-    <link href='./components/sector-view.css' rel='stylesheet' />
-    <link href='./components/supermodule-view.css' rel='stylesheet' />
-    <link href='./components/digits-view.css' rel='stylesheet' />
-    <link href='./components/timebin-view.css' rel='stylesheet' />
-    <link href='./components/track-information.css' rel='stylesheet' />
+    <link href='/proton/style.min.css' rel='stylesheet' />
+    <link href='/components/sector-view.css' rel='stylesheet' />
+    <link href='/components/supermodule-view.css' rel='stylesheet' />
+    <link href='/components/digits-view.css' rel='stylesheet' />
+    <link href='/components/timebin-view.css' rel='stylesheet' />
+    <link href='/components/track-information.css' rel='stylesheet' />
 
-    <link rel="stylesheet" href="jquery-ui.css">
+    <link rel="stylesheet" href="/jquery-ui.css">
 
     <style>
         *,
@@ -92,7 +92,7 @@
         }
 
         .logo {
-            background-image: url("img/alice_logo.png");
+            background-image: url("/img/alice_logo.png");
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -407,22 +407,22 @@
         </div>
     </div>
     <script type="module" async>
-        import { ThreejsComponent } from './components/threejs-view.js';
-        import { ComponentCoordinator } from './components/component-coordinator.js';
-        import { EventTree } from './components/event-tree.js';
-        import { TrackInformationComponent } from './components/track-information.js';
+        import { ThreejsComponent } from '/components/threejs-view.js';
+        import { ComponentCoordinator } from '/components/component-coordinator.js';
+        import { EventTree } from '/components/event-tree.js';
+        import { TrackInformationComponent } from '/components/track-information.js';
 
-        import { SectorViewComponent } from './components/sector-view.js';
-        import { SectorZoomViewComponent } from './components/sector-zoom-view.js';
-        import { SupermoduleViewComponent } from './components/supermodule-view.js';
-        import { SupermoduleZoomViewComponent } from './components/supermodule-zoom-view.js';
-        import { TimebinViewComponent } from './components/timebin-view.js';
+        import { SectorViewComponent } from '/components/sector-view.js';
+        import { SectorZoomViewComponent } from '/components/sector-zoom-view.js';
+        import { SupermoduleViewComponent } from '/components/supermodule-view.js';
+        import { SupermoduleZoomViewComponent } from '/components/supermodule-zoom-view.js';
+        import { TimebinViewComponent } from '/components/timebin-view.js';
 
-        import { mapToDisplayDataFormat } from './components/display-mapper.js';
+        import { mapToDisplayDataFormat } from '/components/display-mapper.js';
 
         function ajoin(a, b) { return a.concat(b); }
 
-        const data = [...mapToDisplayDataFormat(await getDataAsync())];
+        const data = [...mapToDisplayDataFormat(await getData())];
 
         const digitsLoadUrl = getDigitsLoadUrl;
 
