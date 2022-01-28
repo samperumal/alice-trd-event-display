@@ -35,7 +35,7 @@
     <script nomodule src="components/display-mapper.js"></script>
     <script nomodule src="components/timebin-view.js"></script>
     
-    <script src="data/pPb/script.js"></script>
+    <script src="data/cosmics/script.js"></script>
     
     <title>ALICE TRD Event Display - final version</title>
 
@@ -422,7 +422,7 @@
 
         function ajoin(a, b) { return a.concat(b); }
 
-        const data = [...mapToDisplayDataFormat(await getData())];
+        const data = [...mapToDisplayDataFormat(await getDataAsync())];
 
         const digitsLoadUrl = getDigitsLoadUrl;
 
