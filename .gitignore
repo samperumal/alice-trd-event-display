@@ -8,3 +8,4 @@ geometry/*.json
 js/
 py/
 node_modules/
+!data/pilotBeampp
