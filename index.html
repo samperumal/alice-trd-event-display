@@ -35,7 +35,7 @@
     <script nomodule src="components/display-mapper.js"></script>
     <script nomodule src="components/timebin-view.js"></script>
     
-    <script src="data/pPb/script.js"></script>
+    <script src="./script.js"></script>
     
     <title>ALICE TRD Event Display - final version</title>
 
@@ -401,10 +401,12 @@
                         <div class="legend-text">Raw reconstructed tracklet</div>
                     </div>
                 </div>
+                <div class="legend-column">
+                </div>
             </div>
         </div>
     </div>
-    <script type="module">
+    <script type="module" async>
         import { ThreejsComponent } from './components/threejs-view.js';
         import { ComponentCoordinator } from './components/component-coordinator.js';
         import { EventTree } from './components/event-tree.js';
@@ -420,7 +422,7 @@
 
         function ajoin(a, b) { return a.concat(b); }
 
-        const data = [...mapToDisplayDataFormat(getData())];
+        const data = [...mapToDisplayDataFormat(await getDataAsync())];
 
         const digitsLoadUrl = getDigitsLoadUrl;
 
